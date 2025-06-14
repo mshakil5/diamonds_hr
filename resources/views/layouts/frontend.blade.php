@@ -43,13 +43,13 @@
 <body class="index-page">
   
    <!-- Navbar -->
-   <div class="container position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <nav class="navbar navbar-expand-lg  blur blur-rounded top-0 z-index-fixed shadow position-absolute my-3 py-2 start-0 end-0 mx-4">
+   <div class="container position-sticky z-index-sticky top-0 mb-5">
+      <div class="row">
+        <div class="col-12">
+          <nav class="navbar navbar-expand-lg  blur blur-rounded top-0 z-index-fixed shadow position-absolute my-3 py-2 start-0 end-0 mx-4">
           <div class="container-fluid px-0">
             <a class="navbar-brand font-weight-bolder ms-sm-3" href="{{route('homepage')}}" rel="tooltip">
-              PMK
+              {{ $company->company_name }}
             </a>
             <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon mt-2">
@@ -75,17 +75,17 @@
               </ul>
             </div>
           </div>
-    </nav>
-    <!-- End Navbar -->
+          </nav>
+          <!-- End Navbar -->
+        </div>
+      </div>
     </div>
-  </div>
-</div>
     
 
 
 
 
-<header class="header-2">
+<header class="header-2  d-none">
   <div class="page-header min-vh-100 relative" style="background-image: url('./frontend/assets/img/banner.jpg')">
 
     <div class="position-absolute w-100 z-index-1 bottom-0">
@@ -107,7 +107,7 @@
 </header>
 
 
-<section class="pt-3 pb-4" id="count-stats">
+<section class="pt-3 pb-4  d-none" id="count-stats">
   <div class="container">
     <div class="row">
       <div class="col-lg-6 z-index-2 border-radius-xl mt-n10 mx-auto py-3 blur shadow-blur">
@@ -135,7 +135,7 @@
 
 
 
-<section class="py-sm-2" id="download-soft-ui">
+<section class="py-sm-2  d-none" id="download-soft-ui">
   <div class="bg-gradient-dark position-relative m-3 border-radius-xl overflow-hidden">
     <img src="./frontend/assets/img/shapes/waves-white.svg" alt="pattern-lines" class="position-absolute start-0 top-md-0 w-100 opacity-6">
     <div class="container py-7 postion-relative z-index-2 position-relative">
@@ -152,11 +152,11 @@
 
 @yield('content')
 
-<footer class="footer pt-1 mt-1">
+<footer class="footer pt-1 mt-3">
   <hr class="horizontal dark mb-5">
   <div class="container">
     <div class=" row">
-      <div class="col-md-3 mb-4 ms-auto">
+      <div class="col-md-3 mb-4 ms-auto d-none">
         <div>
           <h6 class="text-gradient text-primary font-weight-bolder">Soft</h6>
         </div>
@@ -199,7 +199,7 @@
 
 
 
-      <div class="col-md-2 col-sm-6 col-6 mb-4">
+      <div class="col-md-2 col-sm-6 col-6 mb-4 d-none">
         <div>
           <h6 class="text-gradient text-primary text-sm">Company</h6>
           <ul class="flex-column ms-n3 nav">
@@ -213,7 +213,7 @@
         </div>
       </div>
 
-      <div class="col-md-2 col-sm-6 col-6 mb-4">
+      <div class="col-md-2 col-sm-6 col-6 mb-4  d-none">
         <div>
           <h6 class="text-gradient text-primary text-sm">Resources</h6>
           <ul class="flex-column ms-n3 nav">
@@ -227,7 +227,7 @@
         </div>
       </div>
 
-      <div class="col-md-2 col-sm-6 col-6 mb-4">
+      <div class="col-md-2 col-sm-6 col-6 mb-4  d-none">
         <div>
           <h6 class="text-gradient text-primary text-sm">Help & Support</h6>
           <ul class="flex-column ms-n3 nav">
@@ -243,7 +243,7 @@
         </div>
       </div>
 
-      <div class="col-md-2 col-sm-6 col-6 mb-4 me-auto">
+      <div class="col-md-2 col-sm-6 col-6 mb-4 me-auto  d-none">
         <div>
           <h6 class="text-gradient text-primary text-sm">Legal</h6>
           <ul class="flex-column ms-n3 nav">

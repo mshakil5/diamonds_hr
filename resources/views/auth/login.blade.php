@@ -1,11 +1,11 @@
 @extends('layouts.frontend')
 
 @section('content')
-<section class="pricing section light-background">
-    <div class="container">
+<section class="pricing section light-background mt-5">
+    <div class="container mt-5">
         <div class="row gy-4 justify-content-center">
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="pricing-item recommended">
+                <div class="pricing-item recommended mt-5">
                     <h3 class="text-center">Sign In</h3>
 
                     @if (isset($message))

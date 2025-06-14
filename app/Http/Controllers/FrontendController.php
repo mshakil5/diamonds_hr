@@ -16,6 +16,11 @@ class FrontendController extends Controller
         return view('frontend.index', compact('blogs'));
     }
 
+    public function login()
+    {
+        return view('auth.login');
+    }
+
     public function about()
     {
         $aboutUs = CompanyDetails::select('about_us')->first();

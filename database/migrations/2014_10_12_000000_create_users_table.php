@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('password');
             $table->tinyInteger('is_type')->default(0);
             /* Users: 0=>User, 1=>Admin, 2=>Manager */
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('set null');
             $table->string('phone')->nullable();
             $table->longText('address')->nullable();
             $table->string('nid')->nullable();

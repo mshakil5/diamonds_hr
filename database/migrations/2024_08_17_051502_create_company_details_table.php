@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('company_details', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('set null');
             $table->string('company_name',191)->nullable();
             $table->string('company_logo',191)->nullable();
             $table->string('footer_logo',191)->nullable();

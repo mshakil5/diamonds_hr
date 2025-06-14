@@ -26,8 +26,8 @@ Auth::routes();
 //     return redirect('/');
 // });
   
-Route::get('/', [FrontendController::class, 'index'])->name('homepage');
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/', [FrontendController::class, 'login'])->name('homepage');
+Route::get('/home', [HomeController::class, 'login'])->name('home');
 Route::get('about-us', [FrontendController::class, 'about'])->name('about');
 Route::get('/blog/{slug}', [FrontendController::class, 'showBlogDetails'])->name('blog.details');
 
