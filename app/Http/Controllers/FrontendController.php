@@ -18,7 +18,12 @@ class FrontendController extends Controller
 
     public function login()
     {
-        return view('auth.login');
+        if (Auth::user()) {
+            return redirect()->route('home');
+        } else {
+            return view('auth.login');
+        }
+        
     }
 
     public function about()
