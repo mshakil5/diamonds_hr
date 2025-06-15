@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CompanyDetailsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\EmployeeController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -45,6 +46,16 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/blogs-update', [BlogController::class, 'update']);
     Route::get('/blogs/{id}', [BlogController::class, 'delete']);
     Route::post('/blogs/{id}/status', [BlogController::class, 'updateStatus'])->name('blogs.updateStatus');
+
+    // Employee Routes
+    Route::prefix('employees')->group(function () {
+        Route::get('/', [EmployeeController::class, 'index'])->name('employees.index');
+        Route::post('/', [EmployeeController::class, 'store'])->name('employees.store');
+        Route::get('/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+        Route::post('/update', [EmployeeController::class, 'update'])->name('employees.update');
+        Route::get('/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
+        Route::post('/{id}/status', [EmployeeController::class, 'updateStatus'])->name('employees.updateStatus');
+    });
         
 });
   

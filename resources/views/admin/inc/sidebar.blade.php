@@ -20,6 +20,15 @@
       </li>
 
       <li class="nav-item">
+        <a href="{{route('employees.index')}}" class="nav-link {{ (request()->is('admin/employees*')) ? 'active' : '' }}">
+         <i class="fas fa-users"></i>
+          <p>
+            Employees
+          </p>
+        </a>
+      </li>
+
+      <li class="nav-item">
         <a href="{{route('allUsers')}}" class="nav-link {{ (request()->is('admin/users*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
           <p>
