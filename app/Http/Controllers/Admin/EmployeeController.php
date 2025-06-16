@@ -92,7 +92,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function destroy(Request $request, $id)
+    public function delete(Request $request, $id)
     {
         $attendace = Attendance::whereEmployeeId($id)->count();
         $holiday = Holiday::whereEmployeeId($id)->count();
