@@ -54,7 +54,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
         Route::get('/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
         Route::post('/update', [EmployeeController::class, 'update'])->name('employees.update');
         Route::get('/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
-        Route::post('/{id}/status', [EmployeeController::class, 'updateStatus'])->name('employees.updateStatus');
+        Route::post('/change-status', [EmployeeController::class, 'updateStatus'])->name('employees.updateStatus');
     });
         
 });

@@ -135,4 +135,25 @@ class EmployeeController extends Controller
 
         ]);
     }
+
+    public function updateStatus(Request $request)
+    {
+        $employee = Employee::find($request->userId);
+        if (!$employee) {
+            return response()->json([
+                'type' => 'error',
+                'message' => 'Employee not found'
+            ], 404);
+        }
+
+        $employee->is_active = $request->status;
+        $employee->save();
+
+        return response()->json([
+            'status' => 200,
+            'type' => 'success',
+            'message' => 'Employee status updated successfully',
+            'employee' => $employee
+        ]);
+    }
 }

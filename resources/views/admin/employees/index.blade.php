@@ -281,7 +281,7 @@
                                     </td>
                                     <td>
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->status == 1 ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->is_active == 1 ? 'checked' : '' }}>
                                             <label class="custom-control-label" for="customSwitchStatus{{ $data->id }}"></label>
                                         </div>
                                     </td>
@@ -529,14 +529,17 @@
             var userId = $(this).data('id');
             var status = $(this).prop('checked') ? 1 : 0;
 
+            console.log(userId, status);
             $.ajax({
-                url: '/admin/users/' + userId + '/status',
+                url: '{{ route("employees.updateStatus") }}',
                 method: 'POST',
                 data: {
+                    userId: userId,
                     status: status,
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
+                    console.log(response);
                     if (response.status === 200) {
                         showSuccess(response.message);
                     } else {
