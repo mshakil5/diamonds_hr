@@ -1,6 +1,7 @@
 @extends('admin.layouts.admin')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" />
 
 <!-- Main content -->
 <section class="content" id="newBtnSection">
@@ -21,7 +22,7 @@
     <div class="container-fluid">
         <div class="row justify-content-md-center">
             <!-- right column -->
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <!-- general form elements disabled -->
                 <div class="card card-secondary">
                     <div class="card-header">
@@ -30,66 +31,195 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <form id="createThisForm">
-                            @csrf
-                            <input type="hidden" class="form-control" id="codeid" name="codeid">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
-                                    </div>
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    <h3 class="card-title"> Basic Staff Information</h3>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Surname <span class="text-danger">*</span></label>
-                                        <input type="text" id="surname" name="surname" class="form-control" placeholder="Enter surname">
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <input type="hidden" id="codeid">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Staff ID *</label>
+                                                <input type="text" class="form-control" id="employee_id" name="employee_id">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Name *</label>
+                                                <input type="text" class="form-control" id="name" name="name">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Staff Type *</label>
+                                                <select class="form-control" id="employee_type" name="employee_type">
+                                                    <option value="">Select Staff Type</option>
+                                                    <option value="full time">Full Time</option>
+                                                    <option value="part time">Part Time</option>
+                                                    <option value="casual">Casual</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Phone</label>
+                                                <input type="number" class="form-control" id="phone" name="phone">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Email</label>
+                                                <input type="email" class="form-control" id="email" name="email">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Em. Contact Number</label>
+                                                <input type="number" class="form-control" id="emergency_contact_number" name="emergency_contact_number">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Em. Contact Person</label>
+                                                <input type="text" class="form-control" id="emergency_contact_person" name="emergency_contact_person">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Nation Insurance No</label>
+                                                <input type="text" class="form-control" id="ni" name="ni">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Nationality</label>
+                                                <input type="text" class="form-control" id="nationality" name="nationality">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+
+                                            <div class="form-group">
+                                                <label>Join Date</label>
+                                                <div class="input-group date" id="reservationdatetime" data-target-input="nearest">
+                                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" id="join_date" name="join_date" />
+                                                    <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="col-sm-6">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Image</label>
+                                                <input type="file" class="form-control" id="image" name="image">
+                                                <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Address</label>
+                                                <textarea class="form-control" name="address" id="address" cols="30" rows="2"></textarea>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
+                                <!-- /.card-body -->
                             </div>
 
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
-                                    </div>
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    <h3 class="card-title">  Payment and holiday info</h3>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Phone <span class="text-danger">*</span></label>
-                                        <input type="number" id="phone" name="phone" class="form-control" placeholder="Enter phone">
+                                <!-- /.card-header -->
+                                <div class="card-body">
+
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Pay Rate *</label>
+                                                <input type="number" class="form-control" id="pay_rate" name="pay_rate">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Tax Code *</label>
+                                                <input type="text" class="form-control" id="tax_code" name="tax_code">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-sm-4">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Entitled Holiday *</label>
+                                                <input type="number" class="form-control" id="entitled_holiday" name="entitled_holiday">
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <div class="col-sm-12">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Bank Details</label>
+                                                <textarea class="form-control" name="bank_details" id="bank_details" cols="30" rows="2"></textarea>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
+                                <!-- /.card-body -->
                             </div>
 
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
-                                    </div>
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    <h3 class="card-title"> User Login</h3>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Confirm Password</label>
-                                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Enter confirm password">
-                                    </div>
-                                </div>
-                            </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="feature-img">Image</label>
-                                        <input type="file" class="form-control-file" id="image" accept="image/*">
-                                        <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
+                                    <div class="row">
+                                        
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Username*</label>
+                                                <input type="text" class="form-control" id="username" name="username">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-sm-3">
+                                        <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Password *</label>
+                                                <input type="password" class="form-control" id="password" name="password">
+                                            </div>
+                                        </div>
+                                        
                                     </div>
-                                </div>
-                            </div>
 
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
                         </form>
                     </div>
-
 
                     <!-- /.card-body -->
                     <div class="card-footer">
@@ -126,6 +256,8 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Type</th>
                                     <th>Email/Phone</th>
                                     <th>Image</th>
                                     <th>Status</th>
@@ -136,10 +268,16 @@
                                 @foreach ($query as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{$data->name}} {{$data->surname}}</td>
+                                    <td>{{$data->name}}</td>
+                                    <td>{{$data->username}}</td>
+                                    <td>{{$data->employee_type}}</td>
                                     <td>{{$data->user->email}} <br> {{$data->phone}}</td>
                                     <td>
-                                        <img src="{{ asset($data->photo) }}" alt="" style="max-width: 100px; width: 100%; height: auto;">
+                                        @if ($data->user->photo)
+                                        <a href="{{ asset('public'.$data->user->photo) }}" target="_blank">
+                                            <img src="{{ asset('public'.$data->user->photo) }}" alt="" style="max-width: 100px; width: 100%; height: auto;">
+                                        </a>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="custom-control custom-switch">
@@ -191,13 +329,22 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var url = "{{URL::to('/admin/users')}}";
-        var upurl = "{{URL::to('/admin/users-update')}}";
+        var url = "{{URL::to('/admin/employees')}}";
+        var upurl = "{{URL::to('/admin/employees/update')}}";
         // console.log(url);
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
 
-                var requiredFields = ['#name', '#email', '#phone', '#surname', '#password', '#confirm_password'];
+                var requiredFields = [
+                    '#employee_id',
+                    '#name',
+                    '#employee_type',
+                    '#pay_rate',
+                    '#tax_code',
+                    '#entitled_holiday',
+                    '#username',
+                    '#password'
+                ];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         showError('Please fill all required fields.');
@@ -205,18 +352,9 @@
                     }
                 }
 
-                if ($('#password').val() !== $('#confirm_password').val()) {
-                    showError('Passwords do not match.');
-                    return;
-                }
 
-                var form_data = new FormData();
-                form_data.append("name", $("#name").val());
-                form_data.append("email", $("#email").val());
-                form_data.append("phone", $("#phone").val());
-                form_data.append("surname", $("#surname").val());
-                form_data.append("password", $("#password").val());
-                form_data.append("confirm_password", $("#confirm_password").val());
+                var form_data = new FormData($('#createThisForm')[0]);
+
                 var featureImgInput = document.getElementById('image');
                 if (featureImgInput.files && featureImgInput.files[0]) {
                     form_data.append("photo", featureImgInput.files[0]);
@@ -228,6 +366,7 @@
                     processData: false,
                     data: form_data,
                     success: function(d) {
+                        console.log(d);
                         showSuccess('Data created successfully.');
                         reloadPage(2000);
                     },
@@ -242,7 +381,15 @@
             //Update
             if ($(this).val() == 'Update') {
 
-                var requiredFields = ['#name', '#email', '#phone', '#surname'];
+                var requiredFields = [
+                    '#employee_id',
+                    '#name',
+                    '#employee_type',
+                    '#pay_rate',
+                    '#tax_code',
+                    '#entitled_holiday',
+                    '#username'
+                ];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         showError('Please fill all required fields.');
@@ -250,21 +397,11 @@
                     }
                 }
 
-                if ($('#password').val() !== $('#confirm_password').val()) {
-                    showError('Passwords do not match.');
-                    return;
-                }
 
-                var form_data = new FormData();
-                form_data.append("name", $("#name").val());
-                form_data.append("email", $("#email").val());
-                form_data.append("phone", $("#phone").val());
-                form_data.append("surname", $("#surname").val());
-                form_data.append("password", $("#password").val());
-                form_data.append("confirm_password", $("#confirm_password").val());
+                var form_data = new FormData($('#createThisForm')[0]);
 
                 var featureImgInput = document.getElementById('image');
-                if(featureImgInput.files && featureImgInput.files[0]) {
+                if (featureImgInput.files && featureImgInput.files[0]) {
                     form_data.append("photo", featureImgInput.files[0]);
                 }
 
@@ -278,11 +415,12 @@
                     processData: false,
                     data: form_data,
                     success: function(d) {
+                        console.log(d);
                         showSuccess('Data updated successfully.');
                         reloadPage(2000);
                     },
                     error: function(xhr, status, error) {
-                        error('An error occurred. Please try again.');
+                        showError('An error occurred. Please try again.');
                         console.error(xhr.responseText);
                     }
                 });
@@ -324,10 +462,22 @@
         });
         //Delete  
         function populateForm(data) {
+            $("#employee_id").val(data.employee_id);
             $("#name").val(data.name);
-            $("#surname").val(data.surname);
+            $("#username").val(data.username);
             $("#phone").val(data.phone);
             $("#email").val(data.email);
+            $("#employee_type").val(data.employee_type);
+            $("#emergency_contact_number").val(data.emergency_contact_number);
+            $("#emergency_contact_person").val(data.emergency_contact_person);
+            $("#ni").val(data.ni);
+            $("#nationality").val(data.nationality);
+            $("#join_date").val(data.join_date);
+            $("#address").val(data.address);
+            $("#pay_rate").val(data.pay_rate);
+            $("#tax_code").val(data.tax_code);
+            $("#entitled_holiday").val(data.entitled_holiday);
+            $("#bank_details").val(data.bank_details);
             var image = document.getElementById('preview-image');
             if (data.photo) { 
                 image.src = data.photo;
@@ -399,6 +549,20 @@
             });
         });
 
+
+
+    });
+</script>
+<!-- JS to initialize picker -->
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- Initialize picker with DD-MM-YYYY HH:mm format -->
+<script type="text/javascript">
+    $(function () {
+        $('#reservationdatetime').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm'
+        });
     });
 </script>
 

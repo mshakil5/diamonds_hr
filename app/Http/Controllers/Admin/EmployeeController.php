@@ -17,20 +17,31 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $query = Employee::all();
+        // dd($query);
         return view('admin.employees.index', compact('query'));
     }
 
     public function store(Request $request)
     {
         $request->merge(['password'=>Hash::make($request->password)]);
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/employees'), $imageName);
+            $userphoto = '/images/employees/' . $imageName;
+        }
         $user = User::create([
             'name'=>$request->name,
             'email'=>$request->username.'@diamondsgroup.com',
             'password'=>$request->password,
             'role'=>'staff',
+            'photo'=>$userphoto,
         ]);
         $request->merge(['user_id'=>$user->id]);
+
+        
         Employee::create($request->all());
+
         return response()->json([
            'type'=>'success',
            'message'=>'Staff create successfully'
@@ -42,33 +53,51 @@ class EmployeeController extends Controller
         return Employee::find($id);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
 
-        $employee=Employee::find($id);
-        if(!($employee->password == $request->password)){
-            $request->merge(['password'=>Hash::make($request->password)]);
+        $employee= Employee::find($request->codeid);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/employees'), $imageName);
+            $userphoto = '/images/employees/' . $imageName;
         }
 
-        $user = User::whereId($employee->user_id)->first()->update([
-            'name'=>$request->name,
-            'email'=>$request->username.'@diamondsgroup.com',
-            'password'=>$request->password,
-        ]);
+        if($request->password){
+            $request->merge(['password'=>Hash::make($request->password)]);
+            
+            $user = User::whereId($employee->user_id)->first()->update([
+                'name'=>$request->name,
+                'email'=>$request->username.'@diamondsgroup.com',
+                'password'=>$request->password,
+                'photo'=>$userphoto,
+            ]);
+
+        }else {
+            $user = User::whereId($employee->user_id)->first()->update([
+                'name'=>$request->name,
+                'email'=>$request->username.'@diamondsgroup.com',
+                'photo'=>$userphoto,
+            ]);
+        }
+
+        
         $employee->update($request->all());
         return response()->json([
             'type'=>'success',
-            'message'=>'Staff create successfully'
+            'message'=>'Staff updated successfully'
         ]);
     }
 
 
     public function destroy(Request $request, $id)
     {
-        $attendace=Attendance::whereEmployeeId($id)->count();
-        $holiday=Holiday::whereEmployeeId($id)->count();
-        $stock=Stockmaintaince::whereEmployeeId($id)->count();
-        $preRota=DB::table('employee_pre_rota')
+        $attendace = Attendance::whereEmployeeId($id)->count();
+        $holiday = Holiday::whereEmployeeId($id)->count();
+        $stock = Stockmaintaince::whereEmployeeId($id)->count();
+        $preRota = DB::table('employee_pre_rota')
             ->where('employee_id',$id)->count();
         if($attendace+$preRota+$holiday+$stock>0){
             return response()->json([
