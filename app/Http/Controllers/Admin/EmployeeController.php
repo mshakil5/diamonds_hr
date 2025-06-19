@@ -18,7 +18,6 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $query = Employee::all();
-        // dd($query);
         return view('admin.employees.index', compact('query'));
     }
 

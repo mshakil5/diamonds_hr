@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\HolidayController;
+use App\Http\Controllers\Admin\AttendanceController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -75,6 +76,16 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
         Route::post('/update', [HolidayController::class, 'update'])->name('holidays.update');
         Route::get('/{id}', [HolidayController::class, 'delete'])->name('holidays.delete');
     });
+
+    Route::prefix('attendance')->group(function () {
+        Route::get('/', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('/', [AttendanceController::class, 'store'])->name('attendance.store');
+        Route::get('/{id}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
+        Route::post('/update', [AttendanceController::class, 'update'])->name('attendance.update');
+        Route::get('/{id}', [AttendanceController::class, 'delete'])->name('attendance.delete');
+    });
+
+
         
 });
   

@@ -250,7 +250,6 @@
         });
 
         function populateForm(data) {
-            console.log(data.employee_id);
             $("#date").val(data.date);
             $("#employee_id").val(data.employee_id).trigger('change');
             $("#employee_type").val(data.type);
