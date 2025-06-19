@@ -61,6 +61,17 @@
                         <input type="number" id="phone" name="phone" class="form-control" placeholder="Enter phone">
                       </div>
                     </div>
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label>Branch</label>
+                        <select name="branch_id" id="branch_id" class="form-control">
+                          <option value="">Select</option>
+                          @foreach ($branches as $branch)
+                          <option value="{{$branch->id}}">{{$branch->name}}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                    </div>
                   </div>
 
                   <div class="row">
@@ -120,6 +131,7 @@
                   <th>Surname</th>
                   <th>Email</th>
                   <th>Phone</th>
+                  <th>Branch</th>
                   <th>Action</th>
                 </tr>
                 </thead>
@@ -131,6 +143,7 @@
                     <td style="text-align: center">{{$data->surname}}</td>
                     <td style="text-align: center">{{$data->email}}</td>
                     <td style="text-align: center">{{$data->phone}}</td>
+                    <td style="text-align: center">{{$data->branch->name}}</td>
                     
                     <td style="text-align: center">
                       <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
@@ -203,6 +216,7 @@
               form_data.append("email", $("#email").val());
               form_data.append("phone", $("#phone").val());
               form_data.append("surname", $("#surname").val());
+              form_data.append("branch_id", $("#branch_id").val());
               form_data.append("password", $("#password").val());
               form_data.append("confirm_password", $("#confirm_password").val());
               $.ajax({
@@ -212,23 +226,12 @@
                 processData: false,
                 data:form_data,
                 success: function (d) {
-                    if (d.status == 303) {
-                        $(".ermsg").html(d.message);
-                    }else if(d.status == 300){
-
-                      $(function() {
-                          var Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000
-                          });
-                          Toast.fire({
-                            icon: 'success',
-                            title: 'Data create successfully.'
-                          });
-                        });
-                      window.setTimeout(function(){location.reload()},2000)
+                  
+                    if (d.status == 422) {
+                        $('.ermsg').html(d.message);
+                    } else {
+                        showSuccess('Data created successfully.');
+                        reloadPage(2000);
                     }
                 },
                 error: function (d) {
@@ -244,6 +247,7 @@
               form_data.append("email", $("#email").val());
               form_data.append("phone", $("#phone").val());
               form_data.append("surname", $("#surname").val());
+              form_data.append("branch_id", $("#branch_id").val());
               form_data.append("password", $("#password").val());
               form_data.append("confirm_password", $("#confirm_password").val());
               form_data.append("codeid", $("#codeid").val());
@@ -257,23 +261,11 @@
                   data:form_data,
                   success: function(d){
                       console.log(d);
-                      if (d.status == 303) {
-                          $(".ermsg").html(d.message);
-                          pagetop();
-                      }else if(d.status == 300){
-                        $(function() {
-                          var Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000
-                          });
-                          Toast.fire({
-                            icon: 'success',
-                            title: 'Data updated successfully.'
-                          });
-                        });
-                          window.setTimeout(function(){location.reload()},2000)
+                      if (d.status == 422) {
+                        $('.ermsg').html(d.message);
+                      } else {
+                          showSuccess('Data updated successfully.');
+                          reloadPage(2000);
                       }
                   },
                   error:function(d){
@@ -324,6 +316,7 @@
           $("#surname").val(data.surname);
           $("#phone").val(data.phone);
           $("#email").val(data.email);
+          $("#branch_id").val(data.branch_id);
           $("#codeid").val(data.id);
           $("#addBtn").val('Update');
           $("#addBtn").html('Update');

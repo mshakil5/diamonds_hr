@@ -10,7 +10,7 @@
         </a>
       </li>
 
-      <li class="nav-item d-none">
+      <li class="nav-item">
         <a href="{{route('alladmin')}}" class="nav-link {{ (request()->is('admin/new-admin*')) ? 'active' : '' }}">
           <i class="nav-icon fas fa-th"></i>
           <p>
@@ -37,7 +37,7 @@
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item d-none">
         <a href="{{route('allUsers')}}" class="nav-link {{ (request()->is('admin/users*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
           <p>

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -12,61 +14,51 @@ class AdminController extends Controller
     public function getAdmin()
     {
         $data = User::where('is_type', '1')->orderby('id','DESC')->get();
-        return view('admin.admin.index', compact('data'));
+        $branches = Branch::where('status', 1)->get();
+        return view('admin.admin.index', compact('data','branches'));
     }
 
     public function adminStore(Request $request)
     {
-        if(empty($request->name)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Username \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'surname' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|string|max:20',
+            'branch_id' => 'required|integer|exists:branches,id',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value !== $request->confirm_password) {
+                        $fail('The password confirmation does not match.');
+                    }
+                },
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            $messages = $validator->errors()->all();
+            $alert = "<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>" . implode('<br>', $messages) . "</b></div>";
+            return response()->json(['status' => 422, 'message' => $alert]);
         }
-        if(empty($request->email)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Email \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
+
+        $user = new User;
+        $user->name = $request->name;
+        $user->surname = $request->surname;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->branch_id = $request->branch_id;
+        $user->is_type = 1;
+        $user->password = Hash::make($request->password);
+
+        if ($user->save()) {
+            $success = "<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Data created successfully.</b></div>";
+            return response()->json(['status' => 300, 'message' => $success]);
         }
-        if(empty($request->phone)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Phone \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        if(empty($request->password)){            
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Password\" field..!</b></div>"; 
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        if(isset($request->password) && ($request->password != $request->confirm_password)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Password doesn't match.</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        $chkemail = User::where('email',$request->email)->first();
-        if($chkemail){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>This email already added.</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        $data = new User;
-        $data->name = $request->name;
-        $data->surname = $request->surname;
-        $data->phone = $request->phone;
-        $data->email = $request->email;
-        $data->house_number = $request->house_number;
-        $data->street_name = $request->street_name;
-        $data->town = $request->town;
-        $data->is_type = "1";
-        $data->postcode = $request->postcode;
-        if(isset($request->password)){
-            $data->password = Hash::make($request->password);
-        }
-        if ($data->save()) {
-            $message ="<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Data Create Successfully.</b></div>";
-            return response()->json(['status'=> 300,'message'=>$message]);
-        }else{
-            return response()->json(['status'=> 303,'message'=>'Server Error!!']);
-        }
+
+        return response()->json(['status' => 303, 'message' => 'Server Error!']);
     }
 
     public function adminEdit($id)
@@ -82,33 +74,28 @@ class AdminController extends Controller
     {
 
         
-        if(empty($request->name)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Username \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        if(empty($request->email)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Email \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        if(empty($request->phone)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Phone \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        
-        if(isset($request->password) && ($request->password != $request->confirm_password)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Password doesn't match.</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'surname' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $request->codeid,
+            'phone' => 'nullable|string|max:20',
+            'branch_id' => 'required|integer|exists:branches,id',
+            'password' => [
+                'nullable',
+                'string',
+                'min:6',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value !== $request->confirm_password) {
+                        $fail('The password confirmation does not match.');
+                    }
+                },
+            ],
+        ]);
 
-        $duplicateemail = User::where('email',$request->email)->where('id','!=', $request->codeid)->first();
-        if($duplicateemail){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>This email already added.</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
+        if ($validator->fails()) {
+            $messages = $validator->errors()->all();
+            $alert = "<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>" . implode('<br>', $messages) . "</b></div>";
+            return response()->json(['status' => 422, 'message' => $alert]);
         }
 
 
@@ -117,20 +104,16 @@ class AdminController extends Controller
         $data->surname = $request->surname;
         $data->phone = $request->phone;
         $data->email = $request->email;
-        $data->house_number = $request->house_number;
-        $data->street_name = $request->street_name;
-        $data->town = $request->town;
-        $data->postcode = $request->postcode;
+        $data->branch_id = $request->branch_id;
         if(isset($request->password)){
             $data->password = Hash::make($request->password);
         }
         if ($data->save()) {
-            $message ="<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Data Updated Successfully.</b></div>";
-            return response()->json(['status'=> 300,'message'=>$message]);
+            $success = "<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Data created successfully.</b></div>";
+            return response()->json(['status' => 300, 'message' => $success]);
         }
-        else{
-            return response()->json(['status'=> 303,'message'=>'Server Error!!']);
-        } 
+
+        return response()->json(['status' => 303, 'message' => 'Server Error!']);
     }
 
     public function adminDelete($id)
