@@ -286,6 +286,30 @@
                                         </div>
                                     </td>
                                     <td>
+                                        <a id="DetailsBtn"
+                                            rid="{{$data->id}}"
+                                            title="Details"
+                                            data-name="{{ $data->name }}"
+                                            data-username="{{ $data->username }}"
+                                            data-user_id="{{ $data->user_id }}"
+                                            data-branch_id="{{ $data->branch_id }}"
+                                            data-join_date="{{ $data->join_date }}"
+                                            data-employee_id="{{ $data->employee_id }}"
+                                            data-email="{{ $data->user->email }}"
+                                            data-phone="{{ $data->phone }}"
+                                            data-emergency_contact_number="{{ $data->emergency_contact_number }}"
+                                            data-emergency_contact_person="{{ $data->emergency_contact_person }}"
+                                            data-ni="{{ $data->ni }}"
+                                            data-tax_code="{{ $data->tax_code }}"
+                                            data-nationality="{{ $data->nationality }}"
+                                            data-bank_details="{{ $data->bank_details }}"
+                                            data-entitled_holiday="{{ $data->entitled_holiday }}"
+                                            data-address="{{ $data->address }}"
+                                            data-employee_type="{{ $data->employee_type }}"
+                                            data-pay_rate="{{ $data->pay_rate }}"
+                                        >
+                                             <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
+                                        </a>
                                         <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
                                         <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
                                     </td>
@@ -306,6 +330,8 @@
     <!-- /.container-fluid -->
 </section>
 <!-- /.content -->
+
+
 
 @endsection
 
@@ -550,6 +576,52 @@
                     showError('An error occurred. Please try again.');
                 }
             });
+        });
+
+        $("#contentContainer").on('click', '#DetailsBtn', function() {
+            var attrs = {};
+            $.each(this.attributes, function() {
+                if(this.specified && this.name.startsWith('data-')) {
+                    var key = this.name.replace('data-', '');
+                    attrs[key] = this.value;
+                }
+            });
+            console.log(attrs);
+            // You can use attrs object as needed, e.g., show in a modal
+            let modalHtml = `
+            <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    ${Object.entries(attrs).map(([key, value]) => `
+                                        <tr>
+                                            <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
+                                            <td>${value}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            // Remove any existing modal to avoid duplicates
+            $('#detailsModal').remove();
+            $('body').append(modalHtml);
+            $('#detailsModal').modal('show');
         });
 
 
