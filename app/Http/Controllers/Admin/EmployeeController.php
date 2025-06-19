@@ -11,6 +11,7 @@ use App\Models\Employee;
 use App\Models\Holiday;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -38,7 +39,7 @@ class EmployeeController extends Controller
             'photo'=>$userphoto,
         ]);
         $request->merge(['user_id'=>$user->id]);
-
+        $request->merge(['branch_id' => Auth::user()->branch_id]);
         
         Employee::create($request->all());
 
@@ -67,6 +68,7 @@ class EmployeeController extends Controller
 
         if($request->password){
             $request->merge(['password'=>Hash::make($request->password)]);
+            $request->merge(['branch_id' => Auth::user()->branch_id]);
             
             $user = User::whereId($employee->user_id)->first()->update([
                 'name'=>$request->name,
@@ -76,6 +78,7 @@ class EmployeeController extends Controller
             ]);
 
         }else {
+            $request->merge(['branch_id' => Auth::user()->branch_id]);
             $user = User::whereId($employee->user_id)->first()->update([
                 'name'=>$request->name,
                 'email'=>$request->username.'@diamondsgroup.com',
