@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\BranchController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -55,6 +56,15 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
         Route::post('/update', [EmployeeController::class, 'update'])->name('employees.update');
         Route::get('/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
         Route::post('/change-status', [EmployeeController::class, 'updateStatus'])->name('employees.updateStatus');
+    });
+
+    Route::prefix('branches')->group(function () {
+        Route::get('/', [BranchController::class, 'index'])->name('branches.index');
+        Route::post('/', [BranchController::class, 'store'])->name('branches.store');
+        Route::get('/{id}/edit', [BranchController::class, 'edit'])->name('branches.edit');
+        Route::post('/update', [BranchController::class, 'update'])->name('branches.update');
+        Route::get('/{id}', [BranchController::class, 'delete'])->name('branches.delete');
+        Route::post('/change-status', [BranchController::class, 'updateStatus'])->name('branches.updateStatus');
     });
         
 });
