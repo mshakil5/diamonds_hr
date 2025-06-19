@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\HolidayController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -65,6 +66,14 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
         Route::post('/update', [BranchController::class, 'update'])->name('branches.update');
         Route::get('/{id}', [BranchController::class, 'delete'])->name('branches.delete');
         Route::post('/change-status', [BranchController::class, 'updateStatus'])->name('branches.updateStatus');
+    });
+
+    Route::prefix('holidays')->group(function () {
+        Route::get('/', [HolidayController::class, 'index'])->name('holidays.index');
+        Route::post('/', [HolidayController::class, 'store'])->name('holidays.store');
+        Route::get('/{id}/edit', [HolidayController::class, 'edit'])->name('holidays.edit');
+        Route::post('/update', [HolidayController::class, 'update'])->name('holidays.update');
+        Route::get('/{id}', [HolidayController::class, 'delete'])->name('holidays.delete');
     });
         
 });

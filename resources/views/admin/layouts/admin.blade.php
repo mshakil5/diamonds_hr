@@ -24,6 +24,8 @@
   <link rel="stylesheet" href="{{ asset('assets/admin/summernote/summernote-bs4.min.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+  <!-- Select2 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
   
 
 
@@ -136,7 +138,9 @@
 
 <script src="{{ asset('assets/admin/datatables-buttons/js/buttons.html5.min.js')}}"></script>
 <script src="{{ asset('assets/admin/datatables-buttons/js/buttons.print.min.js')}}"></script>
-<script src="{{ asset('assets/admin/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script src="{{ asset('assets/admin/summernote/summernote.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -166,6 +170,13 @@
             location.reload();
         }, timeout);
     }
+    $(document).ready(function() {
+      if ($.fn.select2) {
+        $('.select2').select2({
+          width: '100%'
+        });
+      }
+    });
 </script>
 
 @yield('script')

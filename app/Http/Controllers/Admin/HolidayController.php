@@ -3,32 +3,38 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Branch;
+use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Models\Holiday;
 use Illuminate\Support\Facades\Validator;
 
-class BranchController extends Controller
+class HolidayController extends Controller
 {
     public function index()
     {
-        $data = Branch::orderby('id', 'DESC')->get();
-        return view('admin.branch.index', compact('data'));
+        $data = Holiday::orderby('id', 'DESC')->get();
+        $employees = Employee::where('is_active', 1)->get();
+        return view('admin.holiday.index', compact('data','employees'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:branches,name',
-            'status' => 'required|boolean',
+            'date' => 'required|string|max:255',
+            'employee_id' => 'required|string|max:255',
+            'employee_type' => 'required|string|max:255',
+            'details' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
-        $data = new Branch();
-        $data->name = $request->name;
-        $data->status = $request->status;
+        $data = new Holiday();
+        $data->date = $request->date;
+        $data->employee_id = $request->employee_id;
+        $data->type = $request->employee_type;
+        $data->details = $request->details;
         $data->created_by = auth()->id();
         $data->save();
 
@@ -37,24 +43,28 @@ class BranchController extends Controller
 
     public function edit($id)
     {
-        $data = Branch::findOrFail($id);
+        $data = Holiday::findOrFail($id);
         return response()->json($data);
     }
 
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:branches,name,' . $request->codeid,
-            'status' => 'required|boolean',
+            'date' => 'required|string|max:255',
+            'employee_id' => 'required|string|max:255',
+            'employee_type' => 'required|string|max:255',
+            'details' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
-        $data = Branch::findOrFail($request->codeid);
-        $data->name = $request->name;
-        $data->status = $request->status;
+        $data = Holiday::findOrFail($request->codeid);
+        $data->date = $request->date;
+        $data->employee_id = $request->employee_id;
+        $data->type = $request->employee_type;
+        $data->details = $request->details;
         $data->updated_by = auth()->id();
         $data->save();
 
@@ -63,18 +73,11 @@ class BranchController extends Controller
 
     public function delete($id)
     {
-        $data = Branch::findOrFail($id);
+        $data = Holiday::findOrFail($id);
         $data->delete();
 
         return response()->json(['status' => 200, 'message' => 'Data deleted successfully.']);
     }
 
-    public function updateStatus(Request $request)
-    {
-        $data = Branch::findOrFail($request->id);
-        $data->status = $request->status;
-        $data->save();
 
-        return response()->json(['status' => 200, 'message' => 'Status updated successfully.']);
-    }
 }
