@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\StockController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -94,6 +95,15 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
         Route::post('/update', [ProductController::class, 'update'])->name('products.update');
         Route::get('/{id}', [ProductController::class, 'delete'])->name('products.delete');
         Route::post('/change-status', [ProductController::class, 'updateStatus'])->name('products.updateStatus');
+    });
+
+    Route::prefix('stocks')->group(function () {
+        Route::get('/', [StockController::class, 'index'])->name('stocks.index');
+        Route::post('/', [StockController::class, 'store'])->name('stocks.store');
+        Route::get('/{id}/edit', [StockController::class, 'edit'])->name('stocks.edit');
+        Route::post('/update', [StockController::class, 'update'])->name('stocks.update');
+        Route::get('/{id}', [StockController::class, 'delete'])->name('stocks.delete');
+        Route::post('/change-status', [StockController::class, 'updateStatus'])->name('stocks.updateStatus');
     });
         
 });
