@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\ProductController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -86,6 +87,14 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     });
 
 
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('products.index');
+        Route::post('/', [ProductController::class, 'store'])->name('products.store');
+        Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::post('/update', [ProductController::class, 'update'])->name('products.update');
+        Route::get('/{id}', [ProductController::class, 'delete'])->name('products.delete');
+        Route::post('/change-status', [ProductController::class, 'updateStatus'])->name('products.updateStatus');
+    });
         
 });
   

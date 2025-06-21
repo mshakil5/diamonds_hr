@@ -64,6 +64,15 @@
         </a>
       </li>
 
+      <li class="nav-item">
+        <a href="{{route('products.index')}}" class="nav-link {{ (request()->is('admin/products*')) ? 'active' : '' }}">
+         <i class="fas fa-users"></i>
+          <p>
+            Product
+          </p>
+        </a>
+      </li>
+
       <li class="nav-item dropdown {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
