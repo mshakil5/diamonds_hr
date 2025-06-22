@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\StockController;
+use App\Http\Controllers\Admin\ReportController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -105,6 +106,10 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
         Route::get('/{id}', [StockController::class, 'delete'])->name('stocks.delete');
         Route::post('/change-status', [StockController::class, 'updateStatus'])->name('stocks.updateStatus');
     });
+
+    // employee report
+    Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');
+    Route::post('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport.search');
         
 });
   

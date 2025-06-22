@@ -82,6 +82,43 @@
         </a>
       </li>
 
+      
+
+      <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-blog"></i>
+              <p>
+                  Report <i class="fas fa-angle-left right"></i>
+              </p>
+          </a>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('employeeReport') }}" class="nav-link {{ request()->routeIs('employeeReport') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Employee Report</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a href="{{ route('allBlogCategories') }}" class="nav-link {{ request()->routeIs('allBlogCategories') ? 'active' : '' }}">
+                      <i class="fas fa-tags nav-icon"></i>
+                      <p>Holiday Report</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a href="{{ route('allBlogs') }}" class="nav-link {{ request()->routeIs('allBlogs') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Product Stock Report</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a href="{{ route('allBlogCategories') }}" class="nav-link {{ request()->routeIs('allBlogCategories') ? 'active' : '' }}">
+                      <i class="fas fa-tags nav-icon"></i>
+                      <p>Staff Based Stock Report</p>
+                  </a>
+              </li>
+          </ul>
+      </li>
+
       <li class="nav-item dropdown {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
