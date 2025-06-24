@@ -10,11 +10,14 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
     use SoftDeletes;
+    use LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -45,6 +48,18 @@ class User extends Authenticatable
         'updated_by',
         'created_by',
     ];
+
+    protected static $logName = 'user';
+    protected static $logAttributes = ['*'];
+    protected static $logOnlyDirty = true;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(array_diff(array_keys($this->getAttributes()), ['password', 'remember_token', 'created_at', 'updated_at', 'deleted_at']))
+            ->useLogName('user')
+            ->setDescriptionForEvent(fn(string $eventName) => "User record has been {$eventName}");
+    }
 
     /**
      * The attributes that should be hidden for serialization.

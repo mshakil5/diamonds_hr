@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\RoleController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -110,6 +111,9 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     // employee report
     Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');
     Route::post('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport.search');
+
+    // roles and permission
+    Route::get('role', [RoleController::class, 'index'])->name('admin.role');
         
 });
   

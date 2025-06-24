@@ -4,11 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class PreRota extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
     protected $guarded=['id'];
+
+    protected static $logName = 'pre_rota';
+    protected static $logAttributes = ['*'];
+    protected static $logOnlyDirty = true;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(array_diff(array_keys($this->getAttributes()), ['created_at', 'updated_at', 'deleted_at']))
+            ->useLogName('pre_rota')
+            ->setDescriptionForEvent(fn(string $eventName) => "Pre Rota record has been {$eventName}");
+    }
 
     public function employees(){
         return $this->belongsToMany(Employee::class);

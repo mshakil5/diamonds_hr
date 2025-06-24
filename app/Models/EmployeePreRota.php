@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class Attendance extends Model
+class EmployeePreRota extends Model
 {
-    use SoftDeletes;
+    use HasFactory;
     use LogsActivity;
-    protected $guarded=['id'];
+    protected $table = 'employee_pre_rota';
+    protected $fillable = ['employee_id', 'branch_id', 'pre_rota_id'];
+    public $timestamps = true;
 
-    protected static $logName = 'attendance';
+    protected static $logName = 'employee_pre_rota';
     protected static $logAttributes = ['*'];
     protected static $logOnlyDirty = true;
 
@@ -21,11 +23,7 @@ class Attendance extends Model
     {
         return LogOptions::defaults()
             ->logOnly(array_diff(array_keys($this->getAttributes()), ['created_at', 'updated_at']))
-            ->useLogName('attendance')
-            ->setDescriptionForEvent(fn(string $eventName) => "Attendance record has been {$eventName}");
-    }
-
-    public function employee(){
-        return $this->belongsTo(Employee::class);
+            ->useLogName('employee_pre_rota')
+            ->setDescriptionForEvent(fn(string $eventName) => "Employee Pre-Rota record has been {$eventName}");
     }
 }
