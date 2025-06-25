@@ -119,6 +119,23 @@
           </ul>
       </li>
 
+      <li class="nav-item dropdown {{ request()->is('admin/settings*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/settings*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-blog"></i>
+              <p>
+                  Settings <i class="fas fa-angle-left right"></i>
+              </p>
+          </a>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('changeBranch') }}" class="nav-link {{ request()->routeIs('changeBranch') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Change Branch</p>
+                  </a>
+              </li>
+          </ul>
+      </li>
+
       <li class="nav-item dropdown d-none {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>

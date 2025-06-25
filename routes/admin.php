@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SettingsController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
   
@@ -114,6 +115,10 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
 
     // roles and permission
     Route::get('role', [RoleController::class, 'index'])->name('admin.role');
+
+    
+    Route::get('settings/change-branch', [SettingsController::class, 'changeBranch'])->name('changeBranch');
+    Route::post('change-branches', [SettingsController::class, 'branchChange']);
         
 });
   
