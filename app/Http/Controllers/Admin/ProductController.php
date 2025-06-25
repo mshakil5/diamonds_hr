@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $data = Product::orderby('id', 'DESC')->get();
+        $data = Product::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
         return view('admin.product.index', compact('data'));
     }
 

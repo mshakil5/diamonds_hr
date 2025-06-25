@@ -17,7 +17,7 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Employee::all();
+        $query = Employee::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
         return view('admin.employees.index', compact('query'));
     }
 

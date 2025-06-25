@@ -25,17 +25,18 @@ class ReportController extends Controller
             ->select('attendances.*', 'employees.name as employee_name')
             ->join('employees', 'attendances.employee_id', '=', 'employees.id')
             ->where('attendances.employee_id', $request->input('employee_id'))
+            ->where('attendances.branch_id', Auth::user()->branch_id)
             ->whereBetween('attendances.clock_in', [$fromDate, $toDate])
             ->get();
 
             // dd($data);
         
-        $employeeName = Employee::where('id', $request->input('employee_id'))->value('name');
-        $employees = Employee::where('is_active', 1)->get();
+        $employeeName = Employee::where('id', $request->input('employee_id'))->where('branch_id', Auth::user()->branch_id)->value('name');
+        $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
         return view('admin.reports.employeeReport', compact('employees','data','employeeName'));
 
         } else {
-            $employees = Employee::where('is_active', 1)->get();
+            $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
             $data = [];
             $employeeName = null;
             return view('admin.reports.employeeReport', compact('employees','data','employeeName'));

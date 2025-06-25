@@ -25,4 +25,10 @@ class Product extends Model
             ->useLogName('product')
             ->setDescriptionForEvent(fn(string $eventName) => "Product record has been {$eventName}");
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
 }

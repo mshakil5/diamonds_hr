@@ -15,8 +15,8 @@ class StockController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Stockmaintaince::all();
-        $products = Product::where('status', 1)->get();
+        $data = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
+        $products = Product::where('status', 1)->where('branch_id', Auth::user()->branch_id)->get();
         return view('admin.stock.index', compact('data','products'));
     }
 

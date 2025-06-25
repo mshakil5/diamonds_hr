@@ -7,12 +7,13 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\Holiday;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class HolidayController extends Controller
 {
     public function index()
     {
-        $data = Holiday::orderby('id', 'DESC')->get();
+        $data = Holiday::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
         $employees = Employee::where('is_active', 1)->get();
         return view('admin.holiday.index', compact('data','employees'));
     }
