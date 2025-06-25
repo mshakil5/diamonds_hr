@@ -28,8 +28,8 @@
         <div class="col-lg-3 col-md-4 col-6 mb-3">
           <div class="small-box bg-info rounded shadow-sm">
             <div class="inner">
-              <h3 class="text-white font-weight-bold">{{ $blogsCount }}</h3>
-              <p class="text-white m-0">Blogs</p>
+              <h3 class="text-white font-weight-bold">{{ $monthlyHoliday }}</h3>
+              <p class="text-white m-0">This month holiday</p>
             </div>
             <div class="icon">
               <i class="fas fa-blog"></i>
@@ -40,8 +40,32 @@
         <div class="col-lg-3 col-md-4 col-6 mb-3">
           <div class="small-box bg-info rounded shadow-sm">
             <div class="inner">
-              <h3 class="text-white font-weight-bold">{{ $usersCount }}</h3>
-              <p class="text-white m-0">Total User</p>
+              <h3 class="text-white font-weight-bold">{{ $todaySick }}</h3>
+              <p class="text-white m-0">Today sick</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-4 col-6 mb-3">
+          <div class="small-box bg-info rounded shadow-sm">
+            <div class="inner">
+              <h3 class="text-white font-weight-bold">{{ $todayAbsence }}</h3>
+              <p class="text-white m-0">Today absence</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-4 col-6 mb-3">
+          <div class="small-box bg-info rounded shadow-sm">
+            <div class="inner">
+              <h3 class="text-white font-weight-bold">{{ $totalHours }}</h3>
+              <p class="text-white m-0">Total Today Hour</p>
             </div>
             <div class="icon">
               <i class="fas fa-users"></i>
@@ -50,155 +74,97 @@
         </div>
         <!-- ./col -->
         
-        <!-- Left col -->
-        <section class="col-lg-7 connectedSortable">
-          
-
-          <!-- TO DO List -->
-          <div class="card d-none">
-            <div class="card-header">
-              <h3 class="card-title">
-                <i class="ion ion-clipboard mr-1"></i>
-                To Do List
-              </h3>
-
-              <div class="card-tools">
-                <ul class="pagination pagination-sm">
-                  <li class="page-item"><a href="#" class="page-link">&laquo;</a></li>
-                  <li class="page-item"><a href="#" class="page-link">1</a></li>
-                  <li class="page-item"><a href="#" class="page-link">2</a></li>
-                  <li class="page-item"><a href="#" class="page-link">3</a></li>
-                  <li class="page-item"><a href="#" class="page-link">&raquo;</a></li>
-                </ul>
-              </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <ul class="todo-list" data-widget="todo-list">
-                <li>
-                  <!-- drag handle -->
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <!-- checkbox -->
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo1" id="todoCheck1">
-                    <label for="todoCheck1"></label>
-                  </div>
-                  <!-- todo text -->
-                  <span class="text">Design a nice theme</span>
-                  <!-- Emphasis label -->
-                  <small class="badge badge-danger"><i class="far fa-clock"></i> 2 mins</small>
-                  <!-- General tools such as edit or delete-->
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo2" id="todoCheck2" checked>
-                    <label for="todoCheck2"></label>
-                  </div>
-                  <span class="text">Make the theme responsive</span>
-                  <small class="badge badge-info"><i class="far fa-clock"></i> 4 hours</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo3" id="todoCheck3">
-                    <label for="todoCheck3"></label>
-                  </div>
-                  <span class="text">Let theme shine like a star</span>
-                  <small class="badge badge-warning"><i class="far fa-clock"></i> 1 day</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo4" id="todoCheck4">
-                    <label for="todoCheck4"></label>
-                  </div>
-                  <span class="text">Let theme shine like a star</span>
-                  <small class="badge badge-success"><i class="far fa-clock"></i> 3 days</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo5" id="todoCheck5">
-                    <label for="todoCheck5"></label>
-                  </div>
-                  <span class="text">Check your messages and notifications</span>
-                  <small class="badge badge-primary"><i class="far fa-clock"></i> 1 week</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo6" id="todoCheck6">
-                    <label for="todoCheck6"></label>
-                  </div>
-                  <span class="text">Let theme shine like a star</span>
-                  <small class="badge badge-secondary"><i class="far fa-clock"></i> 1 month</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer clearfix">
-              <button type="button" class="btn btn-primary float-right"><i class="fas fa-plus"></i> Add item</button>
-            </div>
-          </div>
-          <!-- /.card -->
-        </section>
-        <!-- /.Left col -->
-        <!-- right col (We are only adding the ID to make the widgets sortable)-->
-        <section class="col-lg-5 connectedSortable">
-
-
-          
-          <!-- /.card -->
-        </section>
-        <!-- right col -->
       </div>
       <!-- /.row (main row) -->
     </div><!-- /.container-fluid -->
   </section>
+        <section class="content" id="contentContainer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-secondary">
+                            <div class="card-header">
+                                <h3 class="card-title">Today Attendane Record</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center">Name</th>
+                                            <th> </th>
+                                            <th style="text-align:center">G. Total Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
+                                        @foreach ($todayAttendance as $data)
+                                            <tr>
+                                                <td>{{ $data->employee->name }}</td>
+                                                <td>
+                                                    <table class="table table-bordered w-100">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Type</th>
+                                                                <th>Time In</th>
+                                                                <th>Time Out</th>
+                                                                <th>Late</th>
+                                                                <th>Total Time</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @php
+                                                                if ($data->clock_in && $data->clock_out) {
+                                                                    $in = \Carbon\Carbon::parse($data->clock_in);
+                                                                    $out = \Carbon\Carbon::parse($data->clock_out);
+                                                                    $diff = $in->diff($out);
+                                                                    
+                                                                } else {
+                                                                    
+                                                                }
+                                                            @endphp
+                                                            <tr>
+                                                                <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
+                                                                <td>{{ $data->type }}</td>
+                                                                <td>{{ $data->clock_in }}</td>
+                                                                <td>{{ $data->clock_out }}</td>
+                                                                <td></td>
+                                                                <td>{{$diff->format('%H:%I:%S')}} </td>
+                                                                <td>
+                                                                    <a id="DetailsBtn"
+                                                                        rid="{{$data->id}}"
+                                                                        title="Details"
+                                                                        data-id="{{ $data->id }}"
+                                                                        data-employee="{{ $data->employee->name }}"
+                                                                        data-type="{{ $data->type }}"
+                                                                        data-clock_in="{{ $data->clock_in }}"
+                                                                        data-clock_out="{{ $data->clock_out }}"
+                                                                        data-details="{{ $data->details }}"
+                                                                        data-date="{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}"
+                                                                        data-total_time="{{ isset($diff) ? $diff->format('%H:%I:%S') : '-' }}"
+                                                                    >
+                                                                        <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
+                                                                    </a>
+                                                                    <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                                                    <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <td> </td>
+                                            </tr>
+                                        @endforeach
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 @endsection
 
 @section('script')

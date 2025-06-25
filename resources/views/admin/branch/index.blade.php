@@ -61,6 +61,7 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
+                                    <th>Date</th>
                                     <th>Name</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -70,6 +71,7 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
                                     <td>{{ $data->name }}</td>
                                     <td>
                                         <div class="custom-control custom-switch">

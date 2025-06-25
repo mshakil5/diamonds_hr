@@ -1,12 +1,15 @@
 <?php
   
 namespace App\Http\Controllers;
- 
+
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Blog;
+use App\Models\Holiday;
 use App\Models\User;
-  
+use Carbon\Carbon;
+
 class HomeController extends Controller
 {
     /**
@@ -51,7 +54,19 @@ class HomeController extends Controller
     {
         $blogsCount = Blog::count();
         $usersCount = User::where('is_type', 0)->count();
-        return view('admin.dashboard', compact('blogsCount', 'usersCount'));
+
+        $startDate = date('Y') . '-04-01';
+
+        $monthlyHoliday=Holiday::whereYear('date', Carbon::now()->year)
+                ->whereMonth('date', Carbon::now()->month)->count();
+
+        $todaySick = Attendance::whereDate('clock_in', Carbon::today())->whereType('Sick')->count();
+        $todayAbsence = Attendance::whereDate('clock_in', Carbon::today())->whereType('Absence')->count();
+        $totalHours = Attendance::whereDate('clock_in', Carbon::today())->count();
+        $todayAttendance = Attendance::whereDate('clock_in', Carbon::today())->get();
+
+
+        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours'));
     }
   
     /**

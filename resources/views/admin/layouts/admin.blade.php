@@ -40,25 +40,32 @@
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
-      
+    </ul>
+
+    <!-- Centered user and branch name -->
+    <ul class="navbar-nav mx-auto">
+      <li class="nav-item">
+        <span class="nav-link font-weight-bold">
+          Name: {{ Auth::user()->name }}
+            @if(Auth::user()->branch)
+            &mdash;  Branch: <span class="badge badge-success">{{ Auth::user()->branch->name }}</span>
+          @endif
+        </span>
+      </li>
     </ul>
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-
-      
       <li class="nav-item d-none d-sm-inline-block">
         <a class="dropdown-item" href="{{ route('logout') }}"
             onclick="event.preventDefault();
                           document.getElementById('logout-form').submit();">
             {{ __('Logout') }}
         </a>
-
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
             @csrf
         </form>
       </li>
-      
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
           <i class="fas fa-expand-arrows-alt"></i>

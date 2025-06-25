@@ -255,6 +255,7 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
+                                    <th>Date</th>
                                     <th>Name</th>
                                     <th>Username</th>
                                     <th>Type</th>
@@ -268,6 +269,7 @@
                                 @foreach ($query as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
                                     <td>{{$data->name}}</td>
                                     <td>{{$data->username}}</td>
                                     <td>{{$data->employee_type}}</td>

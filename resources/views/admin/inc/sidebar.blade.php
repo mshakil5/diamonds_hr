@@ -119,7 +119,7 @@
           </ul>
       </li>
 
-      <li class="nav-item dropdown {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
+      <li class="nav-item dropdown d-none {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
               <p>
@@ -142,19 +142,19 @@
           </ul>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item d-none">
           <a href="{{ route('admin.companyDetail') }}" class="nav-link {{ (request()->is('admin/company-details*')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-building"></i>
               <p>Company Details</p>
           </a>
       </li>
 
-      <li class="nav-item">
+      {{-- <li class="nav-item">
           <a href="{{ route('admin.role') }}" class="nav-link {{ (request()->is('admin/role*')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-shield-alt"></i>
               <p>Roles & Permissions</p>
           </a>
-      </li>
+      </li> --}}
 
     </ul>
   </nav>
