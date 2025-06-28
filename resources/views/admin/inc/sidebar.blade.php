@@ -99,7 +99,7 @@
                   </a>
               </li>
               <li class="nav-item">
-                  <a href="{{ route('allBlogCategories') }}" class="nav-link {{ request()->routeIs('allBlogCategories') ? 'active' : '' }}">
+                  <a href="{{ route('holidayReport') }}" class="nav-link {{ request()->routeIs('holidayReport') ? 'active' : '' }}">
                       <i class="fas fa-tags nav-icon"></i>
                       <p>Holiday Report</p>
                   </a>

@@ -20,16 +20,16 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="header-title">Employee report</h3>
+                        <h3 class="card-title" id="header-title">Holiday report</h3>
                     </div>
                     <div class="card-body">
                         <div class="errmsg"></div>
-                        <form action="{{ route('employeeReport.search')}}" method="POST">
+                        <form action="{{ route('holidayReport.search')}}" method="POST">
                             @csrf
                             
                             <div class="row">
                                 
-                                <div class="col-sm-3">
+                                <div class="col-sm-9">
                                 <!-- text input -->
                                     <div class="form-group">
                                         <label>Employee *</label>
@@ -39,23 +39,6 @@
                                             <option value="{{$employee->id}}">{{$employee->name}}</option>
                                             @endforeach
                                         </select>
-                                    </div>
-                                </div>
-
-
-                                <div class="col-sm-3">
-                                <!-- text input -->
-                                    <div class="form-group">
-                                        <label>From Date</label>
-                                        <input type="date" class="form-control" id="from_date" name="from_date" value="">
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-3">
-                                <!-- text input -->
-                                    <div class="form-group">
-                                        <label>To Date</label>
-                                        <input type="date" class="form-control" id="to_date" name="to_date" value="">
                                     </div>
                                 </div>
 
@@ -82,54 +65,42 @@
         </div>
     </div>
 </section>
-
-<section class="content" id="contentContainer">
+@if ($employeeName)
+ <section class="content" id="contentContainer">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Name: {{$employeeName ?? ''}}</h3>
+                        <h3 class="card-title">Name: {{$employeeName->name ?? ''}}</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Date</th>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Details</th>
-                                    <th>Total Time</th>
+                                    <th>Staff ID</th>
+                                    <th>Name </th>
+                                    <th>Holiday Ent</th>
+                                    <th>Holiday Start date </th>
+                                    <th>Duration (Days) </th>
+                                    <th> Status </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($data as $key => $data)
+
                                 <tr>
-                                    <td>{{$key + 1}}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('d/m/Y') }}</td>
-                                    <td>{{ $data->employee_name }}</td>
-                                    <td>{{ $data->type }}</td>
-                                    <td>{{ $data->details }}</td>
-                                    <td>
-                                        @if($data->clock_in && $data->clock_out)
-                                            @php
-                                                $diff = \Carbon\Carbon::parse($data->clock_out)->diff(\Carbon\Carbon::parse($data->clock_in));
-                                                $formatted = $diff->h . ' Hours ' . $diff->i . ' Minutes ' . $diff->s . ' Seconds';
-                                            @endphp
-
-                                            <span style="background-color: #f0f8ff; padding: 6px 12px; border-radius: 20px; display: inline-block; color: #333;">
-                                                {{ $formatted }}
-                                            </span>
-                                        @else
-                                            <span style="background-color: #f8d7da; padding: 6px 12px; border-radius: 20px; display: inline-block; color: #721c24;">
-                                                N/A
-                                            </span>
-                                        @endif
-
-                                    </td>
+                                    <td>1</td>
+                                    <td>{{ $employeeName->id }}</td>
+                                    <td>{{ $employeeName->name }}</td>
+                                    <td>Not clear</td>
+                                    <td>{{ $employeeName->entitled_holiday + $holidayDataCount }}</td>
+                                    <td>Not clear</td>
+                                    <td>1</td>
                                 </tr>
-                                @endforeach
+
+
+                                
                             </tbody>
                         </table>
                     </div>
@@ -137,7 +108,9 @@
             </div>
         </div>
     </div>
-</section>
+</section>   
+@endif
+
 
 @endsection
 

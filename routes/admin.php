@@ -113,6 +113,11 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');
     Route::post('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport.search');
 
+    // holiday report
+    Route::get('/report/holiday', [ReportController::class, 'holidayReport'])->name('holidayReport');
+    Route::post('/report/holiday', [ReportController::class, 'holidayReport'])->name('holidayReport.search');
+
+
     // roles and permission
     Route::get('role', [RoleController::class, 'index'])->name('admin.role');
 
