@@ -105,7 +105,7 @@
                   </a>
               </li>
               <li class="nav-item">
-                  <a href="{{ route('allBlogs') }}" class="nav-link {{ request()->routeIs('allBlogs') ? 'active' : '' }}">
+                  <a href="{{ route('stockReport') }}" class="nav-link {{ request()->routeIs('stockReport') ? 'active' : '' }}">
                       <i class="fas fa-list nav-icon"></i>
                       <p>Product Stock Report</p>
                   </a>

@@ -90,4 +90,51 @@ class ReportController extends Controller
     }
 
 
+    public function stockReport(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            
+            $query = DB::table('products as p')
+            ->leftJoin('stockmaintainces as sm','sm.product_id','=','p.id')
+            ->select('p.name','p.id',
+                DB::raw("sum(CASE when sm.cloth_type='Initial Stock' THEN sm.quantity 
+                ELSE NULL END) as initial_stock,
+            sum(CASE when sm.cloth_type='Dirty' THEN sm.quantity ELSE NULL END) as dirty,
+            sum(CASE when sm.cloth_type='Bed' THEN sm.quantity ELSE NULL END) as bed,
+            sum(CASE when sm.cloth_type='Arrived' THEN sm.quantity ELSE NULL END) as arrived,
+            sum(CASE when sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE NULL END) as lost,
+             sum(sm.marks) as marks
+            "))
+            ->groupBy('p.id');
+
+
+
+            return view('admin.reports.holidayReport', compact('query'));
+
+        } else {
+
+
+            $products = DB::table('products as p')
+                ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
+                ->select(
+                    'p.name',
+                    'p.id',
+                    DB::raw("sum(CASE when sm.cloth_type='Initial Stock' THEN sm.quantity ELSE NULL END) as initial_stock"),
+                    DB::raw("sum(CASE when sm.cloth_type='Dirty' THEN sm.quantity ELSE NULL END) as dirty"),
+                    DB::raw("sum(CASE when sm.cloth_type='Bed' THEN sm.quantity ELSE NULL END) as bed"),
+                    DB::raw("sum(CASE when sm.cloth_type='Arrived' THEN sm.quantity ELSE NULL END) as arrived"),
+                    DB::raw("sum(CASE when sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE NULL END) as lost"),
+                    DB::raw("sum(sm.marks) as marks")
+                )
+                ->groupBy('p.id', 'p.name')  // ✅ add p.name here
+                ->get();
+
+            
+            return view('admin.reports.stockReport', compact('products'));
+
+        }
+        
+    }
+
+
 }
