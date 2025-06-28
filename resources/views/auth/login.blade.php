@@ -38,7 +38,7 @@
                     </form>
 
                     <div class="text-center mt-3">
-                        <a href="{{ route('password.request') }}">Forgot Your Password?</a>
+                        {{-- <a href="{{ route('password.request') }}">Forgot Your Password?</a> --}}
                     </div>
                 </div>
             </div>
