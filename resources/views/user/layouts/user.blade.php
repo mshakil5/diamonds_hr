@@ -84,15 +84,55 @@
         </li>
 
 
-        <a class="btn bg-gradient-primary mt-4 w-100" href="{{ route('logout') }}"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            {{ __('Logout') }}
-        </a>
+<button type="button" class="btn btn-primary w-100 mt-4" onclick="toggleLogoutBox()">
+    Log Out
+</button>
 
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
 
+
+<div id="logoutBox" class="d-none" style="
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 1050;
+    width: 450px;
+    border-radius: 5px;
+">
+    <form method="POST" action="{{ route('clearSession') }}" onsubmit="return validateLogoutNote();">
+        @csrf
+        <label for="logoutDetails" style="font-weight: 600;">What have you done today?</label>
+        <textarea name="details" id="logoutDetails" class="form-control" rows="3" required></textarea>
+        <small class="text-danger d-none" id="logoutError">Please enter your activity.</small>
+        <div style="text-align: center;">
+          <button type="submit" class="btn btn-danger mt-2" style="width: 75%;">Confirm & Log Out</button>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+function toggleLogoutBox() {
+    const box = document.getElementById('logoutBox');
+    box.classList.toggle('d-none');
+}
+
+function validateLogoutNote() {
+    const textarea = document.getElementById('logoutDetails');
+    const errorMsg = document.getElementById('logoutError');
+
+    if (!textarea.value.trim()) {
+        errorMsg.classList.remove('d-none');
+        return false;
+    }
+
+    return true;
+}
+</script>
 
       </ul>
     </div>

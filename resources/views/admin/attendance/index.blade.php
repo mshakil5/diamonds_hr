@@ -141,6 +141,7 @@
                                                 </thead>
                                                 <tbody>
                                                     @php
+                                                        $diff = '';
                                                         if ($data->clock_in && $data->clock_out) {
                                                             $in = \Carbon\Carbon::parse($data->clock_in);
                                                             $out = \Carbon\Carbon::parse($data->clock_out);
@@ -156,7 +157,7 @@
                                                         <td>{{ $data->clock_in }}</td>
                                                         <td>{{ $data->clock_out }}</td>
                                                         <td></td>
-                                                        <td>{{$diff->format('%H:%I:%S')}} </td>
+                                                        <td>{{ $diff ? $diff->format('%H:%I:%S') : '-' }} </td>
                                                         <td>
                                                             <a id="DetailsBtn"
                                                                 rid="{{$data->id}}"
@@ -168,7 +169,7 @@
                                                                 data-clock_out="{{ $data->clock_out }}"
                                                                 data-details="{{ $data->details }}"
                                                                 data-date="{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}"
-                                                                data-total_time="{{ isset($diff) ? $diff->format('%H:%I:%S') : '-' }}"
+                                                                data-total_time="{{ $diff ? $diff->format('%H:%I:%S') : '-' }}"
                                                             >
                                                                 <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
                                                             </a>

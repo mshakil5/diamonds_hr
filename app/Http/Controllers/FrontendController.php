@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CompanyDetails;
 use App\Models\Blog;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Employee;
+use App\Models\Attendance;
+use Illuminate\Support\Carbon;
 
 class FrontendController extends Controller
 {
@@ -60,4 +64,66 @@ class FrontendController extends Controller
     //         return redirect()->route('login');
     //     }
     // }
+
+    public function logoutWithActivity(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+            'details'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
+            $employee = $user->employee ?? Employee::where('user_id', $user->id)->first();
+
+            if ($employee) {
+                $attendance = Attendance::where('employee_id', $employee->id)
+                    ->whereDate('clock_in', Carbon::today())
+                    ->whereNull('clock_out')
+                    ->latest('clock_in')
+                    ->first();
+
+                if ($attendance) {
+                    $attendance->update([
+                        'clock_out' => now()->format('Y-m-d H:i'),
+                        'details'   => $request->details,
+                    ]);
+                } else {
+                    $new = Attendance::create([
+                        'employee_id' => $employee->id,
+                        'branch_id'   => $employee->branch_id,
+                        'clock_in'    => now()->format('Y-m-d H:i'),
+                        'type'        => 'Regular',
+                    ]);
+                    $new->update([
+                        'clock_out' => now()->format('Y-m-d H:i'),
+                        'details'   => $request->details,
+                    ]);
+                }
+            }
+
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Details recorded successfully',
+                'redirect' => route('login'),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials. Please try again.',
+        ], 401);
+    }
 }

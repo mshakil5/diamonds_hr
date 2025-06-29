@@ -7,6 +7,9 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Carbon;
+use App\Models\Employee;
+use App\Models\Attendance;
   
 class LoginController extends Controller
 {
@@ -55,11 +58,26 @@ class LoginController extends Controller
             if ($chksts->status == 1) {
                 if(auth()->attempt(array('email' => $input['email'], 'password' => $input['password'])))
                     {
+
+                        $user = auth()->user();
+                        
                         if (auth()->user()->is_type == '1') {
                             return redirect()->route('admin.dashboard');
                         }else if (auth()->user()->is_type == '2') {
                             return redirect()->route('manager.dashboard');
                         }else if (auth()->user()->is_type == '0') {
+
+                          $employee = Employee::where('user_id', $user->id)->first();
+
+                          if ($employee) {
+                              Attendance::create([
+                                  'employee_id' => $employee->id,
+                                  'branch_id'   => $employee->branch_id,
+                                  'clock_in' => Carbon::now()->format('Y-m-d H:i'),
+                                  'type'        => 'Regular',
+                              ]);
+                          }
+
                             return redirect()->route('user.profile');
                         }
                     }else{
