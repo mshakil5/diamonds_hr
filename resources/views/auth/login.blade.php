@@ -14,7 +14,7 @@
                         <h3 class="text-center">Staff Login</h3>
 
                         @if (isset($message))
-                            <p class="text-danger text-center mt-3"><strong>{{ $message }}</strong></p>
+                            <p class="text-success text-center mt-3"><strong>{{ $message }}</strong></p>
                         @endif
 
                         <form method="POST" action="{{ route('login') }}">

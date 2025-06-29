@@ -130,7 +130,11 @@
                                                                 <td>{{ $data->clock_in }}</td>
                                                                 <td>{{ $data->clock_out }}</td>
                                                                 <td></td>
-                                                                <td>{{$diff->format('%H:%I:%S')}} </td>
+                                                                @if(isset($diff))
+                                                                  <td>{{ $diff->format('%H:%I:%S') }}</td>
+                                                                @else
+                                                                  <td>-</td>
+                                                                @endif
                                                                 <td>
                                                                     <a id="DetailsBtn"
                                                                         rid="{{$data->id}}"

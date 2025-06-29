@@ -44,7 +44,7 @@ class LoginController extends Controller
     }
     
     
-    public function login(Request $request)
+    public function login2(Request $request)
     {   
         $input = $request->all();
      
@@ -56,34 +56,43 @@ class LoginController extends Controller
         $chksts = User::where('email', $input['email'])->first();
         if ($chksts) {
             if ($chksts->status == 1) {
-                if(auth()->attempt(array('email' => $input['email'], 'password' => $input['password'])))
+
+
+                if ($chksts->is_type == '1') {
+                    
+                    if(auth()->attempt(array('email' => $input['email'], 'password' => $input['password'])))
                     {
 
-                        $user = auth()->user();
+                        return redirect()->route('admin.dashboard');
                         
-                        if (auth()->user()->is_type == '1') {
-                            return redirect()->route('admin.dashboard');
-                        }else if (auth()->user()->is_type == '2') {
-                            return redirect()->route('manager.dashboard');
-                        }else if (auth()->user()->is_type == '0') {
-
-                          $employee = Employee::where('user_id', $user->id)->first();
-
-                          if ($employee) {
-                              Attendance::create([
-                                  'employee_id' => $employee->id,
-                                  'branch_id'   => $employee->branch_id,
-                                  'clock_in' => Carbon::now()->format('Y-m-d H:i'),
-                                  'type'        => 'Regular',
-                              ]);
-                          }
-
-                            return redirect()->route('user.profile');
-                        }
+                        
                     }else{
                         return view('auth.login')
                             ->with('message','Wrong Password.');
                     }
+
+
+                }else if ($chksts->is_type == '0') {
+
+                    $employee = Employee::where('user_id', $chksts->id)->first();
+
+                    if ($employee) {
+                        Attendance::create([
+                            'employee_id' => $employee->id,
+                            'branch_id'   => $employee->branch_id,
+                            'clock_in' => Carbon::now()->format('Y-m-d H:i'),
+                            'type'        => 'Regular',
+                        ]);
+                    }
+
+                    return redirect()->route('user.profile');
+                    
+                }else {
+                    return view('auth.login')
+                        ->with('message','You are not authenticate user.');
+                }
+                
+
             }else{
                 return view('auth.login')
                 ->with('message','Your ID is Deactive.');
@@ -94,4 +103,58 @@ class LoginController extends Controller
         }
           
     }
+
+
+    public function login(Request $request)
+    {
+        $input = $request->all();
+
+        $this->validate($request, [
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $input['email'])->first();
+        if ($user && $user->is_type == '0' && $user->status == 1) {
+            if (auth()->attempt(['email' => $input['email'], 'password' => $input['password']])) {
+                $employee = Employee::where('user_id', $user->id)->first();
+                if ($employee) {
+                    // Check for existing clock-in
+                    $existingAttendance = Attendance::where('employee_id', $employee->id)
+                        ->whereDate('clock_in', Carbon::today())
+                        ->first();
+                    if ($existingAttendance) {
+                        auth()->logout();
+                        return view('auth.login')->with('message', 'You have already clocked in today.');
+                    }
+
+                    // Create attendance record
+                    Attendance::create([
+                        'employee_id' => $employee->id,
+                        'branch_id' => $employee->branch_id,
+                        'clock_in' => Carbon::now()->format('Y-m-d H:i'),
+                        'type' => 'Regular',
+                    ]);
+
+                    auth()->logout();
+                    return view('auth.login')->with('message', 'Attendance recorded successfully.');
+                }
+                auth()->logout();
+                return view('auth.login')->with('message', 'Employee record not found.');
+            }
+            return view('auth.login')->with('message', 'Wrong Password.');
+        }elseif ($user && $user->is_type == '1' && $user->status == 1) {
+            if(auth()->attempt(array('email' => $input['email'], 'password' => $input['password'])))
+                {
+                    return redirect()->route('admin.dashboard');
+                    
+                }else{
+                    return view('auth.login')
+                        ->with('message','Wrong Password.');
+                }
+        }
+        return view('auth.login')->with('message', 'Credential Error or not an employee.');
+    }
+
+
 }
