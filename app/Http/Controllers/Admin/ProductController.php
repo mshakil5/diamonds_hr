@@ -29,6 +29,7 @@ class ProductController extends Controller
 
         $data = new Product();
         $data->name = $request->name;
+        $data->branch_id = Auth::user()->branch_id;
         $data->status = $request->status;
         $data->created_by = auth()->id();
         $data->save();
