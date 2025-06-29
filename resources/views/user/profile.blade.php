@@ -378,7 +378,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-xl-12 d-none" id="logoutBox">
+      <div class="col-12 col-xl-12">
         <div class="card h-100">
           <div class="card-header pb-0 p-3">
             <div class="row">
@@ -405,7 +405,7 @@
 
               <div class="row justify-content-center">
                 <div class="col-md-6">
-                  <button type="submit" class="btn bg-gradient-dark w-100">Submit</button>
+                  <button type="submit" class="btn bg-gradient-dark w-100">Save And Logout</button>
                 </div>
               </div>
             </form>

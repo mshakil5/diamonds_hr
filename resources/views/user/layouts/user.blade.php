@@ -84,9 +84,10 @@
         </li>
 
 
-<button type="button" class="btn btn-primary w-100 mt-4" onclick="toggleLogoutBox()">
+<button type="button" class="btn btn-primary w-100 mt-4 d-none" onclick="toggleLogoutBox()">
     Log Out
 </button>
+
 
 
 
