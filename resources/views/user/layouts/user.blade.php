@@ -33,7 +33,7 @@
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="{{route('homepage')}}">
         {{-- <img src="{{ asset('images/company/' . $company->logo) }}" class="navbar-brand-img h-100" alt="main_logo"> --}}
-        <h3 class="ms-1 font-weight-bold">PMK</h3>
+        <h3 class="ms-1 font-weight-bold">Diamonds</h3>
       </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -41,7 +41,7 @@
       <ul class="navbar-nav">
         
         
-        <li class="nav-item">
+        <li class="nav-item d-none">
           <a class="nav-link  " href="#">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -61,7 +61,7 @@
             <span class="nav-link-text ms-1">Transaction</span>
           </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item d-none">
           <a class="nav-link  active" href="{{route('user.profile')}}">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -90,7 +90,7 @@
 
 
 
-<div id="logoutBox" class="d-none" style="
+<div class="d-none" style="
     position: fixed;
     top: 20px;
     left: 50%;
@@ -213,8 +213,8 @@ function validateLogoutNote() {
 
 
 
-    <div class="container-fluid">
-      <div class="page-header min-height-300 border-radius-xl mt-4" style="background-image: url(..{{ Auth::user()->coverimage}}); background-position-y: 50%;">
+    <div class="container-fluid d-none">
+      <div class="page-header min-height-100 border-radius-xl mt-4" style="background-image: url(..{{ Auth::user()->coverimage}}); background-position-y: 50%;">
         {{-- <span class="mask bg-gradient-primary opacity-6"></span> --}}
       </div>
       <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
@@ -231,7 +231,7 @@ function validateLogoutNote() {
               </h5>
             </div>
           </div>
-          <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+          <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 d-none">
             <div class="nav-wrapper position-relative end-0">
               <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
                 <li class="nav-item">

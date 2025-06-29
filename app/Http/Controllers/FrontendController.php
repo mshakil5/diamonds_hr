@@ -22,12 +22,16 @@ class FrontendController extends Controller
 
     public function login()
     {
-        if (Auth::user()) {
-            return redirect()->route('home');
-        } else {
-            return view('auth.login');
+        if (Auth::check()) {
+            if (auth()->user()->is_type == '1') {
+                return redirect()->route('admin.dashboard');
+            } elseif (auth()->user()->is_type == '2') {
+                return redirect()->route('manager.dashboard');
+            } elseif (auth()->user()->is_type == '0') {
+                return redirect()->route('user.profile');
+            }
         }
-        
+        return view('auth.login');
     }
 
     public function about()

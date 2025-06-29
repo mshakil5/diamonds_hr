@@ -12,6 +12,7 @@ use App\Models\Holiday;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -23,6 +24,13 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+
+      $request->validate([
+          'name' => 'required|string|max:255',
+          'email' => 'required|email|unique:users,email',
+          'password' => 'required|string|min:6',
+      ]);
+
         $request->merge(['password'=>Hash::make($request->password)]);
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -32,10 +40,10 @@ class EmployeeController extends Controller
         }
         $user = User::create([
             'name'=>$request->name,
-            'email'=>$request->username.'@diamondsgroup.com',
+            'email'=>$request->email,
             'password'=>$request->password,
             'role'=>'staff',
-            'photo'=>$userphoto,
+            'photo'=>$userphoto ?? '',
         ]);
         $request->merge(['user_id'=>$user->id]);
         $request->merge(['branch_id' => Auth::user()->branch_id]);
@@ -56,7 +64,19 @@ class EmployeeController extends Controller
     public function update(Request $request)
     {
 
-        $employee= Employee::find($request->codeid);
+        $employee = Employee::find($request->codeid);
+        $user = User::find($employee->user_id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'password' => 'nullable|string|min:6',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png',
+        ]);
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -71,7 +91,7 @@ class EmployeeController extends Controller
             
             $user = User::whereId($employee->user_id)->first()->update([
                 'name'=>$request->name,
-                'email'=>$request->username.'@diamondsgroup.com',
+                'email'=>$request->email,
                 'password'=>$request->password,
                 'photo'=>$userphoto,
             ]);
@@ -80,8 +100,8 @@ class EmployeeController extends Controller
             $request->merge(['branch_id' => Auth::user()->branch_id]);
             $user = User::whereId($employee->user_id)->first()->update([
                 'name'=>$request->name,
-                'email'=>$request->username.'@diamondsgroup.com',
-                'photo'=>$userphoto,
+                'email'=>$request->email,
+                'photo'=>$userphoto ?? '',
             ]);
         }
 
@@ -108,8 +128,7 @@ class EmployeeController extends Controller
             ]);
         }else{
 
-            $employee=Employee::find($id);
-            $user=User::whereEmail($employee->username.'@diamondsgroup.com')->first();
+            $user = $employee->user;
             $user->delete();
             $employee->delete();
             return response()->json([
