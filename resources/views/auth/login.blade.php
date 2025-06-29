@@ -74,12 +74,11 @@
     <div class="bg-white border p-4 shadow-lg rounded col-10 col-md-8 col-lg-6">
         <h5 class="text-center mb-4" style="font-weight: bold; color: #333;">Employee Log Details & Activities</h5>
 
-        <p class="text-success"> Please add today's activities which you have done</p>
+        <p class="text-success"> Please add today's activities which you have done.</p>
 
       <form id="logoutForm">
           @csrf
           <div class="form-group mb-3">
-              <label for="logoutDetails">Today's Activities:</label>
               <textarea name="details" id="logoutDetails" class="form-control" rows="5" required></textarea>
               <small class="text-danger d-none" id="logoutError">Please enter your activity.</small>
           </div>
