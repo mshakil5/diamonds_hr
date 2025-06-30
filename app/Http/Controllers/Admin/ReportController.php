@@ -105,6 +105,7 @@ class ReportController extends Controller
             sum(CASE when sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE NULL END) as lost,
              sum(sm.marks) as marks
             "))
+            ->where('sm.branch_id', Auth::user()->branch_id)
             ->groupBy('p.id');
 
 
@@ -127,6 +128,7 @@ class ReportController extends Controller
                     DB::raw("sum(sm.marks) as marks")
                 )
                 ->groupBy('p.id', 'p.name')  // ✅ add p.name here
+                ->where('sm.branch_id', Auth::user()->branch_id)
                 ->get();
 
             
