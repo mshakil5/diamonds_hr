@@ -51,9 +51,9 @@
     <ul class="navbar-nav mx-auto">
       <li class="nav-item">
         <span class="nav-link font-weight-bold">
-          Name: {{ Auth::user()->name }}
+          
             @if(Auth::user()->branch)
-            &mdash;  Branch: <span class="badge badge-success">{{ Auth::user()->branch->name }}</span>
+              Branch: <span class="badge badge-success">{{ Auth::user()->branch->name }}</span>
           @endif
         </span>
       </li>
