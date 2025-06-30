@@ -115,22 +115,30 @@
 
 
                                         </div>
-                                        <div class="col-sm-6">
-                                        <!-- text input -->
-                                            <div class="form-group">
-                                                <label>Image</label>
-                                                <input type="file" class="form-control" id="image" name="image">
-                                                <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
+
+                                        <div class="col-sm-3">
+                                            <!-- text input -->
+                                                <div class="form-group">
+                                                    <label>Email*</label>
+                                                    <input type="text" class="form-control" id="email" name="email">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                            <!-- text input -->
+                                                <div class="form-group">
+                                                    <label>Image</label>
+                                                    <input type="file" class="form-control" id="image" name="image">
+                                                    <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                            <!-- text input -->
+                                                <div class="form-group">
+                                                    <label>Address</label>
+                                                    <textarea class="form-control" name="address" id="address" cols="30" rows="2"></textarea>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-12">
-                                        <!-- text input -->
-                                            <div class="form-group">
-                                                <label>Address</label>
-                                                <textarea class="form-control" name="address" id="address" cols="30" rows="2"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                 </div>
                                 <!-- /.card-body -->
@@ -193,8 +201,8 @@
                                         <div class="col-sm-3">
                                         <!-- text input -->
                                             <div class="form-group">
-                                                <label>Email*</label>
-                                                <input type="text" class="form-control" id="email" name="email">
+                                                <label>Username*</label>
+                                                <input type="text" class="form-control" id="username" name="username">
                                             </div>
                                         </div>
                                         
@@ -250,7 +258,7 @@
                                     <th>Sl</th>
                                     <th>Date</th>
                                     <th>Name</th>
-                                    {{-- <th>Username</th> --}}
+                                    <th>Username</th>
                                     <th>Type</th>
                                     <th>Email/Phone</th>
                                     <th>Image</th>
@@ -264,7 +272,7 @@
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>{{$data->name}}</td>
-                                    {{-- <td>{{$data->username}}</td> --}}
+                                    <td>{{$data->username}}</td>
                                     <td>{{$data->employee_type}}</td>
                                     <td>{{$data->user->email ?? ''}} <br> {{$data->phone ?? ''}}</td>
                                     <td>
@@ -363,7 +371,7 @@
                     '#pay_rate',
                     '#tax_code',
                     '#entitled_holiday',
-                    // '#username',
+                    '#username',
                     '#password'
                 ];
                 for (var i = 0; i < requiredFields.length; i++) {
@@ -415,7 +423,7 @@
                     '#pay_rate',
                     '#tax_code',
                     '#entitled_holiday',
-                    // '#username'
+                    '#username'
                 ];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {

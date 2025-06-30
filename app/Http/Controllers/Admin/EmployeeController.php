@@ -25,11 +25,24 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
 
-      $request->validate([
-          'name' => 'required|string|max:255',
-          'email' => 'required|email|unique:users,email',
-          'password' => 'required|string|min:6',
-      ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email'),
+                Rule::unique('employees', 'email'),
+            ],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users', 'username'),
+                Rule::unique('employees', 'username'),
+            ],
+            'password' => 'required|string|min:6',
+        ]);
 
         $request->merge(['password'=>Hash::make($request->password)]);
         if ($request->hasFile('image')) {
@@ -40,6 +53,7 @@ class EmployeeController extends Controller
         }
         $user = User::create([
             'name'=>$request->name,
+            'username'=>$request->username,
             'email'=>$request->email,
             'password'=>$request->password,
             'role'=>'staff',
@@ -72,7 +86,16 @@ class EmployeeController extends Controller
             'email' => [
                 'required',
                 'email',
+                'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
+                Rule::unique('employees', 'email')->ignore($employee->id),
+            ],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users', 'username')->ignore($user->id),
+                Rule::unique('employees', 'username')->ignore($employee->id),
             ],
             'password' => 'nullable|string|min:6',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
@@ -94,6 +117,7 @@ class EmployeeController extends Controller
                 'email'=>$request->email,
                 'password'=>$request->password,
                 'photo'=>$userphoto,
+                'username'=>$request->username
             ]);
 
         }else {
@@ -102,6 +126,7 @@ class EmployeeController extends Controller
                 'name'=>$request->name,
                 'email'=>$request->email,
                 'photo'=>$userphoto ?? '',
+                'username'=>$request->username
             ]);
         }
 

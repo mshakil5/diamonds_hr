@@ -159,14 +159,16 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'login' => 'required|string',
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->login)
+            ->orWhere('username', $request->login)
+            ->first();
 
         if ($user && $user->is_type == '0' && $user->status == 1) {
-            if (auth()->attempt($request->only('email', 'password'))) {
+            if (auth()->attempt(['email' => $user->email, 'password' => $request->password])) {
                 $employee = Employee::where('user_id', $user->id)->first();
                 if (!$employee) {
                     auth()->logout();

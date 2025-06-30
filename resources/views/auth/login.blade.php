@@ -11,7 +11,7 @@
                         <small id="currentTime">Time: --:--:--</small>
                     </div>
                     <div class="card-body">
-                        <h3 class="text-center">Staff Login</h3>
+                        <h3 class="text-center">Login</h3>
 
                         @if (session('message'))
                             <p class="text-success text-center mt-3"><strong>{{ session('message') }}</strong></p>
@@ -20,9 +20,8 @@
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
                             <div class="form-group mt-4">
-                                <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                       name="email" placeholder="Email" required autofocus>
-                                @error('email')
+                                <input type="text" class="form-control @error('login') is-invalid @enderror" name="login" placeholder="Email or Username" required autofocus>
+                                @error('login')
                                     <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
