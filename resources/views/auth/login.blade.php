@@ -80,6 +80,8 @@
 
         <p class="text-success"> Please add today's activities which you have done.</p>
 
+        <div class="errmsg"></div>
+
       <form id="logoutForm">
           @csrf
           <div class="form-group mb-3">
@@ -88,8 +90,8 @@
           </div>
           <div class="row mb-2">
               <div class="col-6">
-                  <label for="email">Email:</label>
-                  <input type="email" name="email" id="email" class="form-control" required>
+                  <label for="email">Email/Username:</label>
+                  <input type="text" name="email" id="email" class="form-control" required>
               </div>
               <div class="col-6">
                   <label for="password">Password:</label>
@@ -141,16 +143,18 @@
         email: email,
         password: password
       },
-      success: function(data) {
-        alert(data.message);
-        window.location.href = '{{ route("login") }}';
+    success: function(data) {
+      $('.errmsg').html('<div class="alert alert-success text-center">' + data.message + '</div>');
+        setTimeout(function() {
+            window.location.href = '{{ route("login") }}';
+        }, 3000);
       },
       error: function(xhr) {
         if (xhr.responseJSON && xhr.responseJSON.errors) {
           const errorMessage = Object.values(xhr.responseJSON.errors)[0][0];
-          alert(errorMessage);
+          $('.errmsg').html('<div class="alert alert-danger text-center">' + errorMessage + '</div>');
         } else if (xhr.responseJSON && xhr.responseJSON.message) {
-          alert(xhr.responseJSON.message);
+          $('.errmsg').html('<div class="alert alert-danger text-center">' + xhr.responseJSON.message + '</div>');
         } else {
           alert('An unknown error occurred');
         }

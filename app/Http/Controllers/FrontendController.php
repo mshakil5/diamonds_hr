@@ -73,7 +73,7 @@ class FrontendController extends Controller
     public function logoutWithActivity(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required',
             'details'  => 'required',
         ]);
@@ -85,34 +85,36 @@ class FrontendController extends Controller
             ], 422);
         }
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        $loginField = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$loginField => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             $employee = $user->employee ?? Employee::where('user_id', $user->id)->first();
 
             if ($employee) {
-                $attendance = Attendance::where('employee_id', $employee->id)
-                    ->whereDate('clock_in', Carbon::today())
-                    ->whereNull('clock_out')
-                    ->latest('clock_in')
-                    ->first();
+            $attendance = Attendance::where('employee_id', $employee->id)
+                ->whereDate('clock_in', Carbon::today())
+                ->whereNull('clock_out')
+                ->latest('clock_in')
+                ->first();
 
-                if ($attendance) {
-                    $attendance->update([
-                        'clock_out' => now()->format('Y-m-d H:i'),
-                        'details'   => $request->details,
-                    ]);
-                } else {
-                    $new = Attendance::create([
-                        'employee_id' => $employee->id,
-                        'branch_id'   => $employee->branch_id,
-                        'clock_in'    => now()->format('Y-m-d H:i'),
-                        'type'        => 'Regular',
-                    ]);
-                    $new->update([
-                        'clock_out' => now()->format('Y-m-d H:i'),
-                        'details'   => $request->details,
-                    ]);
-                }
+            if ($attendance) {
+                $attendance->update([
+                'clock_out' => now()->format('Y-m-d H:i'),
+                'details'   => $request->details,
+                ]);
+            } else {
+                $new = Attendance::create([
+                'employee_id' => $employee->id,
+                'branch_id'   => $employee->branch_id,
+                'clock_in'    => now()->format('Y-m-d H:i'),
+                'type'        => 'Regular',
+                ]);
+                $new->update([
+                'clock_out' => now()->format('Y-m-d H:i'),
+                'details'   => $request->details,
+                ]);
+            }
             }
 
             Auth::logout();
@@ -120,9 +122,9 @@ class FrontendController extends Controller
             $request->session()->regenerateToken();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Details recorded successfully',
-                'redirect' => route('login'),
+            'success' => true,
+            'message' => 'Details recorded successfully',
+            'redirect' => route('login'),
             ]);
         }
 
