@@ -41,7 +41,7 @@ class EmployeeController extends Controller
                 Rule::unique('users', 'username'),
                 Rule::unique('employees', 'username'),
             ],
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:4',
         ]);
 
         $request->merge(['password'=>Hash::make($request->password)]);
@@ -97,7 +97,7 @@ class EmployeeController extends Controller
                 Rule::unique('users', 'username')->ignore($user->id),
                 Rule::unique('employees', 'username')->ignore($employee->id),
             ],
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:4',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
 
@@ -141,6 +141,7 @@ class EmployeeController extends Controller
 
     public function delete(Request $request, $id)
     {
+        $employee = Employee::find($id);
         $attendace = Attendance::whereEmployeeId($id)->count();
         $holiday = Holiday::whereEmployeeId($id)->count();
         $stock = Stockmaintaince::whereEmployeeId($id)->count();
