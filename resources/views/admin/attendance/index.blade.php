@@ -152,7 +152,7 @@
                                                         }
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                                         <td>{{ $data->type }}</td>
                                                         <td>{{ $data->clock_in }}</td>
                                                         <td>{{ $data->clock_out }}</td>

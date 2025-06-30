@@ -71,7 +71,7 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>{{ $data->name }}</td>
                                     <td>
                                         <div class="custom-control custom-switch">

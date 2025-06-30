@@ -140,7 +140,7 @@
                   @foreach ($data as $key => $data)
                   <tr>
                     <td style="text-align: center">{{ $key + 1 }}</td>
-                    <td style="text-align: center">{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
+                    <td style="text-align: center">{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                     <td style="text-align: center">{{$data->name}}</td>
                     <td style="text-align: center">{{$data->surname}}</td>
                     <td style="text-align: center">{{$data->email}}</td>

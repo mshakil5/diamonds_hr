@@ -11,7 +11,7 @@ class BranchController extends Controller
 {
     public function index()
     {
-        $data = Branch::orderby('id', 'DESC')->get();
+        $data = Branch::where('id', auth()->user()->branch_id)->get();
         return view('admin.branch.index', compact('data'));
     }
 

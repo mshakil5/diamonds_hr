@@ -104,7 +104,7 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ $data->date }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ $data->employee->name }}</td>
                                     <td>{{ $data->type }}</td>
                                     <td>{{ $data->details }}</td>

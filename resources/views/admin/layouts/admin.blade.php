@@ -26,7 +26,12 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
   <!-- Select2 CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-  
+
+  <style>
+    .select2-selection{
+      height: 36px !important;
+    }
+  </style>
 
 
 </head>

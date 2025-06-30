@@ -105,7 +105,7 @@ class LoginController extends Controller
     }
 
 
-    public function login(Request $request)
+    public function login3(Request $request)
     {
         $input = $request->all();
 
@@ -156,5 +156,46 @@ class LoginController extends Controller
         return view('auth.login')->with('message', 'Credential Error or not an employee.');
     }
 
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && $user->is_type == '0' && $user->status == 1) {
+            if (auth()->attempt($request->only('email', 'password'))) {
+                $employee = Employee::where('user_id', $user->id)->first();
+                if (!$employee) {
+                    auth()->logout();
+                    return back()->with('message', 'Employee record not found.');
+                }
+
+                $alreadyClockedIn = Attendance::where('employee_id', $employee->id)
+                    ->whereDate('clock_in', now())->exists();
+
+                if ($alreadyClockedIn) {
+                    auth()->logout();
+                    return back()->with('message', 'Already clocked in today.');
+                }
+
+                Attendance::create([
+                    'employee_id' => $employee->id,
+                    'branch_id' => $employee->branch_id,
+                    'clock_in' => now(),
+                    'type' => 'Regular',
+                ]);
+
+                auth()->logout();
+                return back()->with('message', 'Attendance recorded successfully.');
+            }
+
+            return back()->with('message', 'Wrong Password.');
+        }
+
+        return back()->with('message', 'Invalid employee credentials.');
+    }
 
 }

@@ -62,10 +62,10 @@ class HomeController extends Controller
         $monthlyHoliday=Holiday::whereYear('date', Carbon::now()->year)
                 ->whereMonth('date', Carbon::now()->month)->count();
 
-        $todaySick = Attendance::whereDate('clock_in', Carbon::today())->whereType('Sick')->count();
-        $todayAbsence = Attendance::whereDate('clock_in', Carbon::today())->whereType('Absence')->count();
-        $totalHours = Attendance::whereDate('clock_in', Carbon::today())->count();
-        $todayAttendance = Attendance::whereDate('clock_in', Carbon::today())->get();
+        $todaySick = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->whereType('Sick')->count();
+        $todayAbsence = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->whereType('Absence')->count();
+        $totalHours = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->count();
+        $todayAttendance = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->get();
 
 
         return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours'));

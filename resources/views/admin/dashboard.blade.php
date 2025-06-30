@@ -110,7 +110,7 @@
                                                                 <th>Time Out</th>
                                                                 <th>Late</th>
                                                                 <th>Total Time</th>
-                                                                <th>Action</th>
+                                                                <th class="d-none">Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -125,7 +125,7 @@
                                                                 }
                                                             @endphp
                                                             <tr>
-                                                                <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
+                                                                <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                                                 <td>{{ $data->type }}</td>
                                                                 <td>{{ $data->clock_in }}</td>
                                                                 <td>{{ $data->clock_out }}</td>
@@ -135,7 +135,7 @@
                                                                 @else
                                                                   <td>-</td>
                                                                 @endif
-                                                                <td>
+                                                                <td class="d-none">
                                                                     <a id="DetailsBtn"
                                                                         rid="{{$data->id}}"
                                                                         title="Details"

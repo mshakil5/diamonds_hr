@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Employee;
 use App\Models\Attendance;
 use Illuminate\Support\Carbon;
+use App\Models\User;
 
 class FrontendController extends Controller
 {
@@ -130,4 +131,29 @@ class FrontendController extends Controller
             'message' => 'Invalid credentials. Please try again.',
         ], 401);
     }
+
+    public function showAdminLogin()
+    {
+        return view('auth.admin_login');
+    }
+
+    public function adminLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && $user->is_type == '1' && $user->status == 1) {
+            if (auth()->attempt($request->only('email', 'password'))) {
+                return redirect()->route('admin.dashboard');
+            }
+            return back()->with('message', 'Wrong Password.');
+        }
+
+        return back()->with('message', 'Invalid admin credentials.');
+    }
+
 }

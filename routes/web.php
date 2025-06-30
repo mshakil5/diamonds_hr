@@ -34,6 +34,9 @@ Route::get('/blog/{slug}', [FrontendController::class, 'showBlogDetails'])->name
 Route::post('/clear-session', [HomeController::class, 'clearSession'])->name('clearSession');
 Route::post('/logout-with-activity', [FrontendController::class, 'logoutWithActivity'])->name('logout.with.activity');
 
+Route::get('/login/admin', [FrontendController::class, 'showAdminLogin'])->name('login.admin');
+Route::post('/login/admin', [FrontendController::class, 'adminLogin'])->name('login.admin');
+
 
 Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user']], function(){
   

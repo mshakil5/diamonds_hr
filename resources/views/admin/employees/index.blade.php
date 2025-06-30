@@ -262,7 +262,7 @@
                                 @foreach ($query as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>{{$data->name}}</td>
                                     {{-- <td>{{$data->username}}</td> --}}
                                     <td>{{$data->employee_type}}</td>

@@ -11,13 +11,13 @@
                         <small id="currentTime">Time: --:--:--</small>
                     </div>
                     <div class="card-body">
-                        <h3 class="text-center">Staff Login</h3>
+                        <h3 class="text-center">Admin Login</h3>
 
                         @if (session('message'))
                             <p class="text-success text-center mt-3"><strong>{{ session('message') }}</strong></p>
                         @endif
 
-                        <form method="POST" action="{{ route('login') }}">
+                        <form method="POST" action="{{ route('login.admin') }}">
                             @csrf
                             <div class="form-group mt-4">
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
@@ -40,15 +40,10 @@
                               </div>
                         </form>
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-4">
-                            <button type="button" onclick="showLogoutBox()" class="btn btn-outline-danger btn-sm w-100">
-                                Logout Here
-                            </button>
-                        </div>
-                        <div class="col-5 text-center d-none">
-                            <a href="{{ route('login.admin') }}" class="btn btn-outline-info btn-sm w-100">
-                                Login as Admin
+                    <div class="row justify-content-center d-none">
+                      <div class="col-5 text-center">
+                            <a href="{{ route('login') }}" class="btn btn-outline-info btn-sm w-100">
+                                Login as Staff
                             </a>
                         </div>
                     </div>
