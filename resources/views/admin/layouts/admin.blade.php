@@ -84,7 +84,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
     <a class="brand-link" style="cursor: pointer;">
-      <img src="{{ asset('avatar5.png')}}" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img src="{{ asset('diamond.jpg')}}" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-bold">{{Auth::user()->name}}</span>
     </a>
 
