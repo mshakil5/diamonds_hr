@@ -129,6 +129,8 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     
     Route::get('settings/change-branch', [SettingsController::class, 'changeBranch'])->name('changeBranch');
     Route::post('change-branches', [SettingsController::class, 'branchChange']);
+
+    Route::get('settings/attendance-log', [SettingsController::class, 'attendanceLog'])->name('attendance.log');
         
 });
   

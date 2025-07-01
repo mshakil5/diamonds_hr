@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Activitylog\Models\Activity;
+use App\Models\Attendance;
 
 class SettingsController extends Controller
 {
@@ -34,6 +36,31 @@ class SettingsController extends Controller
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Data updated successfully.']);
+    }
+    
+    public function attendanceLog()
+    {
+        $branchId = auth()->user()->branch_id;
+
+        $createdLogs = Activity::where('log_name', 'attendance')
+            ->where('event', 'created')
+            ->where('properties->branch_id', $branchId)
+            ->with(['subject.employee', 'causer'])
+            ->latest()->get();
+
+        $updatedLogs = Activity::where('log_name', 'attendance')
+            ->where('event', 'updated')
+            ->where('properties->branch_id', $branchId)
+            ->with(['subject.employee', 'causer'])
+            ->latest()->get();
+
+        $deletedLogs = Activity::where('log_name', 'attendance')
+            ->where('event', 'deleted')
+            ->where('properties->branch_id', $branchId)
+            ->with(['subject.employee', 'causer'])
+            ->latest()->get();
+
+        return view('admin.settings.attendanceLog', compact('createdLogs', 'updatedLogs', 'deletedLogs'));
     }
 
 

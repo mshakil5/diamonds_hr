@@ -134,6 +134,14 @@
                   </a>
               </li>
           </ul>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('attendance.log') }}" class="nav-link {{ request()->routeIs('attendance.log') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Attendance Log</p>
+                  </a>
+              </li>
+          </ul>
       </li>
 
       <li class="nav-item dropdown d-none {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
