@@ -1,7 +1,7 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-
+@if (auth()->user()->canDo(5))
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
@@ -11,7 +11,7 @@
         </div>
     </div>
 </section>
-
+@endif
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
          <div class="row justify-content-md-center">
@@ -80,8 +80,12 @@
                                         </div>
                                     </td>
                                     <td>
+                                      @if (auth()->user()->canDo(6))
                                         <a id="EditBtn" rid="{{ $data->id }}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                      @endif
+                                      @if (auth()->user()->canDo(7))
                                         {{-- <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a> --}}
+                                      @endif
                                     </td>
                                 </tr>
                                 @endforeach

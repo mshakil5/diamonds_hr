@@ -2,6 +2,7 @@
 
 @section('content')
 
+@if (auth()->user()->canDo(2))
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
@@ -13,7 +14,7 @@
     </div>
 </section>
   <!-- /.content -->
-
+@endif
 
 
     <!-- Main content -->
@@ -61,13 +62,24 @@
                         <input type="number" id="phone" name="phone" class="form-control" placeholder="Enter phone">
                       </div>
                     </div>
-                    <div class="col-sm-12">
+                    <div class="col-sm-6">
                       <div class="form-group">
                         <label>Branch</label>
                         <select name="branch_id" id="branch_id" class="form-control">
                           <option value="">Select</option>
                           @foreach ($branches as $branch)
                           <option value="{{$branch->id}}">{{$branch->name}}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label>Role</label>
+                        <select name="role_id" id="role_id" class="form-control">
+                          <option value="">Select</option>
+                          @foreach ($roles as $role)
+                          <option value="{{$role->id}}">{{$role->name}}</option>
                           @endforeach
                         </select>
                       </div>
@@ -133,23 +145,29 @@
                   <th>Email</th>
                   <th>Phone</th>
                   <th>Branch</th>
+                  <th>Role</th>
                   <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                   @foreach ($data as $key => $data)
                   <tr>
-                    <td style="text-align: center">{{ $key + 1 }}</td>
-                    <td style="text-align: center">{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
-                    <td style="text-align: center">{{$data->name}}</td>
-                    <td style="text-align: center">{{$data->surname}}</td>
-                    <td style="text-align: center">{{$data->email}}</td>
-                    <td style="text-align: center">{{$data->phone}}</td>
-                    <td style="text-align: center">{{$data->branch->name}}</td>
+                    <td>{{ $key + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
+                    <td>{{$data->name}}</td>
+                    <td>{{$data->surname}}</td>
+                    <td>{{$data->email}}</td>
+                    <td>{{$data->phone}}</td>
+                    <td>{{$data->branch->name}}</td>
+                    <td>{{$data->role->name ?? ''}}</td>
                     
-                    <td style="text-align: center">
+                    <td>
+                      @if (auth()->user()->canDo(3))
                       <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                      @endif
+                      @if (auth()->user()->canDo(4))
                       {{-- <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a> --}}
+                      @endif
                     </td>
                   </tr>
                   @endforeach
@@ -219,6 +237,7 @@
               form_data.append("phone", $("#phone").val());
               form_data.append("surname", $("#surname").val());
               form_data.append("branch_id", $("#branch_id").val());
+              form_data.append("role_id", $("#role_id").val());
               form_data.append("password", $("#password").val());
               form_data.append("confirm_password", $("#confirm_password").val());
               $.ajax({
@@ -250,6 +269,7 @@
               form_data.append("phone", $("#phone").val());
               form_data.append("surname", $("#surname").val());
               form_data.append("branch_id", $("#branch_id").val());
+              form_data.append("role_id", $("#role_id").val());
               form_data.append("password", $("#password").val());
               form_data.append("confirm_password", $("#confirm_password").val());
               form_data.append("codeid", $("#codeid").val());
@@ -319,6 +339,7 @@
           $("#phone").val(data.phone);
           $("#email").val(data.email);
           $("#branch_id").val(data.branch_id);
+          $("#role_id").val(data.role_id);
           $("#codeid").val(data.id);
           $("#addBtn").val('Update');
           $("#addBtn").html('Update');

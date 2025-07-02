@@ -124,7 +124,10 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
 
 
     // roles and permission
-    Route::get('role', [RoleController::class, 'index'])->name('admin.role');
+    Route::get('settings/role', [RoleController::class, 'index'])->name('admin.role');
+    Route::post('role', [RoleController::class, 'store'])->name('admin.rolestore');
+    Route::get('settings/role/{id}', [RoleController::class, 'edit'])->name('admin.roleedit');
+    Route::post('role-update', [RoleController::class, 'update'])->name('admin.roleupdate');
 
     
     Route::get('settings/change-branch', [SettingsController::class, 'changeBranch'])->name('changeBranch');

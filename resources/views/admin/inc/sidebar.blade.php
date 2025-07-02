@@ -10,6 +10,10 @@
         </a>
       </li>
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([2, 3, 4])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item">
         <a href="{{route('alladmin')}}" class="nav-link {{ (request()->is('admin/new-admin*')) ? 'active' : '' }}">
           <i class="nav-icon fas fa-th"></i>
@@ -18,7 +22,12 @@
           </p>
         </a>
       </li>
+      @endif
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([5, 6, 7])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item">
         <a href="{{route('branches.index')}}" class="nav-link {{ (request()->is('admin/branches*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -27,7 +36,13 @@
           </p>
         </a>
       </li>
+      @endif
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([8, 9, 10])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
+      
       <li class="nav-item">
         <a href="{{route('employees.index')}}" class="nav-link {{ (request()->is('admin/employees*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -36,6 +51,7 @@
           </p>
         </a>
       </li>
+      @endif
 
       <li class="nav-item d-none">
         <a href="{{route('allUsers')}}" class="nav-link {{ (request()->is('admin/users*')) ? 'active' : '' }}">
@@ -46,6 +62,10 @@
         </a>
       </li>
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([11, 12, 13])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item">
         <a href="{{route('holidays.index')}}" class="nav-link {{ (request()->is('admin/holidays*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -54,7 +74,12 @@
           </p>
         </a>
       </li>
+      @endif
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([14, 15, 16])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item">
         <a href="{{route('attendance.index')}}" class="nav-link {{ (request()->is('admin/attendance*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -63,7 +88,12 @@
           </p>
         </a>
       </li>
+      @endif
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([17, 18, 19])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item">
         <a href="{{route('products.index')}}" class="nav-link {{ (request()->is('admin/products*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -72,7 +102,12 @@
           </p>
         </a>
       </li>
+      @endif
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([20, 21, 22])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item">
         <a href="{{route('stocks.index')}}" class="nav-link {{ (request()->is('admin/stocks*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -81,9 +116,12 @@
           </p>
         </a>
       </li>
-
+      @endif
       
-
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([23, 24, 25, 26])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
@@ -92,33 +130,46 @@
               </p>
           </a>
           <ul class="nav nav-treeview">
+              @if (auth()->user()->canDo(23))
               <li class="nav-item">
                   <a href="{{ route('employeeReport') }}" class="nav-link {{ request()->routeIs('employeeReport') ? 'active' : '' }}">
                       <i class="fas fa-list nav-icon"></i>
                       <p>Employee Report</p>
                   </a>
               </li>
+              @endif
+              @if (auth()->user()->canDo(24))
               <li class="nav-item">
                   <a href="{{ route('holidayReport') }}" class="nav-link {{ request()->routeIs('holidayReport') ? 'active' : '' }}">
                       <i class="fas fa-tags nav-icon"></i>
                       <p>Holiday Report</p>
                   </a>
               </li>
+              @endif
+              @if (auth()->user()->canDo(25))
               <li class="nav-item">
                   <a href="{{ route('stockReport') }}" class="nav-link {{ request()->routeIs('stockReport') ? 'active' : '' }}">
                       <i class="fas fa-list nav-icon"></i>
                       <p>Product Stock Report</p>
                   </a>
               </li>
+              @endif
+              @if (auth()->user()->canDo(26))
               <li class="nav-item">
                   <a href="{{ route('allBlogCategories') }}" class="nav-link {{ request()->routeIs('allBlogCategories') ? 'active' : '' }}">
                       <i class="fas fa-tags nav-icon"></i>
                       <p>Staff Based Stock Report</p>
                   </a>
               </li>
+              @endif
           </ul>
       </li>
+      @endif
 
+      @if (
+          auth()->user()->is_type == '1' &&
+          collect([27, 28, 29, 30, 31])->intersect(json_decode(auth()->user()->role->permission))->isNotEmpty()
+      )
       <li class="nav-item dropdown {{ request()->is('admin/settings*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/settings*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
@@ -126,6 +177,7 @@
                   Settings <i class="fas fa-angle-left right"></i>
               </p>
           </a>
+           @if (auth()->user()->canDo(27))
           <ul class="nav nav-treeview">
               <li class="nav-item">
                   <a href="{{ route('changeBranch') }}" class="nav-link {{ request()->routeIs('changeBranch') ? 'active' : '' }}">
@@ -134,6 +186,8 @@
                   </a>
               </li>
           </ul>
+          @endif
+          @if (auth()->user()->canDo(28))
           <ul class="nav nav-treeview">
               <li class="nav-item">
                   <a href="{{ route('attendance.log') }}" class="nav-link {{ request()->routeIs('attendance.log') ? 'active' : '' }}">
@@ -142,7 +196,19 @@
                   </a>
               </li>
           </ul>
+          @endif
+          @if (auth()->user()->canDo(30))
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('admin.role') }}" class="nav-link {{ (request()->is('admin/role*')) ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-shield-alt"></i>
+                    <p>Roles & Permissions</p>
+                  </a>
+              </li>
+          </ul> 
+          @endif
       </li>
+      @endif
 
       <li class="nav-item dropdown d-none {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'active' : '' }}">
@@ -174,12 +240,7 @@
           </a>
       </li>
 
-      {{-- <li class="nav-item">
-          <a href="{{ route('admin.role') }}" class="nav-link {{ (request()->is('admin/role*')) ? 'active' : '' }}">
-              <i class="nav-icon fas fa-shield-alt"></i>
-              <p>Roles & Permissions</p>
-          </a>
-      </li> --}}
-
+      <li class="nav-item" style="margin-top: 200px">
+      </li>
     </ul>
   </nav>

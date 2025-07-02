@@ -24,31 +24,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'surname',
-        'username',
-        'is_type',
-        'password',
-        'street_name',
-        'house_number',
-        'town',
-        'country',
-        'postcode',
-        'photo',
-        'phone',
-        'status',
-        'about',
-        'facebook',
-        'twitter',
-        'google',
-        'linkedin',
-        'google_id',
-        'facebook_id',
-        'updated_by',
-        'created_by',
-    ];
+    protected $guarded = [];
 
     protected static $logName = 'user';
     protected static $logAttributes = ['*'];
@@ -94,9 +70,21 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class);
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     public function employee()
     {
         return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function canDo($permissions)
+    {
+        $permissions = is_array($permissions) ? $permissions : [$permissions];
+        $userPermissions = json_decode($this->role->permission ?? '[]');
+        return $this->is_type == '1' && count(array_intersect($permissions, $userPermissions)) > 0;
     }
 
 }

@@ -13,13 +13,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Models\Role;
 
 class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
         $query = Employee::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
-        return view('admin.employees.index', compact('query'));
+        $roles = Role::latest()->get();
+        return view('admin.employees.index', compact('query','roles'));
     }
 
     public function store(Request $request)
@@ -56,8 +58,9 @@ class EmployeeController extends Controller
             'username'=>$request->username,
             'email'=>$request->email,
             'password'=>$request->password,
-            'role'=>'staff',
+            'is_type'=>'0',
             'photo'=>$userphoto ?? '',
+            'role_id'=>$request->role_id ?? ''
         ]);
         $request->merge(['user_id'=>$user->id]);
         $request->merge(['branch_id' => Auth::user()->branch_id]);
@@ -117,7 +120,8 @@ class EmployeeController extends Controller
                 'email'=>$request->email,
                 'password'=>$request->password,
                 'photo'=>$userphoto,
-                'username'=>$request->username
+                'username'=>$request->username,
+                'role_id'=>$request->role_id ?? ''
             ]);
 
         }else {

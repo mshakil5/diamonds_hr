@@ -3,6 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" />
 
+@if (auth()->user()->canDo(8))
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
@@ -14,7 +15,7 @@
     </div>
 </section>
 <!-- /.content -->
-
+@endif
 
 
 <!-- Main content -->
@@ -123,7 +124,18 @@
                                                     <input type="text" class="form-control" id="email" name="email">
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>Select Role</label>
+                                                    <select name="role_id" id="role_id" class="form-control" >
+                                                        <option value="">Select Role</option>
+                                                        @foreach ($roles as $role)
+                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
                                             <!-- text input -->
                                                 <div class="form-group">
                                                     <label>Image</label>
@@ -313,8 +325,12 @@
                                         >
                                              <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
                                         </a>
+                                        @if (auth()->user()->canDo(9))
                                         <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                        @endif
+                                        @if (auth()->user()->canDo(10))
                                         <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -512,6 +528,7 @@
             $("#emergency_contact_number").val(data.emergency_contact_number);
             $("#emergency_contact_person").val(data.emergency_contact_person);
             $("#ni").val(data.ni);
+            $("#role_id").val(data.role_id);
             $("#nationality").val(data.nationality);
             $("#join_date").val(data.join_date);
             $("#address").val(data.address);

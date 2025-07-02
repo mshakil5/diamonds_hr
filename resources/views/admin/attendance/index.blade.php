@@ -3,7 +3,7 @@
 @section('content')
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" />
-
+@if (auth()->user()->canDo(14))
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
@@ -13,6 +13,7 @@
         </div>
     </div>
 </section>
+@endif
 
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
@@ -188,8 +189,12 @@
                                                             >
                                                                 <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
                                                             </a>
+                                                            @if (auth()->user()->canDo(15))
                                                             <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                                            @endif
+                                                            @if (auth()->user()->canDo(16))
                                                             <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 </tbody>

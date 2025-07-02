@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
 
 class AdminController extends Controller
 {
@@ -16,7 +17,8 @@ class AdminController extends Controller
     {
         $data = User::where('is_type', '1')->where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
         $branches = Branch::where('status', 1)->get();
-        return view('admin.admin.index', compact('data','branches'));
+        $roles = Role::latest()->get();
+        return view('admin.admin.index', compact('data','branches','roles'));
     }
 
     public function adminStore(Request $request)
@@ -27,6 +29,7 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:20',
             'branch_id' => 'required|integer|exists:branches,id',
+            'role_id' => 'required|integer|exists:roles,id',
             'password' => [
                 'required',
                 'string',
@@ -51,6 +54,7 @@ class AdminController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
         $user->branch_id = $request->branch_id ?? Auth::user()->branch_id;
+        $user->role_id = $request->role_id ?? '1';
         $user->is_type = 1;
         $user->password = Hash::make($request->password);
 
@@ -81,6 +85,7 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email,' . $request->codeid,
             'phone' => 'nullable|string|max:20',
             'branch_id' => 'required|integer|exists:branches,id',
+            'role_id' => 'required|integer|exists:roles,id',
             'password' => [
                 'nullable',
                 'string',
@@ -106,6 +111,7 @@ class AdminController extends Controller
         $data->phone = $request->phone;
         $data->email = $request->email;
         $data->branch_id = $request->branch_id ?? Auth::user()->branch_id;
+        $user->role_id = $request->role_id ?? Auth::user()->role_id;
         if(isset($request->password)){
             $data->password = Hash::make($request->password);
         }

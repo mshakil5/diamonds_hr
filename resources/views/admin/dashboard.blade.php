@@ -78,6 +78,10 @@
       <!-- /.row (main row) -->
     </div><!-- /.container-fluid -->
   </section>
+  @if (
+    auth()->user()->is_type == '1' && in_array('1', json_decode(auth()->user()->role->permission))
+  )
+
         <section class="content" id="contentContainer">
             <div class="container-fluid">
                 <div class="row">
@@ -169,6 +173,8 @@
                 </div>
             </div>
         </section>
+
+  @endif
 @endsection
 
 @section('script')
