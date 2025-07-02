@@ -50,7 +50,7 @@ class AdminController extends Controller
         $user->surname = $request->surname;
         $user->email = $request->email;
         $user->phone = $request->phone;
-        $user->branch_id = $request->branch_id;
+        $user->branch_id = $request->branch_id ?? Auth::user()->branch_id;
         $user->is_type = 1;
         $user->password = Hash::make($request->password);
 
@@ -105,7 +105,7 @@ class AdminController extends Controller
         $data->surname = $request->surname;
         $data->phone = $request->phone;
         $data->email = $request->email;
-        $data->branch_id = $request->branch_id;
+        $data->branch_id = $request->branch_id ?? Auth::user()->branch_id;
         if(isset($request->password)){
             $data->password = Hash::make($request->password);
         }

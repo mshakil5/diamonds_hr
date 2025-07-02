@@ -25,20 +25,17 @@ class AttendanceController extends Controller
         
         $validator = Validator::make($request->all(), [
             'clock_in' => 'required|date_format:Y-m-d H:i:s',
-            'clock_out' => 'required|date_format:Y-m-d H:i:s|after:clock_in',
+            'clock_out' => 'nullable|date_format:Y-m-d H:i:s|after:clock_in',
             'employee_id' => 'required|string|max:255',
             'type' => 'required|string|max:255',
-            'details' => 'required|string|max:255',
+            'details' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
         
-        $request->merge([
-            'clock_in'=>Carbon::parse($request->clock_in),
-            'clock_out'=>Carbon::parse($request->clock_out),
-            ]);
+
 
         
         Attendance::create([
