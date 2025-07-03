@@ -33,8 +33,8 @@ class EmployeeController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->whereNull('deleted_at'),
-                Rule::unique('employees', 'email')->whereNull('deleted_at'),
+                Rule::unique('users', 'email'),
+                Rule::unique('employees', 'email'),
             ],
             'username' => [
                 'required',
@@ -92,8 +92,8 @@ class EmployeeController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($user->id),
-                Rule::unique('employees', 'email')->whereNull('deleted_at')->ignore($employee->id),
+                Rule::unique('users', 'email')->ignore($user->id),
+                Rule::unique('employees', 'email')->ignore($employee->id),
             ],
             'username' => [
                 'required',
