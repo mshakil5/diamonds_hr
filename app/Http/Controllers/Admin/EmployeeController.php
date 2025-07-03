@@ -33,15 +33,15 @@ class EmployeeController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email'),
-                Rule::unique('employees', 'email'),
+                Rule::unique('users', 'email')->whereNull('deleted_at'),
+                Rule::unique('employees', 'email')->whereNull('deleted_at'),
             ],
             'username' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('users', 'username'),
-                Rule::unique('employees', 'username'),
+                Rule::unique('users', 'username')->whereNull('deleted_at'),
+                Rule::unique('employees', 'username')->whereNull('deleted_at'),
             ],
             'password' => 'required|string|min:4',
         ]);
@@ -90,15 +90,15 @@ class EmployeeController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($user->id),
-                Rule::unique('employees', 'email')->ignore($employee->id),
+                Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($user->id),
+                Rule::unique('employees', 'email')->whereNull('deleted_at')->ignore($employee->id),
             ],
             'username' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('users', 'username')->ignore($user->id),
-                Rule::unique('employees', 'username')->ignore($employee->id),
+                Rule::unique('users', 'username')->whereNull('deleted_at')->ignore($user->id),
+                Rule::unique('employees', 'username')->whereNull('deleted_at')->ignore($employee->id),
             ],
             'password' => 'nullable|string|min:4',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
@@ -121,7 +121,7 @@ class EmployeeController extends Controller
                 'password'=>$request->password,
                 'photo'=>$userphoto,
                 'username'=>$request->username,
-                'role_id'=>$request->role_id ?? ''
+                'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
             ]);
 
         }else {
