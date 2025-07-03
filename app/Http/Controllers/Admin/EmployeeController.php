@@ -54,13 +54,13 @@ class EmployeeController extends Controller
             $userphoto = '/images/employees/' . $imageName;
         }
         $user = User::create([
-            'name'=>$request->name,
-            'username'=>$request->username,
-            'email'=>$request->email,
-            'password'=>$request->password,
-            'is_type'=>'0',
-            'photo'=>$userphoto ?? '',
-            'role_id'=>$request->role_id ?? ''
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => $request->password,
+            'is_type' => '0',
+            'photo' => $userphoto ?? '',
+            'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
         ]);
         $request->merge(['user_id'=>$user->id]);
         $request->merge(['branch_id' => Auth::user()->branch_id]);
@@ -157,8 +157,7 @@ class EmployeeController extends Controller
                 'message'=>'Staff exist with Prorota, Attendance, Holiday, Stock Maintain!'
             ]);
         }else{
-
-            $user = $employee->user;
+            $user = User::find($employee->user_id);
             $user->delete();
             $employee->delete();
             return response()->json([
