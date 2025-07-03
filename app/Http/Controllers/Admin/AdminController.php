@@ -111,7 +111,7 @@ class AdminController extends Controller
         $data->phone = $request->phone;
         $data->email = $request->email;
         $data->branch_id = $request->branch_id ?? Auth::user()->branch_id;
-        $user->role_id = $request->role_id ?? Auth::user()->role_id;
+        $data->role_id = $request->role_id ?? '1';
         if(isset($request->password)){
             $data->password = Hash::make($request->password);
         }

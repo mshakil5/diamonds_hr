@@ -299,6 +299,7 @@ $(document).ready(function() {
         form_data.append("employee_id", $("#employee_id").val());
         form_data.append("type", $("#type").val());
         form_data.append("clock_in", $("#clock_in_date").val() + ' ' + $("#clock_in_time").val());
+        form_data.append("clock_out", $("#clock_out_date").val() + ' ' + $("#clock_out_time").val());
 
         if ($(this).val() == 'Create') {
             $.ajax({

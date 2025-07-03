@@ -289,7 +289,7 @@
                                                 <legend class="w-auto px-2">Roles & Permissions</legend>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="p30" name="permission[]" value="p30">
-                                                    <label class="form-check-label" for="pp30">Create Role</label>
+                                                    <label class="form-check-label" for="p30">Create Role</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="p31" name="permission[]" value="31">
