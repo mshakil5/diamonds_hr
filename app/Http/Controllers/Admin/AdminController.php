@@ -15,7 +15,7 @@ class AdminController extends Controller
 {
     public function getAdmin()
     {
-        $data = User::where('is_type', '1')->where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
+        $data = User::where('is_type', '1')->orderby('id','DESC')->get();
         $branches = Branch::where('status', 1)->get();
         $roles = Role::latest()->get();
         return view('admin.admin.index', compact('data','branches','roles'));
