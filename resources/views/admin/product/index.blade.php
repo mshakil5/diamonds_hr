@@ -72,7 +72,7 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ $data->branch->name }}</td>
+                                    <td>{{ $data->branch->name ?? '' }}</td>
                                     <td>{{ $data->name }}</td>
                                     <td>
                                         <div class="custom-control custom-switch">

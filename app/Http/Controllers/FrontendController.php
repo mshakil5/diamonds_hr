@@ -148,7 +148,7 @@ class FrontendController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if ($user && $user->is_type == '1' && $user->status == 1) {
+        if ($user && ($user->is_type == '1' || $user->is_type == '0') && $user->status == 1) {
             if (auth()->attempt($request->only('email', 'password'))) {
                 return redirect()->route('admin.dashboard');
             }

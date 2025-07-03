@@ -17,7 +17,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 
-Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
+Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
     Route::get('/dashboard', [HomeController::class, 'adminHome'])->name('admin.dashboard');
 

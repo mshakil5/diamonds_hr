@@ -84,7 +84,7 @@ class User extends Authenticatable
     {
         $permissions = is_array($permissions) ? $permissions : [$permissions];
         $userPermissions = json_decode($this->role->permission ?? '[]');
-        return $this->is_type == '1' && count(array_intersect($permissions, $userPermissions)) > 0;
+        return (in_array($this->is_type, ['0', '1'])) && count(array_intersect($permissions, $userPermissions)) > 0;
     }
 
 }

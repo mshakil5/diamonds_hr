@@ -60,6 +60,8 @@ class EmployeeController extends Controller
             'password' => $request->password,
             'is_type' => '0',
             'photo' => $userphoto ?? '',
+            'branch_id' => Auth::user()->branch_id,
+            'created_by' => Auth::user()->id,
             'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
         ]);
         $request->merge(['user_id'=>$user->id]);
@@ -75,7 +77,7 @@ class EmployeeController extends Controller
 
     public function edit(Request $request, $id)
     {
-        return Employee::find($id);
+        return Employee::with('user')->find($id);
     }
 
     public function update(Request $request)
@@ -121,6 +123,7 @@ class EmployeeController extends Controller
                 'password'=>$request->password,
                 'photo'=>$userphoto,
                 'username'=>$request->username,
+                'branch_id' => Auth::user()->branch_id,
                 'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
             ]);
 
@@ -130,7 +133,9 @@ class EmployeeController extends Controller
                 'name'=>$request->name,
                 'email'=>$request->email,
                 'photo'=>$userphoto ?? '',
-                'username'=>$request->username
+                'username'=>$request->username,
+                'branch_id' => Auth::user()->branch_id,
+                'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
             ]);
         }
 

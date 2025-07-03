@@ -528,7 +528,7 @@
             $("#emergency_contact_number").val(data.emergency_contact_number);
             $("#emergency_contact_person").val(data.emergency_contact_person);
             $("#ni").val(data.ni);
-            $("#role_id").val(data.role_id);
+            $("#role_id").val(data.user.role_id);
             $("#nationality").val(data.nationality);
             $("#join_date").val(data.join_date);
             $("#address").val(data.address);
