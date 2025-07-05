@@ -79,7 +79,7 @@
         <a href="{{route('products.index')}}" class="nav-link {{ (request()->is('admin/products*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
           <p>
-            Product
+            Product Laundry
           </p>
         </a>
       </li>
@@ -90,7 +90,7 @@
         <a href="{{route('stocks.index')}}" class="nav-link {{ (request()->is('admin/stocks*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
           <p>
-            Stock
+            Stock Laundry
           </p>
         </a>
       </li>

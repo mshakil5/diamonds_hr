@@ -19,7 +19,11 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Employee::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
+        if (Auth::user()->is_type == '1') {
+          $query = Employee::with('user.branch')->orderby('id','DESC')->get();
+        } else{
+          $query = Employee::with('user.branch')->where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
+        }
         $roles = Role::latest()->get();
         return view('admin.employees.index', compact('query','roles'));
     }
