@@ -129,7 +129,7 @@
                             <tbody>
                                 @foreach ($data as $key => $data)
                                 <tr>
-                                    <td>{{ $data->product->name }}</td>
+                                    <td>{{ $data->user->name ?? "" }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ $data->product->name }}</td>
                                     <td>{{ $data->cloth_type }}</td>
