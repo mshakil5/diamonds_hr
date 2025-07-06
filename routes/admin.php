@@ -121,6 +121,9 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/report/stock', [ReportController::class, 'stockReport'])->name('stockReport');
     Route::post('/report/stock', [ReportController::class, 'stockReport'])->name('stockReport.search');
 
+    // stock-staff
+    Route::get('/report/stock-staff', [ReportController::class, 'stockStaffReport'])->name('stockStaffReport');
+    Route::post('/report/stock-staff', [ReportController::class, 'stockStaffReport'])->name('stockStaffReport.search');
 
 
     // roles and permission

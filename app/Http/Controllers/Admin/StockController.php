@@ -44,6 +44,7 @@ class StockController extends Controller
             'date'=>$request->input('date'),
             'branch_id'=>Auth::user()->branch_id,
             'created_by'=>Auth::user()->id,
+            'user_id'=>Auth::user()->id,
         ]);
         return response()->json(['status' => 200, 'message' => 'Data created successfully.']);
     }

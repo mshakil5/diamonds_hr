@@ -138,5 +138,28 @@ class ReportController extends Controller
         
     }
 
+    public function stockStaffReport(Request $request){
+
+        $query = DB::table('users as u')
+            ->leftJoin('stockmaintainces as sm', 'sm.user_id', '=', 'u.id')
+            ->leftJoin('products as p', 'p.id', '=', 'sm.product_id')
+            ->select(
+                'u.id',
+                'u.name',
+                'p.name as product_name',
+                'p.id as product_id',
+                DB::raw("SUM(CASE WHEN sm.cloth_type = 'Initial Stock' THEN sm.quantity ELSE NULL END) as initial_stock"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type = 'Dirty' THEN sm.quantity ELSE NULL END) as dirty"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type = 'Bed' THEN sm.quantity ELSE NULL END) as bed"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type = 'Arrived' THEN sm.quantity ELSE NULL END) as arrived"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type = 'Lost/Missed' THEN sm.quantity ELSE NULL END) as lost"),
+                DB::raw("SUM(sm.marks) as marks")
+            )
+            ->groupBy('u.id', 'u.name', 'p.id', 'p.name') // Add all non-aggregated columns
+            ->get();
+            
+            return view('admin.reports.staffStockReport', compact('query'));
+    }
+
 
 }

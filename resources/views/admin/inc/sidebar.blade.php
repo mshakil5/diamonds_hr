@@ -131,7 +131,7 @@
               @endif
               @if (auth()->user()->canDo(26))
               <li class="nav-item">
-                  <a href="{{ route('allBlogCategories') }}" class="nav-link {{ request()->routeIs('allBlogCategories') ? 'active' : '' }}">
+                  <a href="{{ route('stockStaffReport') }}" class="nav-link {{ request()->routeIs('stockStaffReport') ? 'active' : '' }}">
                       <i class="fas fa-tags nav-icon"></i>
                       <p>Staff Based Stock Report</p>
                   </a>
