@@ -156,6 +156,7 @@ class ReportController extends Controller
                 DB::raw("SUM(sm.marks) as marks")
             )
             ->groupBy('u.id', 'u.name', 'p.id', 'p.name') // Add all non-aggregated columns
+            ->where('u.branch_id', Auth::user()->branch_id)
             ->get();
             
             return view('admin.reports.staffStockReport', compact('query'));
