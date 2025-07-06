@@ -166,7 +166,7 @@
                                                         }
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('Y-m-d') }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('d/m/Y') }}</td>
                                                         <td>{{ $data->type }}</td>
                                                         <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('H:i:s') }}</td>
                                                         <td>{{ $data->clock_out ? \Carbon\Carbon::parse($data->clock_out)->format('H:i:s') : Null }}</td>
