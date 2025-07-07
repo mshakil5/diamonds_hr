@@ -49,10 +49,9 @@ class ProrotaController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('staff_name', function($row) {
-                  $firstName = $row->staff ? $row->staff->first_name : '';
-                  $lastName = $row->staff ? $row->staff->last_name : '';
+                  $firstName = $row->staff ? $row->staff->name : '';
                   
-                  return trim($firstName . ' ' . $lastName);
+                  return trim($firstName);
               })
                 ->make(true);
         }
@@ -60,15 +59,13 @@ class ProrotaController extends Controller
 
     public function create()
     {
-        $staffs = Employee::whereIn('type', ['2', '3'])
-            ->whereNotIn('id', function ($query) {
+        $employees = Employee::whereNotIn('user_id', function ($query) {
                 $query->select('staff_id')->from('prorotas');
             })
-            ->select('id', 'first_name', 'last_name', 'email')
             ->orderBy('id', 'DESC')
             ->get();
     
-        return view('admin.prorota.create', compact('staffs'));
+        return view('admin.prorota.create', compact('employees'));
     }    
 
     public function store(Request $request)
@@ -137,9 +134,9 @@ class ProrotaController extends Controller
 
     public function edit($id)
     {
-        $staffs = Employee::whereIn('type', ['2','3'])->select('id','first_name','last_name','email')->orderby('id','DESC')->get();
+        $employees = Employee::orderby('id','DESC')->get();
         $data = Prorota::with('prorotaDetail')->findOrFail($id);
-        return view('admin.prorota.edit', compact('data','staffs'));
+        return view('admin.prorota.edit', compact('data','employees'));
     }
 
     public function update(Request $request)

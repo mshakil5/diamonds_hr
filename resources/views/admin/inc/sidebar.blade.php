@@ -74,6 +74,13 @@
       </li>
       @endif
 
+      <li class="nav-item">
+          <a href="{{ route('prorota') }}" class="nav-link {{ request()->routeIs('prorota') ? 'active' : '' }}">
+              <i class="fas fa-list nav-icon"></i>
+              <p>Prorota</p>
+          </a>
+      </li>
+
       @if (auth()->user()->canDo([17, 18, 19]))
       <li class="nav-item">
         <a href="{{route('products.index')}}" class="nav-link {{ (request()->is('admin/products*')) ? 'active' : '' }}">
