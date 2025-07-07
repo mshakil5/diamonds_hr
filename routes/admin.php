@@ -121,6 +121,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::delete('/delete-prorota/{id}', [ProrotaController::class, 'deleteData'])->name('delete.prorota');
     Route::get('/prorota/edit/{id}', [ProrotaController::class,'edit'])->name('prorota.edit');
     Route::get('/prorota-log/{id}', [ProrotaController::class, 'prorotaLog'])->name('prorota.log');
+    Route::get('/prorota/download-pdf', [ProrotaController::class, 'downloadPdf'])->name('prorota.download-pdf');
 
     // employee report
     Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');

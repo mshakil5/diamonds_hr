@@ -18,8 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('prorota_id');
             $table->foreign('prorota_id')->references('id')->on('prorotas')->onDelete('cascade');
             $table->string('day')->nullable();
-            $table->string('start_time')->nullable();
-            $table->string('end_time')->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->date('from_date')->nullable();
+            $table->date('to_date')->nullable();
             $table->boolean('status')->default(1);
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();

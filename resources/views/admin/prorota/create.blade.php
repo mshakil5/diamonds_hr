@@ -15,12 +15,11 @@
 
                           <form id="myForm">
                               <div class="row my-4">
-                                  
-                                  <div class="col-lg-4">
-                                      <label for="country">Employee</label>
+                                  <div class="col-lg-8">
+                                      <label for="staff_id">Employee</label>
                                       <div class="mt-2">
-                                      <select class="form-control select2 my-2" id="staff_id" name="staff_id">
-                                          <option value="" selected disabled>Choose Employee</option>
+                                      <select class="form-control select2 my-2" id="staff_id" name="staff_id[]" multiple>
+                                          <option value="" disabled>Choose Employee</option>
                                           @foreach($employees as $employee)
                                             @if($employee->user_id)
                                                 <option value="{{ $employee->user_id }}">{{ $employee->name }}</option>
@@ -29,8 +28,22 @@
                                       </select>
                                       </div>
                                   </div>
+
+                                  <div class="col-lg-4">
+                                      <label for="schedule_type">Schedule type</label>
+                                      <div class="mt-2">
+                                      <select class="form-control select2 my-2" id="schedule_type" name="schedule_type">
+                                          <option value="" disabled>Choose type</option>
+                                          <option value="Regular">Regular</option>
+                                          <option value="Authorized Holiday">Authorized Holiday</option>
+                                          <option value="Unauthorized Holiday">Unauthorized Holiday</option>
+                                      </select>
+                                      </div>
+                                  </div>
                               </div>
-                              <div class="row align-items-center">
+
+                              <!-- Regular Schedule: Day and Time Table -->
+                              <div class="row align-items-center" id="regular_schedule" style="display: none;">
                                   <div class="col-lg-8">
                                       <table class="table table-bordered">
                                           <thead>
@@ -80,6 +93,19 @@
                                       </table>
                                   </div>
                               </div>
+
+                              <!-- Holiday Schedule: From and To Date -->
+                              <div class="row align-items-center" id="holiday_schedule" style="display: none;">
+                                  <div class="col-lg-4">
+                                      <label for="from_date">From Date</label>
+                                      <input type="date" name="from_date" id="from_date" class="form-control">
+                                  </div>
+                                  <div class="col-lg-4">
+                                      <label for="to_date">To Date</label>
+                                      <input type="date" name="to_date" id="to_date" class="form-control">
+                                  </div>
+                              </div>
+
                               <div class="row">
                                   <div class="col-lg-4 mx-auto text-center">
                                       <a href="{{ route('prorota') }}" class="btn btn-warning btn-sm">Cancel</a>
@@ -108,6 +134,44 @@
 <!-- Staff Start -->
 <script>
     $(document).ready(function () {
+        // Initialize Select2 for multiple staff selection
+        $('#staff_id').select2({
+            placeholder: "Choose Employee",
+            allowClear: true
+        });
+
+        // Initialize Select2 for schedule type
+        $('#schedule_type').select2({
+            placeholder: "Choose type",
+            allowClear: true
+        });
+
+        // Function to toggle schedule fields based on schedule type
+        function toggleScheduleFields() {
+            var scheduleType = $('#schedule_type').val();
+            if (scheduleType === 'Regular') {
+                $('#regular_schedule').show();
+                $('#holiday_schedule').hide();
+                $('#from_date, #to_date').val(''); // Clear date fields
+            } else if (scheduleType === 'Authorized Holiday' || scheduleType === 'Unauthorized Holiday') {
+                $('#regular_schedule').hide();
+                $('#holiday_schedule').show();
+                $('input[name="start_time[]"], input[name="end_time[]"]').val(''); // Clear time fields
+            } else {
+                $('#regular_schedule').hide();
+                $('#holiday_schedule').hide();
+                $('#from_date, #to_date').val('');
+                $('input[name="start_time[]"], input[name="end_time[]"]').val('');
+            }
+        }
+
+        // Trigger toggle on schedule type change
+        $('#schedule_type').on('change', function () {
+            toggleScheduleFields();
+        });
+
+        // Initial toggle on page load
+        toggleScheduleFields();
 
         $('#saveButton').click(function (event) {
             event.preventDefault();
@@ -126,9 +190,8 @@
                     }, 2000);
                 },
                 error: function (xhr, status, error) {
-                  console.log(xhr.responseText);
                     console.error("Error occurred: " + error);
-                    if (xhr.responseJSON.status == 423) {
+                    if (xhr.responseJSON.status == 422) {
                         console.log(xhr.responseJSON.errors);
                         toastr.error(JSON.stringify(xhr.responseJSON.errors), 'Error');
                     } else {
@@ -152,9 +215,12 @@
             return false;
         });
 
-        $('#clearButton').click(function () {
+        $('#clearButton').click(function (event) {
             event.preventDefault();
             $('#myForm')[0].reset();
+            $('#staff_id').val(null).trigger('change'); // Clear staff_id Select2 selection
+            $('#schedule_type').val(null).trigger('change'); // Clear schedule_type Select2 selection
+            toggleScheduleFields(); // Reset visibility of schedule fields
         });
     });
 </script>
