@@ -295,7 +295,7 @@
                                         </a>
                                         @endif
                                     </td>
-                                    <td>{{$data->user->branch->name ?? ''}}</td>
+                                    <td>{{$data->branch->name ?? ''}}</td>
                                     <td>
                                         <div class="custom-control custom-switch">
                                             <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->is_active == 1 ? 'checked' : '' }}>
