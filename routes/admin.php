@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\ProrotaController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
@@ -108,6 +109,18 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::get('/{id}', [StockController::class, 'delete'])->name('stocks.delete');
         Route::post('/change-status', [StockController::class, 'updateStatus'])->name('stocks.updateStatus');
     });
+
+    
+    // prorota make
+    Route::get('/prorota', [ProrotaController::class, 'index'])->name('prorota');
+    Route::get('/prorota-list', [ProrotaController::class, 'getprorota'])->name('get.prorota');
+    Route::get('/create-prorota', [ProrotaController::class, 'create'])->name('prorota.create');
+    Route::post('/prorota', [ProrotaController::class, 'store']);
+    Route::post('/prorota/update', [ProrotaController::class, 'update']);
+    Route::get('/prorota/details/{id}', [ProrotaController::class,'showDetails'])->name('prorota.details');
+    Route::delete('/delete-prorota/{id}', [ProrotaController::class, 'deleteData'])->name('delete.prorota');
+    Route::get('/prorota/edit/{id}', [ProrotaController::class,'edit'])->name('prorota.edit');
+    Route::get('/prorota-log/{id}', [ProrotaController::class, 'prorotaLog'])->name('prorota.log');
 
     // employee report
     Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');
