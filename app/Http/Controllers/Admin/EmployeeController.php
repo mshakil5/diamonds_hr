@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Stockmaintaince;
 use App\Models\User;
 use App\Models\Attendance;
+use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\Holiday;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,8 @@ class EmployeeController extends Controller
           $query = Employee::with('user.branch')->where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
         }
         $roles = Role::latest()->get();
-        return view('admin.employees.index', compact('query','roles'));
+        $branches = Branch::where('status', 1)->get();
+        return view('admin.employees.index', compact('query','roles','branches'));
     }
 
     public function store(Request $request)

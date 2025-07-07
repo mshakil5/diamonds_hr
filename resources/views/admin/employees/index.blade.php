@@ -262,6 +262,23 @@
                     <div class="card-header">
                         <h3 class="card-title">All Data</h3>
                     </div>
+
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="branchFilter">Filter by Branch:</label>
+                                <select id="branchFilter" class="form-control">
+                                    <option value="">All Branches</option>
+                                    @foreach ($branches as $branch)
+                                        <option value="{{ $branch->name }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example1" class="table table-bordered table-striped">
@@ -357,9 +374,48 @@
 @endsection
 
 @section('script')
+<script>
+$(document).ready(function() {
+    // Debug: Check if table element exists
+    if ($('#example1').length === 0) {
+        console.error('Table #example1 not found in DOM');
+        return;
+    }
 
+    // Initialize DataTable
+    var table = $("#example1").DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "searching": true,
+        "buttons": ["copy", "csv", "excel", "pdf", "print"]
+    });
+
+    if (!$.fn.DataTable.isDataTable('#example1')) {
+        console.error('DataTable failed to initialize for #example1');
+    }
+
+    // Branch filter logic
+    $('#branchFilter').on('change', function() {
+        var branch = $(this).val();
+        if ($.fn.DataTable.isDataTable('#example1')) {
+            console.log('Table branch data:', table.column(7).data().toArray());
+            if (branch) {
+                table.column(7).search(branch).draw();
+            } else {
+                table.column(7).search('').draw();
+            }
+        } else {
+            console.error('DataTable not initialized for #example1');
+        }
+    });
+
+    // ... rest of your existing code (addBtn, EditBtn, deleteBtn, etc.) ...
+});
+</script>
 <script>
     $(document).ready(function() {
+
         $("#addThisFormContainer").hide();
         $("#newBtn").click(function() {
             clearform();
@@ -378,10 +434,9 @@
         });
         var url = "{{URL::to('/admin/employees')}}";
         var upurl = "{{URL::to('/admin/employees/update')}}";
-        // console.log(url);
+
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
-
                 var requiredFields = [
                     '#employee_id',
                     '#name',
@@ -399,9 +454,7 @@
                     }
                 }
 
-
                 var form_data = new FormData($('#createThisForm')[0]);
-
                 var featureImgInput = document.getElementById('image');
                 if (featureImgInput.files && featureImgInput.files[0]) {
                     form_data.append("photo", featureImgInput.files[0]);
@@ -413,27 +466,22 @@
                     processData: false,
                     data: form_data,
                     success: function(d) {
-                        console.log(d);
                         showSuccess('Data created successfully.');
                         reloadPage(2000);
                     },
                     error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                            let response = xhr.responseJSON;
-                            if (response && response.errors) {
-                                let firstError = Object.values(response.errors)[0][0];
-                                showError(firstError);
-                            } else {
-                                showError('An error occurred. Please try again.');
-                            }
-                        
+                        let response = xhr.responseJSON;
+                        if (response && response.errors) {
+                            let firstError = Object.values(response.errors)[0][0];
+                            showError(firstError);
+                        } else {
+                            showError('An error occurred. Please try again.');
+                        }
                     }
                 });
             }
-            //create  end
-            //Update
+            // Update logic
             if ($(this).val() == 'Update') {
-
                 var requiredFields = [
                     '#employee_id',
                     '#name',
@@ -450,14 +498,11 @@
                     }
                 }
 
-
                 var form_data = new FormData($('#createThisForm')[0]);
-
                 var featureImgInput = document.getElementById('image');
                 if (featureImgInput.files && featureImgInput.files[0]) {
                     form_data.append("photo", featureImgInput.files[0]);
                 }
-
                 form_data.append("codeid", $("#codeid").val());
 
                 $.ajax({
@@ -468,7 +513,6 @@
                     processData: false,
                     data: form_data,
                     success: function(d) {
-                        console.log(d);
                         showSuccess('Data updated successfully.');
                         reloadPage(2000);
                     },
@@ -480,26 +524,22 @@
                         } else {
                             showError('An error occurred. Please try again.');
                         }
-                        console.error(xhr.responseText);
                     }
                 });
             }
-            //Update
         });
-        //Edit
+
+        // Edit
         $("#contentContainer").on('click', '#EditBtn', function() {
-            //alert("btn work");
             codeid = $(this).attr('rid');
-            //console.log($codeid);
             info_url = url + '/' + codeid + '/edit';
-            //console.log($info_url);
             $.get(info_url, {}, function(d) {
                 populateForm(d);
                 pagetop();
             });
         });
-        //Edit  end
-        //Delete
+
+        // Delete
         $("#contentContainer").on('click', '#deleteBtn', function() {
             if (!confirm('Sure?')) return;
             codeid = $(this).attr('rid');
@@ -519,7 +559,7 @@
                 }
             });
         });
-        //Delete  
+
         function populateForm(data) {
             $("#employee_id").val(data.employee_id);
             $("#name").val(data.name);
@@ -567,29 +607,9 @@
             reader.readAsDataURL(this.files[0]);
         });
 
-        $(function() {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-        });
-
         $(document).on('change', '.toggle-status', function() {
             var userId = $(this).data('id');
             var status = $(this).prop('checked') ? 1 : 0;
-
-            console.log(userId, status);
             $.ajax({
                 url: '{{ route("employees.updateStatus") }}',
                 method: 'POST',
@@ -599,7 +619,6 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-                    console.log(response);
                     if (response.status === 200) {
                         showSuccess(response.message);
                     } else {
@@ -620,8 +639,6 @@
                     attrs[key] = this.value;
                 }
             });
-            console.log(attrs);
-            // You can use attrs object as needed, e.g., show in a modal
             let modalHtml = `
             <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
@@ -629,7 +646,7 @@
                         <div class="modal-header">
                             <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -651,22 +668,17 @@
                 </div>
             </div>
             `;
-
-            // Remove any existing modal to avoid duplicates
             $('#detailsModal').remove();
             $('body').append(modalHtml);
             $('#detailsModal').modal('show');
         });
-
-
-
     });
 </script>
-<!-- JS to initialize picker -->
+
+<!-- JS to initialize datetime picker -->
 <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/js/tempusdominus-bootstrap-4.min.js"></script>
 
-<!-- Initialize picker with DD-MM-YYYY HH:mm format -->
 <script type="text/javascript">
     $(function () {
         $('#reservationdatetime').datetimepicker({

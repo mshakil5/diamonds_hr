@@ -52,5 +52,10 @@ class Employee extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
     
 }
