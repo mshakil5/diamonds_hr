@@ -143,6 +143,12 @@
                       <p>Staff Based Stock Report</p>
                   </a>
               </li>
+              <li class="nav-item">
+                  <a href="{{ route('dirtyStockReport') }}" class="nav-link {{ request()->routeIs('dirtyStockReport') ? 'active' : '' }}">
+                      <i class="fas fa-tags nav-icon"></i>
+                      <p>Dirty Stock Report</p>
+                  </a>
+              </li>
               @endif
           </ul>
       </li>

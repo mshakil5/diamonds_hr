@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\Holiday;
+use App\Models\Product;
+use App\Models\Stockmaintaince;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class ReportController extends Controller
 {
@@ -164,5 +169,121 @@ class ReportController extends Controller
             return view('admin.reports.staffStockReport', compact('query'));
     }
 
+
+    // public function dirtyStockReport(Request $request){
+
+    //     $data = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('cloth_type', 'Dirty')->get();
+
+    //     dd($data);
+        
+    //     return view('admin.reports.dirtyStockReport', compact('data'));
+    // }
+
+    public function dirtyStockReport(Request $request)
+    {
+        // Initialize variables
+        $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::today()->startOfWeek();
+        $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::today()->endOfWeek();
+        
+        // Validate date range
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        // Get branch name
+        $branch = Branch::find(Auth::user()->branch_id);
+        $branchName = $branch ? $branch->name : 'Unknown Branch';
+
+        // Get all products with names for grouping
+        $products = Stockmaintaince::with('product')
+            ->select('product_id')
+            ->distinct()
+            ->where('branch_id', Auth::user()->branch_id)
+            ->where('cloth_type', 'Dirty')
+            ->get()
+            ->pluck('product');
+
+        // Initialize report data array
+        $reportData = [];
+        $weeklyTotals = [];
+
+        // Get week periods
+        $period = CarbonPeriod::create($startDate->startOfWeek(), '1 week', $endDate->endOfWeek());
+
+        foreach ($period as $weekStart) {
+            $weekEnd = $weekStart->copy()->endOfWeek();
+            $weekData = [
+                'days' => [],
+                'first_three_days_total' => 0,
+                'last_four_days_total' => 0,
+                'total_outgoing' => 0,
+            ];
+
+            // Initialize days array
+            $days = [
+                'Tuesday' => ['date' => $weekStart->copy()->next(Carbon::TUESDAY), 'quantities' => [], 'total' => 0],
+                'Wednesday' => ['date' => $weekStart->copy()->next(Carbon::WEDNESDAY), 'quantities' => [], 'total' => 0],
+                'Thursday' => ['date' => $weekStart->copy()->next(Carbon::THURSDAY), 'quantities' => [], 'total' => 0],
+                'Friday' => ['date' => $weekStart->copy()->next(Carbon::FRIDAY), 'quantities' => [], 'total' => 0],
+                'Saturday' => ['date' => $weekStart->copy()->next(Carbon::SATURDAY), 'quantities' => [], 'total' => 0],
+                'Sunday' => ['date' => $weekStart->copy()->next(Carbon::SUNDAY), 'quantities' => [], 'total' => 0],
+                'Monday' => ['date' => $weekStart->copy()->next(Carbon::MONDAY), 'quantities' => [], 'total' => 0],
+            ];
+
+            // Get stock data for the week
+            $stockData = Stockmaintaince::where('branch_id', Auth::user()->branch_id)
+                ->where('cloth_type', 'Dirty')
+                ->whereBetween('date', [$weekStart, $weekEnd])
+                ->selectRaw('product_id, DATE(date) as stock_date, SUM(quantity) as total_quantity')
+                ->groupBy('product_id', 'stock_date')
+                ->get();
+
+            // Process stock data
+            foreach ($stockData as $stock) {
+                $stockDate = Carbon::parse($stock->stock_date);
+                $dayName = $stockDate->format('l');
+
+                if (isset($days[$dayName])) {
+                    $days[$dayName]['quantities'][$stock->product_id] = $stock->total_quantity;
+                    $days[$dayName]['total'] += $stock->total_quantity;
+
+                    // Calculate totals for first three and last four days
+                    if (in_array($dayName, ['Tuesday', 'Wednesday', 'Thursday'])) {
+                        $weekData['first_three_days_total'] += $stock->total_quantity;
+                    } else {
+                        $weekData['last_four_days_total'] += $stock->total_quantity;
+                    }
+                    $weekData['total_outgoing'] += $stock->total_quantity;
+                }
+            }
+
+            $weekData['days'] = $days;
+            $reportData[] = $weekData;
+            $weeklyTotals[] = $weekData['total_outgoing'];
+        }
+
+        // Handle PDF download
+        if ($request->has('download')) {
+            $pdf = PDF::loadView('admin.reports.dirtyStockReportPdf', compact(
+                'reportData',
+                'products',
+                'startDate',
+                'endDate',
+                'weeklyTotals',
+                'branchName'
+            ))->setPaper('a4', 'landscape');
+            return $pdf->download('Dirty_Stock_Report_' . $branchName . '_' . $startDate->format('Y-m-d') . '_to_' . $endDate->format('Y-m-d') . '.pdf');
+        }
+
+        return view('admin.reports.dirtyStockReport', compact(
+            'reportData',
+            'products',
+            'startDate',
+            'endDate',
+            'weeklyTotals',
+            'branchName'
+        ));
+    }
 
 }

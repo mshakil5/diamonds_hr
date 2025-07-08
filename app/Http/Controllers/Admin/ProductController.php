@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:products,name',
+            'name' => 'required|string|max:255|unique:products,name,NULL,id,branch_id,' . Auth::user()->branch_id,
             'status' => 'required|boolean',
         ]);
 
