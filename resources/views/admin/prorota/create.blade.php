@@ -2,228 +2,487 @@
 
 @section('content')
 
-<section class="content">
-  <div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12">
-
-          <div class="card">
-              <div class="card-body">
-                  <div class="tab-content pt-2" id="myTabjustifiedContent">
-
-                      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-
-                          <form id="myForm">
-                              <div class="row my-4">
-                                  <div class="col-lg-8">
-                                      <label for="staff_id">Employee</label>
-                                      <div class="mt-2">
-                                      <select class="form-control select2 my-2" id="staff_id" name="staff_id[]" multiple>
-                                          <option value="" disabled>Choose Employee</option>
-                                          @foreach($employees as $employee)
-                                            @if($employee->user_id)
-                                                <option value="{{ $employee->user_id }}">{{ $employee->name }}</option>
-                                            @endif
-                                          @endforeach
-                                      </select>
-                                      </div>
-                                  </div>
-
-                                  <div class="col-lg-4">
-                                      <label for="schedule_type">Schedule type</label>
-                                      <div class="mt-2">
-                                      <select class="form-control select2 my-2" id="schedule_type" name="schedule_type">
-                                          <option value="" disabled>Choose type</option>
-                                          <option value="Regular">Regular</option>
-                                          <option value="Authorized Holiday">Authorized Holiday</option>
-                                          <option value="Unauthorized Holiday">Unauthorized Holiday</option>
-                                      </select>
-                                      </div>
-                                  </div>
-                              </div>
-
-                              <!-- Regular Schedule: Day and Time Table -->
-                              <div class="row align-items-center" id="regular_schedule" style="display: none;">
-                                  <div class="col-lg-8">
-                                      <table class="table table-bordered">
-                                          <thead>
-                                              <tr>
-                                                  <th>Day</th>
-                                                  <th>Start time</th>
-                                                  <th>End Time</th>
-                                              </tr>
-                                          </thead>
-                                          <tbody>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Monday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control" value="09:00"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control" value="17:00"></td>
-                                              </tr>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Tuesday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control" value="09:00"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control" value="17:00"></td>
-                                              </tr>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Wednesday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control" value="09:00"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control" value="17:00"></td>
-                                              </tr>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Thursday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control" value="09:00"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control" value="17:00"></td>
-                                              </tr>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Friday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control" value="09:00"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control" value="17:00"></td>
-                                              </tr>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Saturday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control" value="09:00"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control" value="17:00"></td>
-                                              </tr>
-                                              <tr>
-                                                  <td><input type="text" name="day[]" class="form-control" value="Sunday" readonly></td>
-                                                  <td><input type="time" name="start_time[]" class="form-control"></td>
-                                                  <td><input type="time" name="end_time[]" class="form-control"></td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-
-                              <!-- Holiday Schedule: From and To Date -->
-                              <div class="row align-items-center" id="holiday_schedule" style="display: none;">
-                                  <div class="col-lg-4">
-                                      <label for="from_date">From Date</label>
-                                      <input type="date" name="from_date" id="from_date" class="form-control">
-                                  </div>
-                                  <div class="col-lg-4">
-                                      <label for="to_date">To Date</label>
-                                      <input type="date" name="to_date" id="to_date" class="form-control">
-                                  </div>
-                              </div>
-
-                              <div class="row">
-                                  <div class="col-lg-4 mx-auto text-center">
-                                      <a href="{{ route('prorota') }}" class="btn btn-warning btn-sm">Cancel</a>
-                                      <button id="clearButton" class="btn btn-primary btn-sm">Clear</button>
-                                      <button id="saveButton" class="btn btn-success btn-sm">Save</button>
-                                  </div>
-                              </div>
-                          </form>
-                      </div>
-                  </div>
-              </div>
-          </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+@if (auth()->user()->canDo(14))
+<section class="content" id="newBtnSection">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
+            </div>
         </div>
     </div>
-  </div>
+</section>
+@endif
+
+<section class="content mt-3" id="addThisFormContainer">
+    <div class="container-fluid">
+         <div class="row justify-content-md-center">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title" id="header-title">PreRota Create</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="errmsg"></div>
+                        <form id="createThisForm">
+                            @csrf
+                            <input type="hidden" class="form-control" id="codeid" name="codeid">
+                            
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>From Date</label>
+                                        <input type="date" class="form-control" id="start_date" name="start_date" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>To Date</label>
+                                        <input type="date" class="form-control" id="end_date" name="end_date" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="type">Type</label>
+                                        <select class="form-control select2" id="type" name="type">
+                                            <option value="" disabled>Choose type</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Authorized Holiday">Authorized Holiday</option>
+                                            <option value="Unauthorized Holiday">Unauthorized Holiday</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Employee *</label>
+                                        <select class="form-control select2" id="employee_id" name="employee_id[]" multiple>
+                                            <option value="">Select Employee</option>
+                                            @foreach ($employees as $employee)
+                                                <option value="{{$employee->id}}">{{$employee->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Start Time</label>
+                                        <input type="time" class="form-control" id="start_time" name="start_time" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>End Time</label>
+                                        <input type="time" class="form-control" id="end_time" name="end_time" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Details</label>
+                                        <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" id="addBtn" class="btn btn-secondary" value="Create">Create</button>
+                        <button type="submit" id="FormCloseBtn" class="btn btn-default">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content" id="contentContainer">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">All Attendance Record</h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="display: none" class="d-none">SL</th>
+                                    <th>Created date</th>
+                                    <th>From date</th>
+                                    <th>To date</th>
+                                    <th>Type</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Employees</th>
+                                    <th>Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($data as $data)
+                                    <tr>
+                                        <td></td>
+                                        <td>{{$data->created_at}}</td>
+                                        <td>{{$data->start_date}}</td>
+                                        <td>{{$data->end_date}}</td>
+                                        <td>{{$data->type}}</td>
+                                        <td>{{$data->start_time ?? '-'}}</td>
+                                        <td>{{$data->end_time ?? '-'}}</td>
+                                        <td>
+                                            @foreach ($data->employees as $employee)
+                                                {{$employee->name}}{{ !$loop->last ? ', ' : ''}}
+                                            @endforeach
+                                        </td>
+                                        <td>{{$data->details}}</td>
+                                        <td>
+                                            <button id="EditBtn" rid="{{$data->id}}" class="btn btn-sm btn-primary">Edit</button>
+                                            <button id="deleteBtn" rid="{{$data->id}}" class="btn btn-sm btn-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 @endsection
 
 @section('script')
 
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
-    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
-</script>
+$(document).ready(function() {
+    // Initialize Select2 for employee_id with multiple selection
+    $('#employee_id').select2({
+        placeholder: 'Select Employees',
+        allowClear: true,
+        width: '100%'
+    });
 
-<!-- Staff Start -->
-<script>
-    $(document).ready(function () {
-        // Initialize Select2 for multiple staff selection
-        $('#staff_id').select2({
-            placeholder: "Choose Employee",
-            allowClear: true
+    // Initialize Select2 for type
+    $('#type').select2({
+        placeholder: 'Choose type',
+        allowClear: true,
+        width: '100%'
+    });
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var url = "{{URL::to('/admin/prorota')}}";
+    var upurl = "{{URL::to('/admin/prorota/update')}}";
+    var dlturl = "{{URL::to('/admin/delete-prorota')}}";
+
+    // Function to reset field styles
+    function resetFieldStyles(fields) {
+        fields.forEach(function(field) {
+            $(field).css('border-color', '');
+            $(field).removeClass('is-invalid');
         });
+    }
 
-        // Initialize Select2 for schedule type
-        $('#schedule_type').select2({
-            placeholder: "Choose type",
-            allowClear: true
-        });
+    // Function to display error message
+    function showError(message, field = null) {
+        $('.errmsg').html(`<div class="alert alert-danger">${message}</div>`);
+        if (field) {
+            $(field).css('border-color', 'red');
+            $(field).addClass('is-invalid');
+            $(field).focus();
+        }
+    }
 
-        // Function to toggle schedule fields based on schedule type
-        function toggleScheduleFields() {
-            var scheduleType = $('#schedule_type').val();
-            if (scheduleType === 'Regular') {
-                $('#regular_schedule').show();
-                $('#holiday_schedule').hide();
-                $('#from_date, #to_date').val(''); // Clear date fields
-            } else if (scheduleType === 'Authorized Holiday' || scheduleType === 'Unauthorized Holiday') {
-                $('#regular_schedule').hide();
-                $('#holiday_schedule').show();
-                $('input[name="start_time[]"], input[name="end_time[]"]').val(''); // Clear time fields
-            } else {
-                $('#regular_schedule').hide();
-                $('#holiday_schedule').hide();
-                $('#from_date, #to_date').val('');
-                $('input[name="start_time[]"], input[name="end_time[]"]').val('');
+    // Function to display success message
+    function showSuccess(message) {
+        $('.errmsg').html(`<div class="alert alert-success">${message}</div>`);
+    }
+
+    // Function to reload page
+    function reloadPage(timeout) {
+        setTimeout(function() {
+            location.reload();
+        }, timeout);
+    }
+
+    // Function to scroll to top
+    function pagetop() {
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
+    }
+
+    $("#addBtn").click(function() {
+        // Define required fields with user-friendly names
+        var requiredFields = [
+            {id: '#employee_id', name: 'Employee'},
+            {id: '#type', name: 'Type'},
+            {id: '#start_date', name: 'From Date'}
+        ];
+
+        // Reset previous validation styles
+        resetFieldStyles(requiredFields.map(field => field.id));
+
+        // Validate required fields
+        for (var i = 0; i < requiredFields.length; i++) {
+            if (requiredFields[i].id === '#employee_id') {
+                if ($('#employee_id').val().length === 0) {
+                    showError(`Please select at least one ${requiredFields[i].name}.`, requiredFields[i].id);
+                    return;
+                }
+            } else if ($(requiredFields[i].id).val() === '') {
+                showError(`Please fill the ${requiredFields[i].name} field.`, requiredFields[i].id);
+                return;
             }
         }
 
-        // Trigger toggle on schedule type change
-        $('#schedule_type').on('change', function () {
-            toggleScheduleFields();
+        // Additional validation for date format (YYYY-MM-DD)
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test($('#start_date').val())) {
+            showError('Please enter a valid From Date (YYYY-MM-DD).', '#start_date');
+            return;
+        }
+
+        var form_data = new FormData();
+        // Debug: Log selected employee IDs
+        var employeeIds = $('#employee_id').val();
+        console.log('Selected Employee IDs:', employeeIds);
+
+        // Append each employee_id individually to FormData
+        employeeIds.forEach(function(employeeId) {
+            form_data.append('employee_id[]', employeeId);
         });
+        form_data.append("start_date", $("#start_date").val());
+        form_data.append("end_date", $("#end_date").val());
+        form_data.append("type", $("#type").val());
+        form_data.append("start_time", $("#start_time").val());
+        form_data.append("end_time", $("#end_time").val());
+        form_data.append("details", $("#details").val());
 
-        // Initial toggle on page load
-        toggleScheduleFields();
+        // Debug: Log FormData contents
+        for (var pair of form_data.entries()) {
+            console.log('FormData:', pair[0] + ': ' + pair[1]);
+        }
 
-        $('#saveButton').click(function (event) {
-            event.preventDefault();
-
-            var formData = new FormData($('#myForm')[0]);
-
+        if ($(this).val() == 'Create') {
             $.ajax({
-                url: "{{URL::to('/admin/prorota')}}",
-                type: 'POST',
-                data: formData,
-                async: false,
-                success: function (response) {
-                    toastr.success("Prorota created successfully", "Success");
-                    setTimeout(function() {
-                        window.location.href = "{{ route('prorota') }}";
-                    }, 2000);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error occurred: " + error);
-                    if (xhr.responseJSON.status == 422) {
-                        console.log(xhr.responseJSON.errors);
-                        toastr.error(JSON.stringify(xhr.responseJSON.errors), 'Error');
+                url: url,
+                method: "POST",
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function(d) {
+                    console.log('Create Response:', d);
+                    if (d.status == 422) {
+                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
                     } else {
-                        var errorMessage = "";
-
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            $.each(xhr.responseJSON.errors, function (key, value) {
-                                errorMessage += value.join(", ") + "<br>";
-                            });
-                            toastr.error(errorMessage, 'Error');
-                        } else {
-                            errorMessage = "An error occurred. Please try again later.";
-                            toastr.error(errorMessage, 'Error');
-                        }
+                        showSuccess('Data created successfully.');
+                        resetFieldStyles(requiredFields.map(field => field.id));
+                        reloadPage(2000);
                     }
                 },
-                cache: false,
-                contentType: false,
-                processData: false
+                error: function(xhr, status, error) {
+                    console.error('Create Error:', xhr.responseText);
+                    showError('An error occurred. Please try again.');
+                }
             });
-            return false;
-        });
+        }
 
-        $('#clearButton').click(function (event) {
-            event.preventDefault();
-            $('#myForm')[0].reset();
-            $('#staff_id').val(null).trigger('change'); // Clear staff_id Select2 selection
-            $('#schedule_type').val(null).trigger('change'); // Clear schedule_type Select2 selection
-            toggleScheduleFields(); // Reset visibility of schedule fields
+        if ($(this).val() == 'Update') {
+            var requiredFields = [
+                {id: '#employee_id', name: 'Employee'},
+                {id: '#type', name: 'Type'},
+                {id: '#start_date', name: 'From Date'}
+            ];
+
+            // Reset previous validation styles
+            resetFieldStyles(requiredFields.map(field => field.id));
+
+            // Validate required fields
+            for (var i = 0; i < requiredFields.length; i++) {
+                if (requiredFields[i].id === '#employee_id') {
+                    if ($('#employee_id').val().length === 0) {
+                        showError(`Please select at least one ${requiredFields[i].name}.`, requiredFields[i].id);
+                        return;
+                    }
+                } else if ($(requiredFields[i].id).val() === '') {
+                    showError(`Please fill the ${requiredFields[i].name} field.`, requiredFields[i].id);
+                    return;
+                }
+            }
+
+            if (!dateRegex.test($('#end_date').val()) && $('#end_date').val() !== '') {
+                showError('Please enter a valid To Date (YYYY-MM-DD).', '#end_date');
+                return;
+            }
+
+            // Debug: Log FormData for update
+            for (var pair of form_data.entries()) {
+                console.log('Update FormData:', pair[0] + ': ' + pair[1]);
+            }
+
+            form_data.append("codeid", $("#codeid").val());
+            $.ajax({
+                url: upurl,
+                type: "POST",
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function(d) {
+                    console.log('Update Response:', d);
+                    if (d.status == 422) {
+                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                    } else {
+                        showSuccess('Data updated successfully.');
+                        resetFieldStyles(requiredFields.map(field => field.id));
+                        reloadPage(2000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Update Error:', xhr.responseText);
+                    showError('An error occurred. Please try again.');
+                }
+            });
+        }
+    });
+
+    $("#contentContainer").on('click', '#EditBtn', function() {
+        var codeid = $(this).attr('rid');
+        var info_url = url + '/' + codeid + '/edit';
+        $.get(info_url, {}, function(d) {
+            console.log('Edit Response:', d);
+            populateForm(d);
+            pagetop();
         });
     });
+
+    $("#contentContainer").on('click', '#deleteBtn', function() {
+        if (!confirm('Sure?')) return;
+        var codeid = $(this).attr('rid');
+        var info_url = dlturl + '/' + codeid;
+        $.ajax({
+            url: info_url,
+            method: "GET",
+            type: "DELETE",
+            data: {},
+            success: function(d) {
+                console.log('Delete Response:', d);
+                showSuccess('Data deleted successfully.');
+                reloadPage(2000);
+            },
+            error: function(xhr, status, error) {
+                console.error('Delete Error:', xhr.responseText);
+                showError('An error occurred. Please try again.');
+            }
+        });
+    });
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    }
+
+    function populateForm(data) {
+        $("#type").val(data.type).trigger('change');
+        $("#employee_id").val(data.employees.map(emp => emp.id)).trigger('change');
+        $("#start_date").val(formatDate(data.start_date));
+        $("#start_time").val(data.start_time || '');
+        $("#end_date").val(formatDate(data.end_date));
+        $("#end_time").val(data.end_time || '');
+        $("#details").val(data.details);
+        $("#codeid").val(data.id);
+        $("#addBtn").val('Update');
+        $("#addBtn").html('Update');
+        $("#header-title").html('Update PreRota');
+        $("#addThisFormContainer").show(300);
+        $("#newBtn").hide(100);
+    }
+
+    function clearform() {
+        $('#createThisForm')[0].reset();
+        $('#employee_id').val(null).trigger('change');
+        $('#type').val(null).trigger('change');
+        $("#addBtn").val('Create');
+        $("#header-title").html('Add new PreRota');
+    }
+
+    $("#FormCloseBtn").click(function() {
+        clearform();
+        $("#addThisFormContainer").hide(300);
+        $("#newBtn").show(100);
+    });
+
+    $("#newBtn").click(function() {
+        clearform();
+        $("#addThisFormContainer").show(300);
+        $("#newBtn").hide(100);
+    });
+
+    $(function() {
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "order": [[0, "desc"]],
+            "columnDefs": [
+                { "targets": 0, "visible": false }
+            ],
+            "buttons": ["copy", "csv", "excel", "pdf", "print"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+
+    $("#contentContainer").on('click', '#DetailsBtn', function() {
+        var attrs = {};
+        $.each(this.attributes, function() {
+            if(this.specified && this.name.startsWith('data-')) {
+                var key = this.name.replace('data-', '');
+                attrs[key] = this.value;
+            }
+        });
+        console.log('Details Attributes:', attrs);
+        let modalHtml = `
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                ${Object.entries(attrs).map(([key, value]) => `
+                                    <tr>
+                                        <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
+                                        <td>${value}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+
+        $('#detailsModal').remove();
+        $('body').append(modalHtml);
+        $('#detailsModal').modal('show');
+    });
+});
 </script>
-<!-- Staff End -->
 
 @endsection

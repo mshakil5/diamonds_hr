@@ -57,5 +57,10 @@ class Employee extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function preRotas()
+    {
+        return $this->belongsToMany(PreRota::class, 'employee_pre_rotas', 'employee_id', 'pre_rota_id');
+    }
     
 }

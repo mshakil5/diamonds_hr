@@ -88,16 +88,20 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($holidayData as $key => $item)
+                                    <tr>
+                                        <td>{{ $key + 1}}</td>
+                                        <td>{{ $employeeName->id }}</td>
+                                        <td>{{ $employeeName->name }}</td>
+                                        <td>{{ $employeeName->entitled_holiday }}</td>
+                                        {{-- <td>{{ $employeeName->entitled_holiday + $holidayDataCount }}</td> --}}
+                                        <td>{{$item->date}}</td>
+                                        <td>1</td>
+                                        <td>Confirmed</td>
+                                    </tr>
+                                @endforeach
 
-                                <tr>
-                                    <td>1</td>
-                                    <td>{{ $employeeName->id }}</td>
-                                    <td>{{ $employeeName->name }}</td>
-                                    <td>Not clear</td>
-                                    <td>{{ $employeeName->entitled_holiday + $holidayDataCount }}</td>
-                                    <td>Not clear</td>
-                                    <td>1</td>
-                                </tr>
+                                
 
 
                                 

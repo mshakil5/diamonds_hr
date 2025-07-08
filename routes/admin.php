@@ -108,20 +108,25 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::post('/update', [StockController::class, 'update'])->name('stocks.update');
         Route::get('/{id}', [StockController::class, 'delete'])->name('stocks.delete');
         Route::post('/change-status', [StockController::class, 'updateStatus'])->name('stocks.updateStatus');
+
+        
     });
 
+    Route::get('/recover-data', [StockController::class, 'addUser']);
     
     // prorota make
     Route::get('/prorota', [ProrotaController::class, 'index'])->name('prorota');
     Route::get('/prorota-list', [ProrotaController::class, 'getprorota'])->name('get.prorota');
     Route::get('/create-prorota', [ProrotaController::class, 'create'])->name('prorota.create');
     Route::post('/prorota', [ProrotaController::class, 'store']);
-    Route::post('/prorota/update', [ProrotaController::class, 'update']);
+    Route::post('/prorota/update', [ProrotaController::class, 'update'])->name('prorota.update');
     Route::get('/prorota/details/{id}', [ProrotaController::class,'showDetails'])->name('prorota.details');
-    Route::delete('/delete-prorota/{id}', [ProrotaController::class, 'deleteData'])->name('delete.prorota');
-    Route::get('/prorota/edit/{id}', [ProrotaController::class,'edit'])->name('prorota.edit');
+    Route::get('/delete-prorota/{id}', [ProrotaController::class, 'destroy'])->name('delete.prorota');
+    Route::get('/prorota/{id}/edit', [ProrotaController::class,'edit'])->name('prorota.edit');
     Route::get('/prorota-log/{id}', [ProrotaController::class, 'prorotaLog'])->name('prorota.log');
     Route::get('/prorota/download-pdf', [ProrotaController::class, 'downloadPdf'])->name('prorota.download-pdf');
+
+    
 
     // employee report
     Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');

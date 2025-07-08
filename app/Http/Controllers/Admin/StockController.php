@@ -88,4 +88,21 @@ class StockController extends Controller
             'message'=>'Data Deleted successfully'
         ]);
     }
+
+
+    public function addUser()
+    {
+
+        
+        $stocks = Stockmaintaince::all();
+
+        foreach ($stocks as $key => $stock) {
+            
+            $data = Stockmaintaince::find($stock->id);
+            $data->user_id = $data->created_by;
+            $data->save();
+        }
+
+        return true;
+    }
 }

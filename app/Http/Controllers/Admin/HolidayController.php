@@ -36,6 +36,7 @@ class HolidayController extends Controller
         $data->employee_id = $request->employee_id;
         $data->type = $request->employee_type;
         $data->details = $request->details;
+        $data->branch_id = Auth::user()->branch_id;
         $data->created_by = auth()->id();
         $data->save();
 

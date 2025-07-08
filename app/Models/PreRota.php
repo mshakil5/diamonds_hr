@@ -13,6 +13,16 @@ class PreRota extends Model
     use LogsActivity;
     protected $guarded=['id'];
 
+    protected $fillable = [
+        'branch_id',
+        'start_date',
+        'end_date',
+        'type',
+        'start_time',
+        'end_time',
+        'details'
+    ];
+
     protected static $logName = 'pre_rota';
     protected static $logAttributes = ['*'];
     protected static $logOnlyDirty = true;
@@ -25,7 +35,12 @@ class PreRota extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "Pre Rota record has been {$eventName}");
     }
 
-    public function employees(){
-        return $this->belongsToMany(Employee::class);
+    // public function employees(){
+    //     return $this->belongsToMany(Employee::class);
+    // }
+
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class, 'employee_pre_rotas', 'pre_rota_id', 'employee_id');
     }
 }

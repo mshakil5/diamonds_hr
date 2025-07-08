@@ -75,13 +75,15 @@ class ReportController extends Controller
                 ->count();
 
 
+
             $employeeName = Employee::where('id', $request->input('employee_id'))->where('branch_id', Auth::user()->branch_id)->first();
-            $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
+            // dd($holidayData);
+            $employees = Employee::where('is_active', 1)->get();
             return view('admin.reports.holidayReport', compact('employees','employeeName','holidayData','holidayDataCount','sickDays','absenceDays','employee'));
 
         } else {
 
-            $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
+            $employees = Employee::where('is_active', 1)->get();
             $employeeName = null;
             return view('admin.reports.holidayReport', compact('employees','employeeName'));
 
