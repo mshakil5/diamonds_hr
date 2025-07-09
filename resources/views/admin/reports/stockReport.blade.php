@@ -90,7 +90,7 @@
                                     <th>Bed</th>
                                     <th>Arrived</th>
                                     <th>Lost/Missed</th>
-                                    <th>Self Stock</th>
+                                    <th>Shelve Stock</th>
                                     <th>Marks</th>
                                 </tr>
                             </thead>
