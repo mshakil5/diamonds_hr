@@ -1,3 +1,4 @@
+
 @extends('admin.layouts.admin')
 
 @section('content')
@@ -35,7 +36,7 @@
                         <!-- Date Range Form -->
                         <div class="no-print">
                             <form method="GET" action="{{ route('dirtyStockReport') }}">
-                                <div class="form-group">
+                                <div classform-group">
                                     <label for="start_date">Start Date:</label>
                                     <input type="date" name="start_date" id="start_date" value="{{ $startDate->format('Y-m-d') }}">
                                     
@@ -70,78 +71,35 @@
                         </div>
                         
                         <!-- Report Table -->
-                        @foreach($reportData as $index => $weekData)
-                            <h3>Week {{ $index + 1 }} ({{ $weekData['days']['Tuesday']['date']->format('d/m/Y') }} - {{ $weekData['days']['Monday']['date']->format('d/m/Y') }})</h3>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Tuesday</th>
-                                        <th>Wednesday</th>
-                                        <th>Thursday</th>
-                                        <th>Total Outgoing (Tue-Thu)</th>
-                                        <th>Friday</th>
-                                        <th>Saturday</th>
-                                        <th>Sunday</th>
-                                        <th>Monday</th>
-                                        <th>Total Outgoing (Fri-Mon)</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>{{ $weekData['days']['Tuesday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['days']['Wednesday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['days']['Thursday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['first_three_days_total'] }}</th>
-                                        <th>{{ $weekData['days']['Friday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['days']['Saturday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['days']['Sunday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['days']['Monday']['date']->format('d/m/Y') }}</th>
-                                        <th>{{ $weekData['last_four_days_total'] }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($products as $product)
-                                        <tr>
-                                            <td>{{ $product->name }}</td>
-                                            <td>{{ $weekData['days']['Tuesday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>{{ $weekData['days']['Wednesday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>{{ $weekData['days']['Thursday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>
-                                                {{ array_sum([
-                                                    ($weekData['days']['Tuesday']['quantities'][$product->id] ?? 0),
-                                                    ($weekData['days']['Wednesday']['quantities'][$product->id] ?? 0),
-                                                    ($weekData['days']['Thursday']['quantities'][$product->id] ?? 0)
-                                                ]) }}
-                                            </td>
-                                            <td>{{ $weekData['days']['Friday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>{{ $weekData['days']['Saturday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>{{ $weekData['days']['Sunday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>{{ $weekData['days']['Monday']['quantities'][$product->id] ?? '' }}</td>
-                                            <td>
-                                                {{ array_sum([
-                                                    ($weekData['days']['Friday']['quantities'][$product->id] ?? 0),
-                                                    ($weekData['days']['Saturday']['quantities'][$product->id] ?? 0),
-                                                    ($weekData['days']['Sunday']['quantities'][$product->id] ?? 0),
-                                                    ($weekData['days']['Monday']['quantities'][$product->id] ?? 0)
-                                                ]) }}
-                                            </td>
-                                        </tr>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    @foreach($reportData['days'] as $date => $dayData)
+                                        <th>{{ $dayData['date']->format('d/m/Y') }}</th>
                                     @endforeach
+                                    <th>Sum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($products as $product)
                                     <tr>
-                                        <td><strong>Total</strong></td>
-                                        <td><strong>{{ $weekData['days']['Tuesday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['days']['Wednesday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['days']['Thursday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['first_three_days_total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['days']['Friday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['days']['Saturday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['days']['Sunday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['days']['Monday']['total'] }}</strong></td>
-                                        <td><strong>{{ $weekData['last_four_days_total'] }}</strong></td>
+                                        <td>{{ $product->name }}</td>
+                                        @foreach($reportData['days'] as $date => $dayData)
+                                            <td>{{ $dayData['quantities'][$product->id] ?? '' }}</td>
+                                        @endforeach
+                                        <td>{{ $reportData['product_totals'][$product->id] ?? 0 }}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        @endforeach
+                                @endforeach
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    @foreach($reportData['days'] as $date => $dayData)
+                                        <td><strong>{{ $dayData['total'] }}</strong></td>
+                                    @endforeach
+                                    <td><strong>{{ $reportData['total_sum'] }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
