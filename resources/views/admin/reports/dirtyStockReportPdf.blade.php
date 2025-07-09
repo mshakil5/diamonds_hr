@@ -25,7 +25,7 @@
                 @foreach($reportData['days'] as $date => $dayData)
                     <th>{{ $dayData['date']->format('d/m/Y') }}</th>
                 @endforeach
-                <th>Sum</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>

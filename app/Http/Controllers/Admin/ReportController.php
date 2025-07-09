@@ -99,52 +99,33 @@ class ReportController extends Controller
 
     public function stockReport(Request $request)
     {
-        if ($request->isMethod('post')) {
-            
-            $products = DB::table('products as p')
-                ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
-                ->select(
-                    'p.name',
-                    'p.id',
-                    DB::raw("sum(CASE when sm.cloth_type='Initial Stock' THEN sm.quantity ELSE NULL END) as initial_stock"),
-                    DB::raw("sum(CASE when sm.cloth_type='Dirty' THEN sm.quantity ELSE NULL END) as dirty"),
-                    DB::raw("sum(CASE when sm.cloth_type='Bed' THEN sm.quantity ELSE NULL END) as bed"),
-                    DB::raw("sum(CASE when sm.cloth_type='Arrived' THEN sm.quantity ELSE NULL END) as arrived"),
-                    DB::raw("sum(CASE when sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE NULL END) as lost"),
-                    DB::raw("sum(sm.marks) as marks")
-                )
-                ->groupBy('p.id', 'p.name')  // ✅ add p.name here
-                ->where('sm.branch_id', Auth::user()->branch_id)
-                ->get();
+        $query = DB::table('products as p')
+            ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
+            ->select(
+                'p.name',
+                'p.id',
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Initial Stock' THEN sm.quantity ELSE 0 END) as initial_stock"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Dirty' THEN sm.quantity ELSE 0 END) as dirty"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Bed' THEN sm.quantity ELSE 0 END) as bed"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Arrived' THEN sm.quantity ELSE 0 END) as arrived"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE 0 END) as lost"),
+                DB::raw("SUM(sm.marks) as marks")
+            )
+            ->groupBy('p.id', 'p.name')
+            ->where('sm.branch_id', Auth::user()->branch_id);
 
+        if ($request->isMethod('post') && $request->has(['from_date', 'to_date'])) {
+            $fromDate = $request->input('from_date');
+            $toDate = $request->input('to_date');
 
-
-            return view('admin.reports.stockReport', compact('products'));
-
-        } else {
-
-
-            $products = DB::table('products as p')
-                ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
-                ->select(
-                    'p.name',
-                    'p.id',
-                    DB::raw("sum(CASE when sm.cloth_type='Initial Stock' THEN sm.quantity ELSE NULL END) as initial_stock"),
-                    DB::raw("sum(CASE when sm.cloth_type='Dirty' THEN sm.quantity ELSE NULL END) as dirty"),
-                    DB::raw("sum(CASE when sm.cloth_type='Bed' THEN sm.quantity ELSE NULL END) as bed"),
-                    DB::raw("sum(CASE when sm.cloth_type='Arrived' THEN sm.quantity ELSE NULL END) as arrived"),
-                    DB::raw("sum(CASE when sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE NULL END) as lost"),
-                    DB::raw("sum(sm.marks) as marks")
-                )
-                ->groupBy('p.id', 'p.name')  // ✅ add p.name here
-                ->where('sm.branch_id', Auth::user()->branch_id)
-                ->get();
-
-            
-            return view('admin.reports.stockReport', compact('products'));
-
+            if ($fromDate && $toDate) {
+                $query->whereBetween('sm.created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59']);
+            }
         }
-        
+
+        $products = $query->get();
+
+        return view('admin.reports.stockReport', compact('products'));
     }
 
     public function stockStaffReport(Request $request){
@@ -172,14 +153,7 @@ class ReportController extends Controller
     }
 
 
-    // public function dirtyStockReport(Request $request){
 
-    //     $data = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('cloth_type', 'Dirty')->get();
-
-    //     dd($data);
-        
-    //     return view('admin.reports.dirtyStockReport', compact('data'));
-    // }
 
     public function dirtyStockReport(Request $request)
     {

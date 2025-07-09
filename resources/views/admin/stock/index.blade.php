@@ -60,7 +60,8 @@
                                             <option value="Bed">Bed</option>
                                             <option value="Arrived">Arrived</option>
                                             <option value="Initial Stock">Initial Stock</option>
-                                            <option value="Lost/Missed">Lost/Missed</option>
+                                            <option value="Lost/Missed">Missed</option>
+                                            <option value="Rejected">Rejected</option>
                                         </select>
                                     </div>
                                 </div>
@@ -74,7 +75,7 @@
                                 </div>
                                 
 
-                                <div class="col-sm-3">
+                                <div class="col-sm-3 d-none">
                                 <!-- text input -->
                                     <div class="form-group">
                                         <label>Marks</label>
@@ -83,7 +84,7 @@
                                 </div>
                                 
 
-                                <div class="col-sm-9">
+                                <div class="col-sm-12">
                                 <!-- text input -->
                                     <div class="form-group">
                                         <label>Details</label>
@@ -123,7 +124,6 @@
                                     <th>Product</th>
                                     <th>Type</th>
                                     <th>Quantity</th>
-                                    <th>Marks</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -136,7 +136,6 @@
                                     <td>{{ $data->product->name }}</td>
                                     <td>{{ $data->cloth_type }}</td>
                                     <td>{{ $data->quantity }}</td>
-                                    <td>{{ $data->marks }}</td>
                                     <td>
                                         <a id="DetailsBtn"
                                             data-id="{{ $data->id }}"
