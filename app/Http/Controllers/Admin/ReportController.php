@@ -242,7 +242,7 @@ class ReportController extends Controller
                 'startDate',
                 'endDate',
                 'branchName'
-            ))->setPaper('a4', 'landscape');
+            ));
             return $pdf->download('Dirty_Stock_Report_' . $branchName . '_' . $startDate->format('Y-m-d') . '_to_' . $endDate->format('Y-m-d') . '.pdf');
         }
 
