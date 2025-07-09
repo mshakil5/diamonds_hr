@@ -104,7 +104,7 @@
                                         <td>{{ $product->arrived ?? 0 }}</td>
                                         <td>{{ $product->lost ?? 0 }}</td>
                                         <td>{{ $product->marks ?? 0 }}</td>
-                                        <td>{{ ($product->initial_stock - $product->dirty - $product->lost + $product->arrived) }}</td>
+                                        <td>{{ ($product->initial_stock + $product->arrived - $product->dirty - $product->lost - $product->bed - $product->marks) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
