@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AssetController;
+use App\Http\Controllers\Admin\AssetTypeController;
 use App\Http\Controllers\Admin\CompanyDetailsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BlogCategoryController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\ReportController;
@@ -158,7 +161,29 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('settings/change-branch', [SettingsController::class, 'changeBranch'])->name('changeBranch');
     Route::post('change-branches', [SettingsController::class, 'branchChange']);
 
-    Route::get('settings/attendance-log', [SettingsController::class, 'attendanceLog'])->name('attendance.log');
+    // Asset Types crud
+    Route::get('/asset-type', [AssetTypeController::class, 'index'])->name('assetTypes');
+    Route::post('/asset-type', [AssetTypeController::class, 'store']);
+    Route::get('/asset-type/{id}/edit', [AssetTypeController::class, 'edit']);
+    Route::post('/asset-type-update', [AssetTypeController::class, 'update']);
+    Route::get('/asset-type/{id}', [AssetTypeController::class, 'delete']);
+    Route::post('/asset-type/update-status', [AssetTypeController::class, 'updateStatus'])->name('assetTypes.updateStatus');
+
+    // Locations crud
+    Route::get('/location', [LocationController::class, 'index'])->name('locations');
+    Route::post('/location', [LocationController::class, 'store']);
+    Route::get('/location/{id}/edit', [LocationController::class, 'edit']);
+    Route::post('/location-update', [LocationController::class, 'update']);
+    Route::get('/location/{id}', [LocationController::class, 'delete']);
+    Route::post('/location/update-status', [LocationController::class, 'updateStatus'])->name('locations.updateStatus');
+
+  // Assets crud
+  Route::get('/asset', [AssetController::class, 'index'])->name('assets');
+  Route::post('/asset', [AssetController::class, 'store']);
+  Route::get('/asset/{id}/edit', [AssetController::class, 'edit']);
+  Route::post('/asset-update', [AssetController::class, 'update']);
+  Route::get('/asset/{id}', [AssetController::class, 'delete']);
+  Route::post('/asset/update-status', [AssetController::class, 'updateStatus'])->name('assets.updateStatus');
         
 });
   

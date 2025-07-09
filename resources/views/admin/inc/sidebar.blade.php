@@ -102,6 +102,39 @@
         </a>
       </li>
       @endif
+
+      <li class="nav-item dropdown {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-blog"></i>
+              <p>
+                  Asset<i class="fas fa-angle-left right"></i>
+              </p>
+          </a>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('assetTypes') }}" class="nav-link {{ request()->routeIs('assetTypes') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Asset Types</p>
+                  </a>
+              </li>
+          </ul>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('locations') }}" class="nav-link {{ request()->routeIs('locations') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Locations</p>
+                  </a>
+              </li>
+          </ul>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('assets') }}" class="nav-link {{ request()->routeIs('assets') ? 'active' : '' }}">
+                    <i class="fas fa-list nav-icon"></i>
+                    <p>Assets</p>
+                  </a>
+              </li>
+          </ul> 
+      </li>
       
       @if (auth()->user()->canDo([23, 24, 25, 26]))
       <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}">
@@ -175,7 +208,7 @@
           @if (auth()->user()->canDo(28))
           <ul class="nav nav-treeview">
               <li class="nav-item">
-                  <a href="{{ route('attendance.log') }}" class="nav-link {{ request()->routeIs('attendance.log') ? 'active' : '' }}">
+                  <a href="#" class="nav-link ">
                       <i class="fas fa-list nav-icon"></i>
                       <p>Attendance Log</p>
                   </a>

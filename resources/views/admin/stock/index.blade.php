@@ -119,6 +119,7 @@
                                 <tr>
                                     <th>Staff</th>
                                     <th>Date</th>
+                                    <th>Branch</th>
                                     <th>Product</th>
                                     <th>Type</th>
                                     <th>Quantity</th>
@@ -131,6 +132,7 @@
                                 <tr>
                                     <td>{{ $data->user->name ?? "" }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
+                                    <td>{{ $data->branch->name ?? '' }}</td>
                                     <td>{{ $data->product->name }}</td>
                                     <td>{{ $data->cloth_type }}</td>
                                     <td>{{ $data->quantity }}</td>

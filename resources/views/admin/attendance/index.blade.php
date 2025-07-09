@@ -134,6 +134,7 @@
                                 <tr>
                                     <th style="display: none" class="d-none">SL</th>
                                     <th>Name</th>
+                                    <th>Branch</th>
                                     <th> </th>
                                     <th>G. Total Time</th>
                                 </tr>
@@ -143,6 +144,7 @@
                                     <tr>
                                         <td style="display: none" class="d-none">{{ $data->id }}</td>
                                         <td>{{ $data->employee->name }}</td>
+                                        <td>{{ $data->branch->name ?? '' }}</td>
                                         <td>
                                             <table class="table table-bordered w-100">
                                                 <thead>

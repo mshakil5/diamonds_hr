@@ -15,7 +15,7 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Attendance::where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
+        $data = Attendance::where('branch_id', Auth::user()->branch_id)->with('branch')->orderby('id','DESC')->get();
         $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
         return view('admin.attendance.index', compact('data','employees'));
     }

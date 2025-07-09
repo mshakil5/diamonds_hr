@@ -28,4 +28,9 @@ class Holiday extends Model
     public function employee(){
         return $this->belongsTo(Employee::class);
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

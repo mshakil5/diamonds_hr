@@ -1,74 +1,44 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-@if (auth()->user()->canDo(11))
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
             <div class="col-2">
-                {{-- <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button> --}}
+                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
             </div>
         </div>
     </div>
 </section>
-@endif
 
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
          <div class="row justify-content-md-center">
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="header-title">Add new Holiday</h3>
+                        <h3 class="card-title" id="header-title">Add new location</h3>
                     </div>
                     <div class="card-body">
                         <div class="errmsg"></div>
                         <form id="createThisForm">
                             @csrf
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
-                            
-                            <div class="row">
-
-                                <div class="col-sm-3">
-                                <!-- text input -->
-                                    <div class="form-group">
-                                        <label>Date</label>
-                                        <input type="date" class="form-control datetimepicker-input" id="date" name="date" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                <!-- text input -->
-                                    <div class="form-group">
-                                        <label>Employee *</label>
-                                        <select class="form-control select2" id="employee_id" name="employee_id">
-                                            <option value="">Select Employee</option>
-                                            @foreach ($employees as $employee)
-                                            <option value="{{$employee->id}}">{{$employee->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                <!-- text input -->
-                                    <div class="form-group">
-                                        <label>Type *</label>
-                                        <select class="form-control" id="employee_type" name="employee_type">
-                                            <option value="">Select Type</option>
-                                            <option value="Authorized holiday">Authorized holiday</option>
-                                            <option value="Unauthorized holiday">Unauthorized holiday</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                <!-- text input -->
-                                    <div class="form-group">
-                                        <label>Details</label>
-                                        <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
-                                    </div>
-                                </div>
-
+                            <div class="form-group">
+                                <label>Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter location name">
                             </div>
-                            
+                            <div class="form-group">
+                                <label>Location</label>
+                                <input type="text" class="form-control" id="location" name="location" placeholder="Enter location details">
+                            </div>
+                            <div class="form-group">
+                                <label>Status <span class="text-danger">*</span></label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
                         </form>
                     </div>
                     <div class="card-footer">
@@ -87,7 +57,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">All Holiday Record</h3>
+                        <h3 class="card-title">All Locations</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table table-bordered table-striped">
@@ -95,10 +65,9 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Date</th>
-                                    <th>Employee</th>
-                                    <th>Type</th>
-                                    <th>Branch</th>
-                                    <th>Details</th>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -106,18 +75,18 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
-                                    <td>{{ $data->employee->name }}</td>
-                                    <td>{{ $data->type }}</td>
-                                    <td>{{ $data->branch->name ?? '' }}</td>
-                                    <td>{{ $data->details }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
+                                    <td>{{ $data->name }}</td>
+                                    <td>{{ $data->location }}</td>
                                     <td>
-                                        @if (auth()->user()->canDo(12))
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->status == 1 ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="customSwitchStatus{{ $data->id }}"></label>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <a id="EditBtn" rid="{{ $data->id }}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
-                                        @endif
-                                        @if (auth()->user()->canDo(13))
-                                        {{-- <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a> --}}
-                                        @endif
+                                        <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -133,38 +102,41 @@
 @endsection
 
 @section('script')
-
 <script>
-    // Function to show error messages in .errmsg div
-    // function showError(message) {
-    //     $('.errmsg').html('<div class="alert alert-danger">' + message + '</div>');
-    // }
-
     $(document).ready(function() {
-        
-        
+        $("#addThisFormContainer").hide();
+        $("#newBtn").click(function() {
+            clearform();
+            $("#newBtn").hide(100);
+            $("#addThisFormContainer").show(300);
+        });
+        $("#FormCloseBtn").click(function() {
+            $("#addThisFormContainer").hide(200);
+            $("#newBtn").show(100);
+            clearform();
+        });
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var url = "{{URL::to('/admin/holidays')}}";
-        var upurl = "{{URL::to('/admin/holidays/update')}}";
+        var url = "{{URL::to('/admin/location')}}";
+        var upurl = "{{URL::to('/admin/location-update')}}";
 
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
-                var requiredFields = ['#date', '#employee_id', '#employee_type', '#details'];
+                var requiredFields = ['#name', '#status'];
                 for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val () === '') {
-                        showError('Please fill all required fields.');
+                    if ($(requiredFields[i]).val() === '') {
+                        $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
                         return;
                     }
                 }
+
                 var form_data = new FormData();
-                form_data.append("date", $("#date").val());
-                form_data.append("employee_type", $("#employee_type").val());
-                form_data.append("employee_id", $("#employee_id").val());
-                form_data.append("details", $("#details").val());
+                form_data.append("name", $("#name").val());
+                form_data.append("location", $("#location").val());
+                form_data.append("status", $("#status").val());
 
                 $.ajax({
                     url: url,
@@ -176,32 +148,30 @@
                         if (d.status == 422) {
                             $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
                         } else {
-                            showSuccess('Data created successfully.');
+                            $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
                             reloadPage(2000);
                         }
-                       
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr.responseText);
-                        showError('An error occurred. Please try again.');
+                        $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
                     }
                 });
             }
 
             if ($(this).val() == 'Update') {
-                var requiredFields = ['#date', '#employee_id', '#employee_type', '#details'];
+                var requiredFields = ['#name', '#status'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
-                        showError('Please fill all required fields.');
+                        $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
                         return;
                     }
                 }
 
                 var form_data = new FormData();
-                form_data.append("date", $("#date").val());
-                form_data.append("employee_type", $("#employee_type").val());
-                form_data.append("employee_id", $("#employee_id").val());
-                form_data.append("details", $("#details").val());
+                form_data.append("name", $("#name").val());
+                form_data.append("location", $("#location").val());
+                form_data.append("status", $("#status").val());
                 form_data.append("codeid", $("#codeid").val());
 
                 $.ajax({
@@ -215,14 +185,13 @@
                         if (d.status == 422) {
                             $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
                         } else {
-                            showSuccess('Data updated successfully.');
+                            $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
                             reloadPage(2000); 
                         }
-                        
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr.responseText);
-                        showError('An error occurred. Please try again.');
+                        $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
                     }
                 });
             }
@@ -247,24 +216,23 @@
                 type: "DELETE",
                 data: {},
                 success: function(d) {
-                    showSuccess('Data deleted successfully.');
+                    $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
                     reloadPage(2000);
                 },
                 error: function(xhr, status, error) {
-                    showError('An error occurred. Please try again.');
+                    $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
                 }
             });
         });
 
         function populateForm(data) {
-            $("#date").val(data.date);
-            $("#employee_id").val(data.employee_id).trigger('change');
-            $("#employee_type").val(data.type);
-            $("#details").val(data.details);
+            $("#name").val(data.name);
+            $("#location").val(data.location);
+            $("#status").val(data.status);
             $("#codeid").val(data.id);
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');
-            $("#header-title").html('Update data');
+            $("#header-title").html('Update location');
             $("#addThisFormContainer").show(300);
             $("#newBtn").hide(100);
         }
@@ -272,10 +240,43 @@
         function clearform() {
             $('#createThisForm')[0].reset();
             $("#addBtn").val('Create');
-            $("#header-title").html('Add new data');
+            $("#header-title").html('Add new location');
         }
 
+        $(document).on('change', '.toggle-status', function() {
+            var id = $(this).data('id');
+            var status = $(this).prop('checked') ? 1 : 0;
 
+            $.ajax({
+                url: '{{ route("locations.updateStatus") }}',
+                method: 'POST',
+                data: {
+                    id: id,
+                    status: status,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.status === 200) {
+                        $('.errmsg').html('<div class="alert alert-success">' + response.message + '</div>');
+                    } else {
+                        $('.errmsg').html('<div class="alert alert-danger">Failed to update status.</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+                }
+            });
+        });
+
+        function reloadPage(time) {
+            setTimeout(function() {
+                window.location.reload();
+            }, time);
+        }
+
+        function pagetop() {
+            window.scrollTo(0, 0);
+        }
 
         $(function() {
             $("#example1").DataTable({
@@ -296,7 +297,4 @@
         });
     });
 </script>
-
-
-
 @endsection
