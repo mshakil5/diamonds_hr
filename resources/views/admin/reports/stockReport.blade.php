@@ -90,8 +90,8 @@
                                     <th>Bed</th>
                                     <th>Arrived</th>
                                     <th>Lost/Missed</th>
-                                    <th>Shelve Stock</th>
                                     <th>Marks</th>
+                                    <th>Shelve Stock</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,8 +103,8 @@
                                         <td>{{ $product->bed ?? 0 }}</td>
                                         <td>{{ $product->arrived ?? 0 }}</td>
                                         <td>{{ $product->lost ?? 0 }}</td>
-                                        <td>{{ ($product->initial_stock - $product->dirty - $product->lost + $product->arrived) }}</td>
                                         <td>{{ $product->marks ?? 0 }}</td>
+                                        <td>{{ ($product->initial_stock - $product->dirty - $product->lost + $product->arrived) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
