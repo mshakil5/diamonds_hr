@@ -2,47 +2,37 @@
 
 @section('content')
 
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-    </style>
-
-<section class="content" id="newBtnSection">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-2">
-                {{-- <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button> --}}
-            </div>
-        </div>
-    </div>
-</section>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+</style>
 
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
-         <div class="row justify-content-md-center">
+        <div class="row justify-content-md-center">
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="header-title">Dirty product report</h3>
+                        <h3 class="card-title" id="header-title">Dirty Product Report</h3>
                     </div>
                     <div class="card-body">
                         <div class="errmsg"></div>
-                                <!-- Date Range Form -->
+                        <!-- Date Range Form -->
                         <div class="no-print">
                             <form method="GET" action="{{ route('dirtyStockReport') }}">
                                 <div class="form-group">
@@ -64,26 +54,22 @@
     </div>
 </section>
 
-
-
-
- <section class="content" id="contentContainer">
+<section class="content" id="contentContainer">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Dirty product report</h3>
+                        <h3 class="card-title">Dirty Product Report</h3>
                     </div>
                     <div class="card-body">
-
                         <div class="header">
                             <h1>Dirty Stock Report</h1>
                             <h3>Branch: {{ $branchName }}</h3>
                             <h4>Period: {{ $startDate->format('d/m/Y') }} - {{ $endDate->format('d/m/Y') }}</h4>
                         </div>
                         
-                         <!-- Report Table -->
+                        <!-- Report Table -->
                         @foreach($reportData as $index => $weekData)
                             <h3>Week {{ $index + 1 }} ({{ $weekData['days']['Tuesday']['date']->format('d/m/Y') }} - {{ $weekData['days']['Monday']['date']->format('d/m/Y') }})</h3>
                             <table class="table table-bordered">
@@ -102,78 +88,65 @@
                                     </tr>
                                     <tr>
                                         <th>Date</th>
-                                        @foreach($weekData['days'] as $dayName => $dayData)
-                                            <th>{{ $dayData['date']->format('d/m/Y') }}</th>
-                                            @if($dayName == 'Thursday')
-                                                <th>{{ $weekData['first_three_days_total'] }}</th>
-                                            @endif
-                                            @if($dayName == 'Monday')
-                                                <th>{{ $weekData['last_four_days_total'] }}</th>
-                                            @endif
-                                        @endforeach
+                                        <th>{{ $weekData['days']['Tuesday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['days']['Wednesday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['days']['Thursday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['first_three_days_total'] }}</th>
+                                        <th>{{ $weekData['days']['Friday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['days']['Saturday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['days']['Sunday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['days']['Monday']['date']->format('d/m/Y') }}</th>
+                                        <th>{{ $weekData['last_four_days_total'] }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($products as $product)
                                         <tr>
                                             <td>{{ $product->name }}</td>
-                                            @foreach($weekData['days'] as $dayName => $dayData)
-                                                <td>{{ $dayData['quantities'][$product->id] ?? ''}}</td>
-                                                @if($dayName == 'Thursday')
-                                                    <td>
-                                                        {{ array_sum([
-                                                            ($weekData['days']['Tuesday']['quantities'][$product->id] ?? ''),
-                                                            ($weekData['days']['Wednesday']['quantities'][$product->id] ?? ''),
-                                                            ($weekData['days']['Thursday']['quantities'][$product->id] ?? '')
-                                                        ]) }}
-                                                    </td>
-                                                @endif
-                                                @if($dayName == 'Monday')
-                                                    <td>
-                                                        {{ array_sum([
-                                                            ($weekData['days']['Friday']['quantities'][$product->id] ?? ''),
-                                                            ($weekData['days']['Saturday']['quantities'][$product->id] ?? ''),
-                                                            ($weekData['days']['Sunday']['quantities'][$product->id] ?? ''),
-                                                            ($weekData['days']['Monday']['quantities'][$product->id] ?? '')
-                                                        ]) }}
-                                                    </td>
-                                                @endif
-                                            @endforeach
+                                            <td>{{ $weekData['days']['Tuesday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>{{ $weekData['days']['Wednesday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>{{ $weekData['days']['Thursday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>
+                                                {{ array_sum([
+                                                    ($weekData['days']['Tuesday']['quantities'][$product->id] ?? 0),
+                                                    ($weekData['days']['Wednesday']['quantities'][$product->id] ?? 0),
+                                                    ($weekData['days']['Thursday']['quantities'][$product->id] ?? 0)
+                                                ]) }}
+                                            </td>
+                                            <td>{{ $weekData['days']['Friday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>{{ $weekData['days']['Saturday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>{{ $weekData['days']['Sunday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>{{ $weekData['days']['Monday']['quantities'][$product->id] ?? '' }}</td>
+                                            <td>
+                                                {{ array_sum([
+                                                    ($weekData['days']['Friday']['quantities'][$product->id] ?? 0),
+                                                    ($weekData['days']['Saturday']['quantities'][$product->id] ?? 0),
+                                                    ($weekData['days']['Sunday']['quantities'][$product->id] ?? 0),
+                                                    ($weekData['days']['Monday']['quantities'][$product->id] ?? 0)
+                                                ]) }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                     <tr>
                                         <td><strong>Total</strong></td>
-                                        @foreach($weekData['days'] as $dayName => $dayData)
-                                            <td><strong>{{ $dayData['total'] }}</strong></td>
-                                            @if($dayName == 'Thursday')
-                                                <td><strong>{{ $weekData['first_three_days_total'] }}</strong></td>
-                                            @endif
-                                            @if($dayName == 'Monday')
-                                                <td><strong>{{ $weekData['last_four_days_total'] }}</strong></td>
-                                            @endif
-                                        @endforeach
+                                        <td><strong>{{ $weekData['days']['Tuesday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['days']['Wednesday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['days']['Thursday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['first_three_days_total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['days']['Friday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['days']['Saturday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['days']['Sunday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['days']['Monday']['total'] }}</strong></td>
+                                        <td><strong>{{ $weekData['last_four_days_total'] }}</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
                         @endforeach
-
-
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>   
-
-
-
-@endsection
-
-@section('script')
-
-
-
-
+</section>
 
 @endsection

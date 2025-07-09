@@ -182,8 +182,8 @@ class ReportController extends Controller
     public function dirtyStockReport(Request $request)
     {
         // Initialize variables
-        $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::today()->startOfWeek();
-        $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::today()->endOfWeek();
+        $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::today()->startOfWeek(Carbon::TUESDAY);
+        $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::today()->endOfWeek(Carbon::MONDAY);
         
         // Validate date range
         $request->validate([
@@ -208,11 +208,15 @@ class ReportController extends Controller
         $reportData = [];
         $weeklyTotals = [];
 
+        // Adjust startDate to the previous Tuesday if it's not already a Tuesday
+        $startDate = $startDate->startOfWeek(Carbon::TUESDAY);
+        $endDate = $endDate->endOfWeek(Carbon::MONDAY);
+
         // Get week periods
-        $period = CarbonPeriod::create($startDate->startOfWeek(), '1 week', $endDate->endOfWeek());
+        $period = CarbonPeriod::create($startDate, '1 week', $endDate);
 
         foreach ($period as $weekStart) {
-            $weekEnd = $weekStart->copy()->endOfWeek();
+            $weekEnd = $weekStart->copy()->endOfWeek(Carbon::MONDAY);
             $weekData = [
                 'days' => [],
                 'first_three_days_total' => 0,
@@ -220,16 +224,17 @@ class ReportController extends Controller
                 'total_outgoing' => 0,
             ];
 
-            // Initialize days array
+            // Initialize days array (Tuesday to Monday)
             $days = [
-                'Tuesday' => ['date' => $weekStart->copy()->next(Carbon::TUESDAY), 'quantities' => [], 'total' => 0],
-                'Wednesday' => ['date' => $weekStart->copy()->next(Carbon::WEDNESDAY), 'quantities' => [], 'total' => 0],
-                'Thursday' => ['date' => $weekStart->copy()->next(Carbon::THURSDAY), 'quantities' => [], 'total' => 0],
-                'Friday' => ['date' => $weekStart->copy()->next(Carbon::FRIDAY), 'quantities' => [], 'total' => 0],
-                'Saturday' => ['date' => $weekStart->copy()->next(Carbon::SATURDAY), 'quantities' => [], 'total' => 0],
-                'Sunday' => ['date' => $weekStart->copy()->next(Carbon::SUNDAY), 'quantities' => [], 'total' => 0],
-                'Monday' => ['date' => $weekStart->copy()->next(Carbon::MONDAY), 'quantities' => [], 'total' => 0],
+                'Tuesday' => ['date' => $weekStart->copy(), 'quantities' => [], 'total' => 0],
+                'Wednesday' => ['date' => $weekStart->copy()->addDay(), 'quantities' => [], 'total' => 0],
+                'Thursday' => ['date' => $weekStart->copy()->addDays(2), 'quantities' => [], 'total' => 0],
+                'Friday' => ['date' => $weekStart->copy()->addDays(3), 'quantities' => [], 'total' => 0],
+                'Saturday' => ['date' => $weekStart->copy()->addDays(4), 'quantities' => [], 'total' => 0],
+                'Sunday' => ['date' => $weekStart->copy()->addDays(5), 'quantities' => [], 'total' => 0],
+                'Monday' => ['date' => $weekStart->copy()->addDays(6), 'quantities' => [], 'total' => 0],
             ];
+
 
             // Get stock data for the week
             $stockData = Stockmaintaince::where('branch_id', Auth::user()->branch_id)
@@ -239,6 +244,7 @@ class ReportController extends Controller
                 ->groupBy('product_id', 'stock_date')
                 ->get();
 
+                // dd($stockData);
             // Process stock data
             foreach ($stockData as $stock) {
                 $stockDate = Carbon::parse($stock->stock_date);
