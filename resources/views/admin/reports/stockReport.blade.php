@@ -89,7 +89,7 @@
                                     <th>Dirty</th>
                                     <th>Bed</th>
                                     <th>Arrived</th>
-                                    <th>Lost/Missed</th>
+                                    <th>Missed</th>
                                     <th>Marks</th>
                                     <th>Shelve Stock</th>
                                 </tr>
