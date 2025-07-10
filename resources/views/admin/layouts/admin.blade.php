@@ -31,6 +31,7 @@
     .select2-selection{
       height: 36px !important;
     }
+    
   </style>
 
 
@@ -105,12 +106,12 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <footer class="main-footer">
+  <footer class="main-footer no-print">
     All rights reserved. Copyright © <script>document.write(new Date().getFullYear())</script>.
   </footer>
 
   <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
+  <aside class="control-sidebar control-sidebar-dark no-print">
     <!-- Control sidebar content goes here -->
   </aside>
   <!-- /.control-sidebar -->
@@ -192,5 +193,7 @@
 </script>
 
 @yield('script')
+
+
 </body>
 </html>

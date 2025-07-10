@@ -60,23 +60,27 @@ class ReportController extends Controller
             $contractDateBegin = date('Y') . '-04-01';
             $contractDateEnd = date('Y', strtotime('+1 year')) . '-03-31';
 
-            $employee= Employee::find($employeeId);
+            $employee = Employee::find($employeeId);
             $holidayData=Holiday::with('employee')
                 ->whereEmployeeId($employeeId)
                 ->whereBetween('date',[$contractDateBegin,Carbon::today()])
                 ->where('type','Authorized holiday')
+                ->where('branch_id', $employee->branch_id)
                 ->get();
             $holidayDataCount=Holiday::whereEmployeeId($employeeId)
                 ->whereBetween('date',[$contractDateBegin,$contractDateEnd])
                 ->where('type','Authorized holiday')
+                ->where('branch_id', $employee->branch_id)
                 ->count();
             $sickDays = Attendance::whereEmployeeId($employeeId)
                 ->whereBetween('clock_in',[$contractDateBegin,Carbon::today()])
                 ->where('type','Sick')
+                ->where('branch_id', $employee->branch_id)
                 ->count();
             $absenceDays=Attendance::whereEmployeeId($employeeId)
                 ->whereBetween('clock_in',[$contractDateBegin,Carbon::today()])
                 ->where('type','Absence')
+                ->where('branch_id', $employee->branch_id)
                 ->count();
 
 
