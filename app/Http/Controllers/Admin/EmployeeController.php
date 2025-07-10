@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Models\Role;
+use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
-    public function index(Request $request)
+    public function index2(Request $request)
     {
         if (Auth::user()->is_type == '1') {
           $query = Employee::with('user.branch')->orderby('id','DESC')->get();
@@ -28,6 +29,43 @@ class EmployeeController extends Controller
         $roles = Role::latest()->get();
         $branches = Branch::where('status', 1)->get();
         return view('admin.employees.index', compact('query','roles','branches'));
+    }
+
+    public function index(Request $request)
+    {
+        if (Auth::user()->is_type == '1') {
+            $query = Employee::with('user.branch')->orderBy('id', 'DESC')->get();
+        } else {
+            $query = Employee::with('user.branch')->where('branch_id', Auth::user()->branch_id)->orderBy('id', 'DESC')->get();
+        }
+        $roles = Role::latest()->get();
+        $branches = Branch::where('status', 1)->get();
+        return view('admin.employees.index', compact('query', 'roles', 'branches'));
+    }
+
+    public function payslip(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
+        ]);
+
+        $formDate=$request->input('from_date').' 00:00:00';
+        $toDate=$request->input('to_date').' 23:59:59';
+        $employee=Employee::find($request->employee_id);
+        $payslip=Attendance::whereType('Regular')
+            ->whereEmployeeId($request->employee_id)
+            ->whereBetween('clock_in',[$formDate,$toDate])
+            ->get();
+
+        $holidayController = $this->getHolidayReport($request);
+        return response()->json([
+            'payslip'=>$payslip,
+            'employee'=>$employee,
+            'holiday' =>$holidayController
+
+        ]);
     }
 
     public function store(Request $request)
@@ -217,4 +255,41 @@ class EmployeeController extends Controller
             'employee' => $employee
         ]);
     }
+
+
+    public function getHolidayReport(Request $request)
+    {
+        $employeeId=request()->input('employee_id');
+        $contractDateBegin = date('Y') . '-04-01';
+        $contractDateEnd = date('Y', strtotime('+1 year')) . '-03-31';
+
+        $employee= Employee::find($employeeId);
+        $holidayData=Holiday::with('employee')
+            ->whereEmployeeId($employeeId)
+            ->whereBetween('date',[$contractDateBegin,Carbon::today()])
+            ->where('type','Authorized holiday')
+            ->get();
+        $holidayDataCount=Holiday::whereEmployeeId($employeeId)
+            ->whereBetween('date',[$contractDateBegin,$contractDateEnd])
+            ->where('type','Authorized holiday')
+            ->count();
+        $sickDays = Attendance::whereEmployeeId($employeeId)
+            ->whereBetween('clock_in',[$contractDateBegin,Carbon::today()])
+            ->where('type','Sick')
+            ->count();
+        $absenceDays=Attendance::whereEmployeeId($employeeId)
+            ->whereBetween('clock_in',[$contractDateBegin,Carbon::today()])
+            ->where('type','Absence')
+            ->count();
+
+        return response()->json([
+           'employee'=>$employee,
+           'holidayData'=>$holidayData,
+            'sickDays'=>$sickDays,
+            'absenceDays'=>$absenceDays,
+            'holidayDataCount'=>$holidayDataCount
+        ]);
+    }
+
+
 }

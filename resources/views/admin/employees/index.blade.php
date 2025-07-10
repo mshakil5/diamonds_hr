@@ -17,7 +17,6 @@
 <!-- /.content -->
 @endif
 
-
 <!-- Main content -->
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
@@ -36,26 +35,26 @@
                                 <div class="card-header">
                                     <h3 class="card-title"> Basic Staff Information</h3>
                                 </div>
-                                <!-- /.card-header -->
+                                <!-- /.card-body -->
                                 <div class="card-body">
                                     <input type="hidden" id="codeid">
                                     <div class="row">
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Staff ID *</label>
                                                 <input type="text" class="form-control" id="employee_id" name="employee_id">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Name *</label>
                                                 <input type="text" class="form-control" id="name" name="name">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Staff Type *</label>
                                                 <select class="form-control" id="employee_type" name="employee_type">
@@ -67,43 +66,42 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Phone</label>
                                                 <input type="number" class="form-control" id="phone" name="phone">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Em. Contact Number</label>
                                                 <input type="number" class="form-control" id="emergency_contact_number" name="emergency_contact_number">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Em. Contact Person</label>
                                                 <input type="text" class="form-control" id="emergency_contact_person" name="emergency_contact_person">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Nation Insurance No</label>
                                                 <input type="text" class="form-control" id="ni" name="ni">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Nationality</label>
                                                 <input type="text" class="form-control" id="nationality" name="nationality">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
-                                        <!-- text input -->
-
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Join Date</label>
                                                 <div class="input-group date" id="reservationdatetime" data-target-input="nearest">
@@ -113,90 +111,81 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                         </div>
-
                                         <div class="col-sm-3">
                                             <!-- text input -->
-                                                <div class="form-group">
-                                                    <label>Email*</label>
-                                                    <input type="text" class="form-control" id="email" name="email">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-3">
-                                                <div class="form-group">
-                                                    <label>Select Role</label>
-                                                    <select name="role_id" id="role_id" class="form-control" >
-                                                        <option value="">Select Role</option>
-                                                        @foreach ($roles as $role)
-                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-3">
-                                            <!-- text input -->
-                                                <div class="form-group">
-                                                    <label>Image</label>
-                                                    <input type="file" class="form-control" id="image" name="image">
-                                                    <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-12">
-                                            <!-- text input -->
-                                                <div class="form-group">
-                                                    <label>Address</label>
-                                                    <textarea class="form-control" name="address" id="address" cols="30" rows="2"></textarea>
-                                                </div>
+                                            <div class="form-group">
+                                                <label>Email*</label>
+                                                <input type="text" class="form-control" id="email" name="email">
                                             </div>
                                         </div>
-
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Select Role</label>
+                                                <select name="role_id" id="role_id" class="form-control">
+                                                    <option value="">Select Role</option>
+                                                    @foreach ($roles as $role)
+                                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Image</label>
+                                                <input type="file" class="form-control" id="image" name="image">
+                                                <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Address</label>
+                                                <textarea class="form-control" name="address" id="address" cols="30" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>
 
                             <div class="card mb-2">
                                 <div class="card-header">
-                                    <h3 class="card-title">  Payment and holiday info</h3>
+                                    <h3 class="card-title"> Payment and holiday info</h3>
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
-
                                     <div class="row">
                                         <div class="col-sm-4">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Pay Rate *</label>
                                                 <input type="number" class="form-control" id="pay_rate" name="pay_rate">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Tax Code *</label>
                                                 <input type="text" class="form-control" id="tax_code" name="tax_code">
                                             </div>
                                         </div>
-                                        
                                         <div class="col-sm-4">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Entitled Holiday *</label>
                                                 <input type="number" class="form-control" id="entitled_holiday" name="entitled_holiday">
                                             </div>
                                         </div>
-                                        
-                                        
                                         <div class="col-sm-12">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Bank Details</label>
                                                 <textarea class="form-control" name="bank_details" id="bank_details" cols="30" rows="2"></textarea>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                                 <!-- /.card-body -->
                             </div>
@@ -207,40 +196,33 @@
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
-
                                     <div class="row">
-                                        
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Username*</label>
                                                 <input type="text" class="form-control" id="username" name="username">
                                             </div>
                                         </div>
-                                        
                                         <div class="col-sm-3">
-                                        <!-- text input -->
+                                            <!-- text input -->
                                             <div class="form-group">
                                                 <label>Password *</label>
                                                 <input type="password" class="form-control" id="password" name="password">
                                             </div>
                                         </div>
-                                        
                                     </div>
-
                                 </div>
                                 <!-- /.card-body -->
                             </div>
                         </form>
                     </div>
-
                     <!-- /.card-body -->
                     <div class="card-footer">
                         <button type="submit" id="addBtn" class="btn btn-secondary" value="Create">Create</button>
                         <button type="submit" id="FormCloseBtn" class="btn btn-default">Cancel</button>
                     </div>
                     <!-- /.card-footer -->
-                    <!-- /.card-body -->
                 </div>
             </div>
             <!--/.col (right) -->
@@ -250,19 +232,15 @@
 </section>
 <!-- /.content -->
 
-
 <!-- Main content -->
 <section class="content" id="contentContainer">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <!-- /.card -->
-
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title">All Data</h3>
                     </div>
-
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-4">
@@ -276,9 +254,6 @@
                             </div>
                         </div>
                     </div>
-
-
-
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example1" class="table table-bordered table-striped">
@@ -301,10 +276,10 @@
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
-                                    <td>{{$data->name}}</td>
-                                    <td>{{$data->username}}</td>
-                                    <td>{{$data->employee_type}}</td>
-                                    <td>{{$data->user->email ?? ''}} <br> {{$data->phone ?? ''}}</td>
+                                    <td>{{ $data->name }}</td>
+                                    <td>{{ $data->username }}</td>
+                                    <td>{{ $data->employee_type }}</td>
+                                    <td>{{ $data->user->email ?? '' }} <br> {{ $data->phone ?? '' }}</td>
                                     <td>
                                         @if ($data->user->photo != null)
                                         <a href="{{ asset('public'.$data->user->photo) }}" target="_blank">
@@ -312,7 +287,7 @@
                                         </a>
                                         @endif
                                     </td>
-                                    <td>{{$data->branch->name ?? ''}}</td>
+                                    <td>{{ $data->branch->name ?? '' }}</td>
                                     <td>
                                         <div class="custom-control custom-switch">
                                             <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->is_active == 1 ? 'checked' : '' }}>
@@ -321,7 +296,7 @@
                                     </td>
                                     <td>
                                         <a id="DetailsBtn"
-                                            rid="{{$data->id}}"
+                                            rid="{{ $data->id }}"
                                             title="Details"
                                             data-name="{{ $data->name }}"
                                             data-username="{{ $data->username }}"
@@ -342,18 +317,18 @@
                                             data-employee_type="{{ $data->employee_type }}"
                                             data-pay_rate="{{ $data->pay_rate }}"
                                         >
-                                             <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
+                                            <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
                                         </a>
                                         @if (auth()->user()->canDo(9))
-                                        <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                        <a id="EditBtn" rid="{{ $data->id }}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px; margin-right:8px;"></i></a>
                                         @endif
                                         @if (auth()->user()->canDo(10))
-                                        <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
+                                        <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px; margin-right:8px;"></i></a>
                                         @endif
+                                        <a id="PayslipBtn" rid="{{ $data->id }}" title="Payslip"><i class="fa fa-file-text" style="color: #28a745; font-size:16px;"></i></a>
                                     </td>
                                 </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>
@@ -369,19 +344,188 @@
 </section>
 <!-- /.content -->
 
-
+<!-- Payslip Modal -->
+<div class="modal fade" id="payslipModal" tabindex="-1" role="dialog" aria-labelledby="payslipModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="payslipModalLabel">Pay Report</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="payslipForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>From Date *</label>
+                                <div class="input-group date" id="fromDatePicker" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" data-target="#fromDatePicker" id="from_date" name="from_date" required />
+                                    <div class="input-group-append" data-target="#fromDatePicker" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>To Date *</label>
+                                <div class="input-group date" id="toDatePicker" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" data-target="#toDatePicker" id="to_date" name="to_date" required />
+                                    <div class="input-group-append" data-target="#toDatePicker" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mt-4">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                                <button type="button" class="btn btn-secondary" id="printPayslip">Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div id="payslipContent" style="display: none;">
+                    <div class="text-center">
+                        <h3>Diamonds Guest House</h3>
+                        <h5>Staff Pay Report</h5>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Id</th>
+                                        <th>Staff Name</th>
+                                        <th>Process Date</th>
+                                        <th>N.I Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="employee_id"></td>
+                                        <td id="name"></td>
+                                        <td id="process_date"></td>
+                                        <td id="ni"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Details</th>
+                                        <th>Hours</th>
+                                        <th>Rate</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Working details</td>
+                                        <td id="total_hours"></td>
+                                        <td id="pay_rate"></td>
+                                        <td id="total_amount"></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>Holidays: <span id="entitled_holiday"></span></td>
+                                        <td>Taken: <span id="holiday_taken"></span></td>
+                                        <td>Remaining: <span id="holiday_remaining"></span></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sick Days: <span id="sick_days"></span></td>
+                                        <td>Absence Days: <span id="absence_days"></span></td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p class="font-weight-bold">
+                                Diamonds Guest House<br>
+                                York, Yorkshire, UK
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="font-weight-bold">Diamonds Guest House</p>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td>Hourly Based Amount</td>
+                                    <td id="hourly_amount"></td>
+                                </tr>
+                                <tr>
+                                    <td>Overtime</td>
+                                    <td><input type="number" class="form-control payslip-input" id="overtime" name="overtime" step="any" value="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Maternity/Paternity</td>
+                                    <td><input type="number" class="form-control payslip-input" id="maternity" name="maternity" step="any" value="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Sick Pay</td>
+                                    <td><input type="number" class="form-control payslip-input" id="sickPay" name="sickPay" step="any" value="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Holiday Pay</td>
+                                    <td><input type="number" class="form-control payslip-input" id="holidayPay" name="holidayPay" step="any" value="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Bonus</td>
+                                    <td><input type="number" class="form-control payslip-input" id="bonus" name="bonus" step="any" value="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Other</td>
+                                    <td><input type="number" class="form-control payslip-input" id="other" name="other" step="any" value="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Adjustment (-)</td>
+                                    <td><input type="number" class="form-control payslip-input" id="adjustment" name="adjustment" step="any" value="0" /></td>
+                                </tr>
+                            </table>
+                            <div class="text-right">
+                                <strong>Gross Pay: </strong><span id="gross_pay"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <p class="font-weight-bold">Date and Tax Details</p>
+                            <table class="table table-bordered text-center">
+                                <tr>
+                                    <td><span>Tax code: <span id="tax_code"></span></span></td>
+                                    <td>From Date: <span id="from_date_display"></span></td>
+                                    <td>To Date: <span id="to_date_display"></span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
 
 @section('script')
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/js/tempusdominus-bootstrap-4.min.js"></script>
+
 <script>
 $(document).ready(function() {
-    // Debug: Check if table element exists
-    if ($('#example1').length === 0) {
-        console.error('Table #example1 not found in DOM');
-        return;
-    }
-
     // Initialize DataTable
     var table = $("#example1").DataTable({
         "responsive": true,
@@ -391,300 +535,391 @@ $(document).ready(function() {
         "buttons": ["copy", "csv", "excel", "pdf", "print"]
     });
 
-    if (!$.fn.DataTable.isDataTable('#example1')) {
-        console.error('DataTable failed to initialize for #example1');
-    }
-
     // Branch filter logic
     $('#branchFilter').on('change', function() {
         var branch = $(this).val();
         if ($.fn.DataTable.isDataTable('#example1')) {
-            console.log('Table branch data:', table.column(7).data().toArray());
             if (branch) {
                 table.column(7).search(branch).draw();
             } else {
                 table.column(7).search('').draw();
             }
-        } else {
-            console.error('DataTable not initialized for #example1');
         }
     });
 
-    // ... rest of your existing code (addBtn, EditBtn, deleteBtn, etc.) ...
-});
-</script>
-<script>
-    $(document).ready(function() {
+    // Initialize datetime pickers
+    $('#fromDatePicker').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    $('#toDatePicker').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    $('#reservationdatetime').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm'
+    });
 
-        $("#addThisFormContainer").hide();
-        $("#newBtn").click(function() {
-            clearform();
-            $("#newBtn").hide(100);
-            $("#addThisFormContainer").show(300);
-        });
-        $("#FormCloseBtn").click(function() {
-            $("#addThisFormContainer").hide(200);
-            $("#newBtn").show(100);
-            clearform();
-        });
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    // CSRF Token Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var url = "{{ URL::to('/admin/employees') }}";
+    var upurl = "{{ URL::to('/admin/employees/update') }}";
+
+    // Add/Edit form logic (unchanged)
+    $("#addThisFormContainer").hide();
+    $("#newBtn").click(function() {
+        clearform();
+        $("#newBtn").hide(100);
+        $("#addThisFormContainer").show(300);
+    });
+    $("#FormCloseBtn").click(function() {
+        $("#addThisFormContainer").hide(200);
+        $("#newBtn").show(100);
+        clearform();
+    });
+
+    $("#addBtn").click(function() {
+        if ($(this).val() == 'Create') {
+            var requiredFields = [
+                '#employee_id',
+                '#name',
+                '#employee_type',
+                '#pay_rate',
+                '#tax_code',
+                '#entitled_holiday',
+                '#username',
+                '#password'
+            ];
+            for (var i = 0; i < requiredFields.length; i++) {
+                if ($(requiredFields[i]).val() === '') {
+                    showError('Please fill all required fields.');
+                    return;
+                }
             }
-        });
-        var url = "{{URL::to('/admin/employees')}}";
-        var upurl = "{{URL::to('/admin/employees/update')}}";
 
-        $("#addBtn").click(function() {
-            if ($(this).val() == 'Create') {
-                var requiredFields = [
-                    '#employee_id',
-                    '#name',
-                    '#employee_type',
-                    '#pay_rate',
-                    '#tax_code',
-                    '#entitled_holiday',
-                    '#username',
-                    '#password'
-                ];
-                for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val() === '') {
-                        showError('Please fill all required fields.');
-                        return;
-                    }
-                }
-
-                var form_data = new FormData($('#createThisForm')[0]);
-                var featureImgInput = document.getElementById('image');
-                if (featureImgInput.files && featureImgInput.files[0]) {
-                    form_data.append("photo", featureImgInput.files[0]);
-                }
-                $.ajax({
-                    url: url,
-                    method: "POST",
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(d) {
-                        showSuccess('Data created successfully.');
-                        reloadPage(2000);
-                    },
-                    error: function(xhr, status, error) {
-                        let response = xhr.responseJSON;
-                        if (response && response.errors) {
-                            let firstError = Object.values(response.errors)[0][0];
-                            showError(firstError);
-                        } else {
-                            showError('An error occurred. Please try again.');
-                        }
-                    }
-                });
+            var form_data = new FormData($('#createThisForm')[0]);
+            var featureImgInput = document.getElementById('image');
+            if (featureImgInput.files && featureImgInput.files[0]) {
+                form_data.append("photo", featureImgInput.files[0]);
             }
-            // Update logic
-            if ($(this).val() == 'Update') {
-                var requiredFields = [
-                    '#employee_id',
-                    '#name',
-                    '#employee_type',
-                    '#pay_rate',
-                    '#tax_code',
-                    '#entitled_holiday',
-                    '#username'
-                ];
-                for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val() === '') {
-                        showError('Please fill all required fields.');
-                        return;
-                    }
-                }
-
-                var form_data = new FormData($('#createThisForm')[0]);
-                var featureImgInput = document.getElementById('image');
-                if (featureImgInput.files && featureImgInput.files[0]) {
-                    form_data.append("photo", featureImgInput.files[0]);
-                }
-                form_data.append("codeid", $("#codeid").val());
-
-                $.ajax({
-                    url: upurl,
-                    type: "POST",
-                    dataType: 'json',
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(d) {
-                        showSuccess('Data updated successfully.');
-                        reloadPage(2000);
-                    },
-                    error: function(xhr, status, error) {
-                        let response = xhr.responseJSON;
-                        if (response && response.errors) {
-                            let firstError = Object.values(response.errors)[0][0];
-                            showError(firstError);
-                        } else {
-                            showError('An error occurred. Please try again.');
-                        }
-                    }
-                });
-            }
-        });
-
-        // Edit
-        $("#contentContainer").on('click', '#EditBtn', function() {
-            codeid = $(this).attr('rid');
-            info_url = url + '/' + codeid + '/edit';
-            $.get(info_url, {}, function(d) {
-                populateForm(d);
-                pagetop();
-            });
-        });
-
-        // Delete
-        $("#contentContainer").on('click', '#deleteBtn', function() {
-            if (!confirm('Sure?')) return;
-            codeid = $(this).attr('rid');
-            info_url = url + '/' + codeid;
             $.ajax({
-                url: info_url,
-                method: "GET",
-                type: "DELETE",
-                data: {},
+                url: url,
+                method: "POST",
+                contentType: false,
+                processData: false,
+                data: form_data,
                 success: function(d) {
-                    showSuccess('Data deleted successfully.');
+                    showSuccess('Data created successfully.');
                     reloadPage(2000);
                 },
                 error: function(xhr, status, error) {
-                    showError('An error occurred. Please try again.');
-                    console.error(error);
+                    let response = xhr.responseJSON;
+                    if (response && response.errors) {
+                        let firstError = Object.values(response.errors)[0][0];
+                        showError(firstError);
+                    } else {
+                        showError('An error occurred. Please try again.');
+                    }
                 }
             });
-        });
-
-        function populateForm(data) {
-            $("#employee_id").val(data.employee_id);
-            $("#name").val(data.name);
-            $("#username").val(data.username);
-            $("#phone").val(data.phone);
-            $("#email").val(data.email);
-            $("#employee_type").val(data.employee_type);
-            $("#emergency_contact_number").val(data.emergency_contact_number);
-            $("#emergency_contact_person").val(data.emergency_contact_person);
-            $("#ni").val(data.ni);
-            $("#role_id").val(data.user.role_id);
-            $("#nationality").val(data.nationality);
-            $("#join_date").val(data.join_date);
-            $("#address").val(data.address);
-            $("#pay_rate").val(data.pay_rate);
-            $("#tax_code").val(data.tax_code);
-            $("#entitled_holiday").val(data.entitled_holiday);
-            $("#bank_details").val(data.bank_details);
-            var image = document.getElementById('preview-image');
-            if (data.photo) { 
-                image.src = data.photo;
-            } else {
-                image.src = "#";
+        }
+        if ($(this).val() == 'Update') {
+            var requiredFields = [
+                '#employee_id',
+                '#name',
+                '#employee_type',
+                '#pay_rate',
+                '#tax_code',
+                '#entitled_holiday',
+                '#username'
+            ];
+            for (var i = 0; i < requiredFields.length; i++) {
+                if ($(requiredFields[i]).val() === '') {
+                    showError('Please fill all required fields.');
+                    return;
+                }
             }
-            $("#codeid").val(data.id);
-            $("#addBtn").val('Update');
-            $("#addBtn").html('Update');
-            $("#header-title").html('Update new data');
-            $("#addThisFormContainer").show(300);
-            $("#newBtn").hide(100);
-        }
 
-        function clearform() {
-            $('#createThisForm')[0].reset();
-            $("#addBtn").val('Create');
-            $('#preview-image').attr('src', '#');
-            $("#header-title").html('Add new data');
-        }
+            var form_data = new FormData($('#createThisForm')[0]);
+            var featureImgInput = document.getElementById('image');
+            if (featureImgInput.files && featureImgInput.files[0]) {
+                form_data.append("photo", featureImgInput.files[0]);
+            }
+            form_data.append("codeid", $("#codeid").val());
 
-        $("#image").change(function(e){
-            var reader = new FileReader();
-            reader.onload = function(e){
-                $("#preview-image").attr("src", e.target.result);
-            };
-            reader.readAsDataURL(this.files[0]);
-        });
-
-        $(document).on('change', '.toggle-status', function() {
-            var userId = $(this).data('id');
-            var status = $(this).prop('checked') ? 1 : 0;
             $.ajax({
-                url: '{{ route("employees.updateStatus") }}',
-                method: 'POST',
-                data: {
-                    userId: userId,
-                    status: status,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    if (response.status === 200) {
-                        showSuccess(response.message);
-                    } else {
-                        showError('Failed to update status.');
-                    }
+                url: upurl,
+                type: "POST",
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function(d) {
+                    showSuccess('Data updated successfully.');
+                    reloadPage(2000);
                 },
                 error: function(xhr, status, error) {
-                    showError('An error occurred. Please try again.');
+                    let response = xhr.responseJSON;
+                    if (response && response.errors) {
+                        let firstError = Object.values(response.errors)[0][0];
+                        showError(firstError);
+                    } else {
+                        showError('An error occurred. Please try again.');
+                    }
                 }
             });
-        });
+        }
+    });
 
-        $("#contentContainer").on('click', '#DetailsBtn', function() {
-            var attrs = {};
-            $.each(this.attributes, function() {
-                if(this.specified && this.name.startsWith('data-')) {
-                    var key = this.name.replace('data-', '');
-                    attrs[key] = this.value;
+    // Edit
+    $("#contentContainer").on('click', '#EditBtn', function() {
+        codeid = $(this).attr('rid');
+        info_url = url + '/' + codeid + '/edit';
+        $.get(info_url, {}, function(d) {
+            populateForm(d);
+            pagetop();
+        });
+    });
+
+    // Delete
+    $("#contentContainer").on('click', '#deleteBtn', function() {
+        if (!confirm('Sure?')) return;
+        codeid = $(this).attr('rid');
+        info_url = url + '/' + codeid;
+        $.ajax({
+            url: info_url,
+            method: "GET",
+            type: "DELETE",
+            data: {},
+            success: function(d) {
+                showSuccess('Data deleted successfully.');
+                reloadPage(2000);
+            },
+            error: function(xhr, status, error) {
+                showError('An error occurred. Please try again.');
+                console.error(error);
+            }
+        });
+    });
+
+    // Payslip Modal Trigger
+    $("#contentContainer").on('click', '#PayslipBtn', function() {
+        var employeeId = $(this).attr('rid');
+        $('#payslipForm').data('employee-id', employeeId);
+        $('#payslipContent').hide();
+        $('#payslipModal').modal('show');
+    });
+
+    // Calculate Gross Pay
+    function calculateGrossPay() {
+        var hourlyAmount = parseFloat($('#hourly_amount').text()) || 0;
+        var overtime = parseFloat($('#overtime').val()) || 0;
+        var maternity = parseFloat($('#maternity').val()) || 0;
+        var sickPay = parseFloat($('#sickPay').val()) || 0;
+        var holidayPay = parseFloat($('#holidayPay').val()) || 0;
+        var bonus = parseFloat($('#bonus').val()) || 0;
+        var other = parseFloat($('#other').val()) || 0;
+        var adjustment = parseFloat($('#adjustment').val()) || 0;
+        var grossPay = hourlyAmount + overtime + maternity + sickPay + holidayPay + bonus + other - adjustment;
+        $('#gross_pay').text(grossPay.toFixed(2));
+    }
+
+    // Update Gross Pay on input change
+    $('#payslipContent').on('input', '.payslip-input', calculateGrossPay);
+
+    // Payslip Form Submission
+    $('#payslipForm').on('submit', function(e) {
+        e.preventDefault();
+        var employeeId = $(this).data('employee-id');
+        var fromDate = $('#from_date').val();
+        var toDate = $('#to_date').val();
+
+        if (!fromDate || !toDate) {
+            showError('Please select both from and to dates.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('employees.payslip') }}",
+            method: "POST",
+            data: {
+                employee_id: employeeId,
+                from_date: fromDate,
+                to_date: toDate,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.payslip && response.employee && response.holiday) {
+                    $('#payslipContent').show();
+                    $('#employee_id').text(response.employee.employee_id);
+                    $('#name').text(response.employee.name);
+                    $('#process_date').text('{{ \Carbon\Carbon::today()->format('Y-m-d') }}');
+                    $('#ni').text(response.employee.ni || 'N/A');
+                    $('#total_hours').text(response.total_hours.toFixed(2));
+                    $('#pay_rate').text(response.employee.pay_rate);
+                    $('#total_amount').text(response.total_amount.toFixed(2));
+                    $('#hourly_amount').text(response.total_amount.toFixed(2));
+                    $('#entitled_holiday').text(response.employee.entitled_holiday);
+                    $('#holiday_taken').text(response.holiday.holidayDataCount);
+                    $('#holiday_remaining').text((response.employee.entitled_holiday - response.holiday.holidayDataCount));
+                    $('#sick_days').text(response.holiday.sickDays);
+                    $('#absence_days').text(response.holiday.absenceDays);
+                    $('#tax_code').text(response.employee.tax_code);
+                    $('#from_date_display').text(fromDate);
+                    $('#to_date_display').text(toDate);
+                    // Reset additional inputs
+                    $('#overtime, #maternity, #sickPay, #holidayPay, #bonus, #other, #adjustment').val(0);
+                    calculateGrossPay();
+                } else {
+                    showError('Failed to fetch payslip data.');
                 }
-            });
-            let modalHtml = `
-            <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <table class="table table-bordered">
-                                <tbody>
-                                    ${Object.entries(attrs).map(([key, value]) => `
-                                        <tr>
-                                            <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
-                                            <td>${value}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
+            },
+            error: function(xhr) {
+                showError('An error occurred while fetching payslip data.');
+            }
+        });
+    });
+
+    // Print Payslip
+    $('#printPayslip').on('click', function() {
+        var printContents = $('#payslipContent').html();
+        var originalContents = $('body').html();
+        $('body').html(printContents);
+        window.print();
+        $('body').html(originalContents);
+    });
+
+    function populateForm(data) {
+        $("#employee_id").val(data.employee_id);
+        $("#name").val(data.name);
+        $("#username").val(data.username);
+        $("#phone").val(data.phone);
+        $("#email").val(data.email);
+        $("#employee_type").val(data.employee_type);
+        $("#emergency_contact_number").val(data.emergency_contact_number);
+        $("#emergency_contact_person").val(data.emergency_contact_person);
+        $("#ni").val(data.ni);
+        $("#role_id").val(data.user.role_id);
+        $("#nationality").val(data.nationality);
+        $("#join_date").val(data.join_date);
+        $("#address").val(data.address);
+        $("#pay_rate").val(data.pay_rate);
+        $("#tax_code").val(data.tax_code);
+        $("#entitled_holiday").val(data.entitled_holiday);
+        $("#bank_details").val(data.bank_details);
+        var image = document.getElementById('preview-image');
+        if (data.photo) {
+            image.src = data.photo;
+        } else {
+            image.src = "#";
+        }
+        $("#codeid").val(data.id);
+        $("#addBtn").val('Update');
+        $("#addBtn").html('Update');
+        $("#header-title").html('Update new data');
+        $("#addThisFormContainer").show(300);
+        $("#newBtn").hide(100);
+    }
+
+    function clearform() {
+        $('#createThisForm')[0].reset();
+        $("#addBtn").val('Create');
+        $('#preview-image').attr('src', '#');
+        $("#header-title").html('Add new data');
+    }
+
+    $("#image").change(function(e) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $("#preview-image").attr("src", e.target.result);
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    $(document).on('change', '.toggle-status', function() {
+        var userId = $(this).data('id');
+        var status = $(this).prop('checked') ? 1 : 0;
+        $.ajax({
+            url: '{{ route("employees.updateStatus") }}',
+            method: 'POST',
+            data: {
+                userId: userId,
+                status: status,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    showSuccess(response.message);
+                } else {
+                    showError('Failed to update status.');
+                }
+            },
+            error: function(xhr) {
+                showError('An error occurred. Please try again.');
+            }
+        });
+    });
+
+    $("#contentContainer").on('click', '#DetailsBtn', function() {
+        var attrs = {};
+        $.each(this.attributes, function() {
+            if (this.specified && this.name.startsWith('data-')) {
+                var key = this.name.replace('data-', '');
+                attrs[key] = this.value;
+            }
+        });
+        let modalHtml = `
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                ${Object.entries(attrs).map(([key, value]) => `
+                                    <tr>
+                                        <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
+                                        <td>${value}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
-            `;
-            $('#detailsModal').remove();
-            $('body').append(modalHtml);
-            $('#detailsModal').modal('show');
-        });
+        </div>
+        `;
+        $('#detailsModal').remove();
+        $('body').append(modalHtml);
+        $('#detailsModal').modal('show');
     });
+
+    function showSuccess(message) {
+        alert(message);
+    }
+
+    function showError(message) {
+        alert(message);
+    }
+
+    function reloadPage(timeout) {
+        setTimeout(() => location.reload(), timeout);
+    }
+
+    function pagetop() {
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
+    }
+});
 </script>
-
-<!-- JS to initialize datetime picker -->
-<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/js/tempusdominus-bootstrap-4.min.js"></script>
-
-<script type="text/javascript">
-    $(function () {
-        $('#reservationdatetime').datetimepicker({
-            format: 'YYYY-MM-DD HH:mm'
-        });
-    });
-</script>
-
 @endsection
