@@ -21,7 +21,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="header-title">Add new Holiday</h3>
+                        <h3 class="card-title" id="header-title">Add new Attendance</h3>
                     </div>
                     <div class="card-body">
                         <div class="errmsg"></div>
@@ -120,122 +120,73 @@
     </div>
 </section>
 
+<section class="content mt-3" id="dateFilterSection">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Filter Attendance by Date Range</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>From Date</label>
+                                    <div class="input-group date" id="fromDate" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" data-target="#fromDate" id="from_date" name="from_date" />
+                                        <div class="input-group-append" data-target="#fromDate" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>To Date</label>
+                                    <div class="input-group date" id="toDate" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" data-target="#toDate" id="to_date" name="to_date" />
+                                        <div class="input-group-append" data-target="#toDate" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label> </label>
+                                    <button type="button" class="btn btn-secondary" id="filterBtn">Filter</button>
+                                    <button type="button" class="btn btn-secondary" id="downloadBtn">Download CSV</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="content" id="contentContainer">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">All Attendance Record</h3>
+                        <h3 class="card-title">All Attendance Records</h3>
                     </div>
                     <div class="card-body">
-
-                        <form action="{{route('attendance.search')}}" method="POST">
-                            @csrf
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label>From Date</label>
-                                            <input type="date" class="form-control" id="from_date" name="from_date" value="{{$fromDate}}" required/>
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label>To Date</label>
-                                        <input type="date" class="form-control" id="to_date" name="to_date" value="{{$toDate}}" required/>
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label>Action</label> <br>
-                                        <button type="submit" class="btn btn-secondary" >Filter</button>
-                                        <button type="button" class="btn btn-secondary" id="downloadBtn">Download CSV</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        
-                    </div>
-
-
-
                         <table id="example1" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th style="display: none" class="d-none">SL</th>
                                     <th>Name</th>
                                     <th>Branch</th>
-                                    <th> </th>
+                                    <th>Details</th>
                                     <th>G. Total Time</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach ($data as $data)
-                                    <tr>
-                                        <td style="display: none" class="d-none">{{ $data->id }}</td>
-                                        <td>{{ $data->employee->name }}</td>
-                                        <td>{{ $data->branch->name ?? '' }}</td>
-                                        <td>
-                                            <table class="table table-bordered w-100">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Date</th>
-                                                        <th>Type</th>
-                                                        <th>Time In</th>
-                                                        <th>Time Out</th>
-                                                        <th>Late</th>
-                                                        <th>Total Time</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @php
-                                                        $diff = '';
-                                                        if ($data->clock_in && $data->clock_out) {
-                                                            $in = \Carbon\Carbon::parse($data->clock_in);
-                                                            $out = \Carbon\Carbon::parse($data->clock_out);
-                                                            $diff = $in->diff($out);
-                                                        }
-                                                    @endphp
-                                                    <tr>
-                                                        <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('d/m/Y') }}</td>
-                                                        <td>{{ $data->type }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('H:i:s') }}</td>
-                                                        <td>{{ $data->clock_out ? \Carbon\Carbon::parse($data->clock_out)->format('H:i:s') : Null }}</td>
-                                                        <td></td>
-                                                        <td>{{ $diff ? $diff->format('%H:%I:%S') : '-' }} </td>
-                                                        <td>
-                                                            <a id="DetailsBtn"
-                                                                rid="{{$data->id}}"
-                                                                title="Details"
-                                                                data-id="{{ $data->id }}"
-                                                                data-employee="{{ $data->employee->name }}"
-                                                                data-type="{{ $data->type }}"
-                                                                data-clock_in_date="{{ \Carbon\Carbon::parse($data->clock_in)->format('Y-m-d') }}"
-                                                                data-clock_in_time="{{ \Carbon\Carbon::parse($data->clock_in)->format('H:i:s') }}"
-                                                                data-clock_out_date="{{ \Carbon\Carbon::parse($data->clock_out)->format('Y-m-d') }}"
-                                                                data-clock_out_time="{{ \Carbon\Carbon::parse($data->clock_out)->format('H:i:s') }}"
-                                                                data-details="{{ $data->details }}"
-                                                                data-date="{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}"
-                                                                data-total_time="{{ $diff ? $diff->format('%H:%I:%S') : '-' }}"
-                                                            >
-                                                                <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
-                                                            </a>
-                                                            @if (auth()->user()->canDo(15))
-                                                            <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
-                                                            @endif
-                                                            @if (auth()->user()->canDo(16))
-                                                            <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                        <td> </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -267,11 +218,100 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    var url = "{{URL::to('/admin/attendance')}}";
-    var upurl = "{{URL::to('/admin/attendance/update')}}";
+    var url = "{{ route('attendance.index') }}";
+    var upurl = "{{ route('attendance.update') }}";
 
+    // Initialize DataTable with AJAX
+    var table = $("#example1").DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "order": [[0, "desc"]],
+        "columnDefs": [
+            { "targets": 0, "visible": false }
+        ],
+        "ajax": {
+            "url": url,
+            "dataSrc": "data",
+            "error": function(xhr, error, thrown) {
+                console.error('DataTable AJAX error:', xhr.responseText);
+                $('.errmsg').html('<div class="alert alert-danger">Failed to load data. Please try again.</div>');
+            }
+        },
+        "columns": [
+            { "data": "id" },
+            { "data": "employee.name" },
+            { "data": "branch.name", "defaultContent": "" },
+            {
+                "data": null,
+                "render": function(data, type, row) {
+                    var diff = '';
+                    if (row.clock_in && row.clock_out) {
+                        var inTime = moment(row.clock_in);
+                        var outTime = moment(row.clock_out);
+                        diff = moment.utc(outTime.diff(inTime)).format('HH:mm:ss');
+                    }
+                    return `
+                        <table class="table table-bordered w-100">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Time In</th>
+                                    <th>Time Out</th>
+                                    <th>Late</th>
+                                    <th>Total Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${row.clock_in ? moment(row.clock_in).format('DD/MM/YYYY') : '-'}</td>
+                                    <td>${row.type || '-'}</td>
+                                    <td>${row.clock_in ? moment(row.clock_in).format('HH:mm:ss') : '-'}</td>
+                                    <td>${row.clock_out ? moment(row.clock_out).format('HH:mm:ss') : '-'}</td>
+                                    <td></td>
+                                    <td>${diff || '-'}</td>
+                                    <td>
+                                        <a id="DetailsBtn"
+                                            rid="${row.id}"
+                                            title="Details"
+                                            data-id="${row.id}"
+                                            data-employee="${row.employee ? row.employee.name : '-'}"
+                                            data-type="${row.type || '-'}"
+                                            data-clock_in_date="${row.clock_in ? moment(row.clock_in).format('YYYY-MM-DD') : '-'}"
+                                            data-clock_in_time="${row.clock_in ? moment(row.clock_in).format('HH:mm:ss') : '-'}"
+                                            data-clock_out_date="${row.clock_out ? moment(row.clock_out).format('YYYY-MM-DD') : '-'}"
+                                            data-clock_out_time="${row.clock_out ? moment(row.clock_out).format('HH:mm:ss') : '-'}"
+                                            data-details="${row.details || ''}"
+                                            data-date="${row.created_at ? moment(row.created_at).format('YYYY-MM-DD') : '-'}"
+                                            data-total_time="${diff || '-'}"
+                                        >
+                                            <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
+                                        </a>
+                                        @if (auth()->user()->canDo(15))
+                                        <a id="EditBtn" rid="${row.id}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                        @endif
+                                        @if (auth()->user()->canDo(16))
+                                        <a id="deleteBtn" rid="${row.id}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                }
+            },
+            { "data": null, "defaultContent": "" }
+        ],
+        "buttons": ["copy", "csv", "excel", "pdf", "print"],
+        "initComplete": function(settings, json) {
+            if (!json || !json.data) {
+                $('.errmsg').html('<div class="alert alert-danger">No data available or invalid response from server.</div>');
+            }
+        }
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
-    
     // Function to reset field styles
     function resetFieldStyles(fields) {
         fields.forEach(function(field) {
@@ -290,8 +330,12 @@ $(document).ready(function() {
         }
     }
 
+    // Function to display success message
+    function showSuccess(message) {
+        $('.errmsg').html(`<div class="alert alert-success">${message}</div>`);
+    }
+
     $("#addBtn").click(function() {
-        // Define required fields with user-friendly names
         var requiredFields = [
             {id: '#employee_id', name: 'Employee'},
             {id: '#type', name: 'Type'},
@@ -299,10 +343,8 @@ $(document).ready(function() {
             {id: '#clock_in_time', name: 'Clock In Time'}
         ];
 
-        // Reset previous validation styles
         resetFieldStyles(requiredFields.map(field => field.id));
 
-        // Validate required fields
         for (var i = 0; i < requiredFields.length; i++) {
             if ($(requiredFields[i].id).val() === '') {
                 showError(`Please fill the ${requiredFields[i].name} field.`, requiredFields[i].id);
@@ -310,55 +352,49 @@ $(document).ready(function() {
             }
         }
 
-        // Additional validation for date format (YYYY-MM-DD)
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test($('#clock_in_date').val())) {
             showError('Please enter a valid Clock In Date (YYYY-MM-DD).', '#clock_in_date');
             return;
         }
 
-        // Additional validation for time format (HH:mm:ss)
         const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
         if (!timeRegex.test($('#clock_in_time').val())) {
             showError('Please enter a valid Clock In Time (HH:mm:ss).', '#clock_in_time');
             return;
         }
-        
-
-        
 
         var form_data = new FormData();
         form_data.append("employee_id", $("#employee_id").val());
         form_data.append("type", $("#type").val());
         form_data.append("clock_in", $("#clock_in_date").val() + ' ' + $("#clock_in_time").val());
-        form_data.append("clock_out", $("#clock_out_date").val() + ' ' + $("#clock_out_time").val());
+        form_data.append("clock_out", $("#clock_out_date").val() && $("#clock_out_time").val() ? $("#clock_out_date").val() + ' ' + $("#clock_out_time").val() : '');
+        form_data.append("details", $("#details").val());
 
         if ($(this).val() == 'Create') {
             $.ajax({
-                url: "{{ route('attendance.store') }}",
+                url: url,
                 method: "POST",
                 contentType: false,
                 processData: false,
                 data: form_data,
                 success: function(d) {
-                    console.log(d);
                     if (d.status == 422) {
-                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                        showError(d.message);
                     } else {
                         showSuccess('Data created successfully.');
                         resetFieldStyles(requiredFields.map(field => field.id));
-                        reloadPage(2000);
+                        table.ajax.reload();
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    showError('An error occurred. Please try again.');
+                    console.error('Create AJAX error:', xhr.responseText);
+                    showError('An error occurred while creating the record. Please try again.');
                 }
             });
         }
 
         if ($(this).val() == 'Update') {
-
             var requiredFields = [
                 {id: '#employee_id', name: 'Employee'},
                 {id: '#type', name: 'Type'},
@@ -368,33 +404,25 @@ $(document).ready(function() {
                 {id: '#clock_out_time', name: 'Clock Out Time'}
             ];
 
-
-            // Reset previous validation styles
             resetFieldStyles(requiredFields.map(field => field.id));
 
-            // Validate required fields
             for (var i = 0; i < requiredFields.length; i++) {
                 if ($(requiredFields[i].id).val() === '') {
                     showError(`Please fill the ${requiredFields[i].name} field.`, requiredFields[i].id);
                     return;
                 }
             }
-            
 
-            
             if (!dateRegex.test($('#clock_out_date').val())) {
                 showError('Please enter a valid Clock Out Date (YYYY-MM-DD).', '#clock_out_date');
                 return;
             }
 
-            // Additional validation for time format (HH:mm:ss)
-            const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
             if (!timeRegex.test($('#clock_out_time').val())) {
-                showError('Please enter a valid Clock In Time (HH:mm:ss).', '#clock_out_time');
+                showError('Please enter a valid Clock Out Time (HH:mm:ss).', '#clock_out_time');
                 return;
             }
 
-            // Validate that clock out is after clock in
             const clockIn = new Date(`${$('#clock_in_date').val()} ${$('#clock_in_time').val()}`);
             const clockOut = new Date(`${$('#clock_out_date').val()} ${$('#clock_out_time').val()}`);
             if (clockOut <= clockIn) {
@@ -402,12 +430,8 @@ $(document).ready(function() {
                 return;
             }
 
-            
-
-            form_data.append("clock_out", $("#clock_out_date").val() + ' ' + $("#clock_out_time").val());
-            form_data.append("details", $("#details").val());
-
             form_data.append("codeid", $("#codeid").val());
+
             $.ajax({
                 url: upurl,
                 type: "POST",
@@ -416,53 +440,52 @@ $(document).ready(function() {
                 processData: false,
                 data: form_data,
                 success: function(d) {
-                    console.log(d);
                     if (d.status == 422) {
-                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                        showError(d.message);
                     } else {
                         showSuccess('Data updated successfully.');
                         resetFieldStyles(requiredFields.map(field => field.id));
-                        reloadPage(2000); 
+                        table.ajax.reload();
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    showError('An error occurred. Please try again.');
+                    console.error('Update AJAX error:', xhr.responseText);
+                    showError('An error occurred while updating the record. Please try again.');
                 }
             });
         }
     });
-    
-    
-
-
-
-
 
     $("#contentContainer").on('click', '#EditBtn', function() {
         var codeid = $(this).attr('rid');
         var info_url = url + '/' + codeid + '/edit';
         $.get(info_url, {}, function(d) {
             populateForm(d);
-            pagetop();
+        }, 'json').fail(function(xhr) {
+            console.error('Edit AJAX error:', xhr.responseText);
+            showError('Failed to load record for editing.');
         });
     });
 
     $("#contentContainer").on('click', '#deleteBtn', function() {
-        if (!confirm('Sure?')) return;
+        if (!confirm('Are you sure you want to delete this record?')) return;
         var codeid = $(this).attr('rid');
         var info_url = url + '/' + codeid;
         $.ajax({
             url: info_url,
-            method: "GET",
-            type: "DELETE",
-            data: {},
+            method: "DELETE",
+            dataType: 'json',
             success: function(d) {
-                showSuccess('Data deleted successfully.');
-                reloadPage(2000);
+                if (d.status == 200) {
+                    showSuccess(d.message);
+                    table.ajax.reload();
+                } else {
+                    showError('Failed to delete data.');
+                }
             },
             error: function(xhr, status, error) {
-                showError('An error occurred. Please try again.');
+                console.error('Delete AJAX error:', xhr.responseText);
+                showError('An error occurred while deleting the record. Please try again.');
             }
         });
     });
@@ -470,15 +493,15 @@ $(document).ready(function() {
     function populateForm(data) {
         $("#type").val(data.type);
         $("#employee_id").val(data.employee_id).trigger('change');
-        $("#clock_in_date").val(moment(data.clock_in).format('YYYY-MM-DD'));
-        $("#clock_in_time").val(moment(data.clock_in).format('HH:mm:ss'));
-        $("#clock_out_date").val(moment(data.clock_out).format('YYYY-MM-DD'));
-        $("#clock_out_time").val(moment(data.clock_out).format('HH:mm:ss'));
-        $("#details").val(data.details);
+        $("#clock_in_date").val(data.clock_in ? moment(data.clock_in).format('YYYY-MM-DD') : '');
+        $("#clock_in_time").val(data.clock_in ? moment(data.clock_in).format('HH:mm:ss') : '');
+        $("#clock_out_date").val(data.clock_out ? moment(data.clock_out).format('YYYY-MM-DD') : '');
+        $("#clock_out_time").val(data.clock_out ? moment(data.clock_out).format('HH:mm:ss') : '');
+        $("#details").val(data.details || '');
         $("#codeid").val(data.id);
         $("#addBtn").val('Update');
         $("#addBtn").html('Update');
-        $("#header-title").html('Update data');
+        $("#header-title").html('Update Attendance');
         $("#addThisFormContainer").show(300);
         $("#newBtn").hide(100);
     }
@@ -486,22 +509,40 @@ $(document).ready(function() {
     function clearform() {
         $('#createThisForm')[0].reset();
         $("#addBtn").val('Create');
-        $("#header-title").html('Add new data');
+        $("#addBtn").html('Create');
+        $("#header-title").html('Add new Attendance');
+        $('.errmsg').html('');
+        resetFieldStyles(['#employee_id', '#type', '#clock_in_date', '#clock_in_time', '#clock_out_date', '#clock_out_time']);
     }
 
-    $(function() {
+    // Date range filter
+    $("#filterBtn").click(function() {
+        var fromDate = $("#from_date").val();
+        var toDate = $("#to_date").val();
 
-        $("#example1").DataTable({
-            "responsive": true,
-            "lengthChange": false,
-            "autoWidth": false,
-            "order": [[0, "desc"]], // Order by first (hidden) column (id) descending
-            "columnDefs": [
-            { "targets": 0, "visible": false } // Hide the first column (id)
-            ],
-            "buttons": ["copy", "csv", "excel", "pdf", "print"]
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!fromDate || !dateRegex.test(fromDate)) {
+            showError('Please enter a valid From Date (YYYY-MM-DD).', '#from_date');
+            return;
+        }
+        if (!toDate || !dateRegex.test(toDate)) {
+            showError('Please enter a valid To Date (YYYY-MM-DD).', '#to_date');
+            return;
+        }
 
+        const start = new Date(fromDate);
+        const end = new Date(toDate);
+        if (end < start) {
+            showError('To Date must be after From Date.', '#to_date');
+            return;
+        }
+
+        if (table && table.ajax) {
+            table.ajax.url(url + '?from_date=' + fromDate + '&to_date=' + toDate).load(null, false);
+        } else {
+            console.error('DataTable AJAX is not initialized');
+            showError('Table initialization error. Please refresh the page and try again.');
+        }
     });
 
     // Download CSV
@@ -537,13 +578,12 @@ $(document).ready(function() {
                 attrs[key] = this.value;
             }
         });
-        console.log(attrs);
         let modalHtml = `
         <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
+                        <h5 class="modal-title" id="detailsModalLabel">Attendance Details</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -554,7 +594,7 @@ $(document).ready(function() {
                                 ${Object.entries(attrs).map(([key, value]) => `
                                     <tr>
                                         <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
-                                        <td>${value}</td>
+                                        <td>${value || '-'}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>

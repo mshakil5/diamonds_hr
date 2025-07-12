@@ -90,10 +90,12 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
 
     Route::prefix('attendance')->group(function () {
         Route::get('/', [AttendanceController::class, 'index'])->name('attendance.index');
-        Route::post('/', [AttendanceController::class, 'store'])->name('attendance.store');
+        Route::post('/', [AttendanceController::class, 'index'])->name('attendance.search');
+        Route::post('/store', [AttendanceController::class, 'store'])->name('attendance.store');
         Route::get('/{id}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
         Route::post('/update', [AttendanceController::class, 'update'])->name('attendance.update');
-        Route::get('/{id}', [AttendanceController::class, 'delete'])->name('attendance.delete');
+        Route::delete('/{id}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
+        Route::get('/export', [AttendanceController::class, 'export'])->name('attendance.export');
     });
 
 

@@ -3,6 +3,38 @@
 @section('content')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" />
 
+<style>
+    #payslipContent table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+#payslipContent th, #payslipContent td {
+    padding: 10px;
+    text-align: left;
+}
+#payslipContent .text-center {
+    text-align: center;
+}
+#payslipContent .text-right {
+    text-align: right;
+}
+#payslipContent .font-weight-bold {
+    font-weight: bold;
+}
+#payslipContent .payslip-input {
+    width: 100px;
+}
+@media print {
+    #payslipContent {
+        font-size: 12px;
+    }
+    #payslipContent .payslip-input {
+        border: none;
+        background: transparent;
+    }
+}
+</style>
+
 @if (auth()->user()->canDo(8))
 <!-- Main content -->
 <section class="content" id="newBtnSection">
