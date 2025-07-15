@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('locations', function (Blueprint $table) {
+        Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->string('location')->nullable();
+            $table->string('date')->nullable();
+            $table->unsignedBigInteger('asset_type_id')->nullable();
+            $table->foreign('asset_type_id')->references('id')->on('asset_types')->onDelete('cascade');
             $table->unsignedBigInteger('branch_id')->nullable();
-            $table->boolean('status')->default(1); // 1 = active, 2 = inactive
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
-            $table->unsignedBigInteger('deleted_by')->nullable();
-            $table->softDeletes();
-            $table->timestamps();
+            $table->string('brand')->nullable();
+            $table->string('model')->nullable();
+            $table->string('quantity')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
+            $table->softDeletes();
+            $table->unsignedBigInteger('deleted_by')->nullable();
         });
     }
 
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('stocks');
     }
 };

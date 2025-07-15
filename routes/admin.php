@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ProrotaController;
+use App\Http\Controllers\Admin\AssetStockController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
@@ -180,6 +181,15 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::post('/location-update', [LocationController::class, 'update']);
     Route::get('/location/{id}', [LocationController::class, 'delete']);
     Route::post('/location/update-status', [LocationController::class, 'updateStatus'])->name('locations.updateStatus');
+
+    // Locations crud
+    Route::get('/stock', [AssetStockController::class, 'index'])->name('stock');
+    Route::post('/stock', [AssetStockController::class, 'store']);
+    Route::get('/stock/{id}/edit', [AssetStockController::class, 'edit']);
+    Route::post('/stock-update', [AssetStockController::class, 'update']);
+    Route::get('/stock/{id}', [AssetStockController::class, 'delete']);
+
+    Route::get('/admin/stock/{stock}/status/{status}', [AssetStockController::class, 'viewByStatus'])->name('stock.view.status');
 
   // Assets crud
   Route::get('/asset', [AssetController::class, 'index'])->name('assets');

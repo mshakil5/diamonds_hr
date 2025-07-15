@@ -103,8 +103,8 @@
       </li>
       @endif
 
-      <li class="nav-item dropdown {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') ? 'active' : '' }}">
+      <li class="nav-item dropdown {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
               <p>
                   Asset<i class="fas fa-angle-left right"></i>
@@ -123,6 +123,14 @@
                   <a href="{{ route('locations') }}" class="nav-link {{ request()->routeIs('locations') ? 'active' : '' }}">
                       <i class="fas fa-list nav-icon"></i>
                       <p>Locations</p>
+                  </a>
+              </li>
+          </ul>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('stock') }}" class="nav-link {{ request()->routeIs('stock') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Stock</p>
                   </a>
               </li>
           </ul>

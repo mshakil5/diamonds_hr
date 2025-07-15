@@ -34,6 +34,7 @@ class AssetTypeController extends Controller
         $data->model = $request->model;
         $data->branch_id = auth()->user()->branch_id;
         $data->status = $request->status;
+        $data->created_by = auth()->id();
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Data created successfully.']);
@@ -63,6 +64,7 @@ class AssetTypeController extends Controller
         $data->brand = $request->brand;
         $data->model = $request->model;
         $data->status = $request->status;
+        $data->updated_by = auth()->id();
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Data updated successfully.']);
@@ -82,6 +84,7 @@ class AssetTypeController extends Controller
     {
         $data = AssetType::findOrFail($request->id);
         $data->status = $request->status;
+        $data->updated_by = auth()->id();
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Status updated successfully.']);

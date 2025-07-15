@@ -32,6 +32,7 @@ class LocationController extends Controller
         $data->location = $request->location;
         $data->branch_id = auth()->user()->branch_id;
         $data->status = $request->status;
+        $data->created_by = auth()->id();
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Location created successfully.']);
@@ -59,6 +60,7 @@ class LocationController extends Controller
         $data->name = $request->name;
         $data->location = $request->location;
         $data->status = $request->status;
+        $data->updated_by = auth()->id();
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Location updated successfully.']);
