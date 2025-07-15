@@ -63,7 +63,6 @@ class AssetTypeController extends Controller
         $data->brand = $request->brand;
         $data->model = $request->model;
         $data->status = $request->status;
-        $data->updated_by = auth()->id();
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Data updated successfully.']);

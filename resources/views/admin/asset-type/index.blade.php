@@ -29,14 +29,14 @@
                                 <label>Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="Enter asset type name">
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label>Brand</label>
                                 <input type="text" class="form-control" id="brand" name="brand" placeholder="Enter brand">
                             </div>
                             <div class="form-group">
                                 <label>Model</label>
                                 <input type="text" class="form-control" id="model" name="model" placeholder="Enter model">
-                            </div>
+                            </div> --}}
                             <div class="form-group">
                                 <label>Status <span class="text-danger">*</span></label>
                                 <select class="form-control" id="status" name="status">
@@ -71,8 +71,8 @@
                                     <th>Sl</th>
                                     <th>Date</th>
                                     <th>Name</th>
-                                    <th>Brand</th>
-                                    <th>Model</th>
+                                    {{-- <th>Brand</th>
+                                    <th>Model</th> --}}
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -83,8 +83,8 @@
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>{{ $data->name }}</td>
-                                    <td>{{ $data->brand }}</td>
-                                    <td>{{ $data->model }}</td>
+                                    {{-- <td>{{ $data->brand }}</td>
+                                    <td>{{ $data->model }}</td> --}}
                                     <td>
                                         <div class="custom-control custom-switch">
                                             <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->status == 1 ? 'checked' : '' }}>
