@@ -21,7 +21,8 @@ class HolidayController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'date' => 'required|string|max:255',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
             'employee_id' => 'required|string|max:255',
             'employee_type' => 'required|string|max:255',
             'details' => 'required|string|max:255',
@@ -32,7 +33,9 @@ class HolidayController extends Controller
         }
 
         $data = new Holiday();
-        $data->date = $request->date;
+        $data->date = date('Y-m-d');
+        $data->from_date = $request->from_date;
+        $data->to_date = $request->to_date;
         $data->employee_id = $request->employee_id;
         $data->type = $request->employee_type;
         $data->details = $request->details;
@@ -52,7 +55,8 @@ class HolidayController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'date' => 'required|string|max:255',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
             'employee_id' => 'required|string|max:255',
             'employee_type' => 'required|string|max:255',
             'details' => 'required|string|max:255',
@@ -63,7 +67,8 @@ class HolidayController extends Controller
         }
 
         $data = Holiday::findOrFail($request->codeid);
-        $data->date = $request->date;
+        $data->from_date = $request->from_date;
+        $data->to_date = $request->to_date;
         $data->employee_id = $request->employee_id;
         $data->type = $request->employee_type;
         $data->details = $request->details;

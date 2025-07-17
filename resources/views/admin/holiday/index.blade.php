@@ -32,8 +32,16 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Date</label>
-                                        <input type="date" class="form-control datetimepicker-input" id="date" name="date" />
+                                        <label>From Date</label>
+                                            <input type="date" class="form-control" id="from_date" name="from_date" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                <!-- text input -->
+                                    <div class="form-group">
+                                        <label>To Date</label>
+                                        <input type="date" class="form-control" id="to_date" name="to_date"/>
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
@@ -59,7 +67,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-12">
                                 <!-- text input -->
                                     <div class="form-group">
                                         <label>Details</label>
@@ -94,7 +102,9 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Date</th>
+                                    <th>Created Date</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Employee</th>
                                     <th>Type</th>
                                     <th>Branch</th>
@@ -107,6 +117,8 @@
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->from_date)->format('d-m-Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->to_date)->format('d-m-Y') }}</td>
                                     <td>{{ $data->employee->name }}</td>
                                     <td>{{ $data->type }}</td>
                                     <td>{{ $data->branch->name ?? '' }}</td>
@@ -153,7 +165,7 @@
 
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
-                var requiredFields = ['#date', '#employee_id', '#employee_type', '#details'];
+                var requiredFields = ['#from_date', '#to_date', '#employee_id', '#employee_type', '#details'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val () === '') {
                         showError('Please fill all required fields.');
@@ -161,7 +173,8 @@
                     }
                 }
                 var form_data = new FormData();
-                form_data.append("date", $("#date").val());
+                form_data.append("from_date", $("#from_date").val());
+                form_data.append("to_date", $("#to_date").val());
                 form_data.append("employee_type", $("#employee_type").val());
                 form_data.append("employee_id", $("#employee_id").val());
                 form_data.append("details", $("#details").val());
@@ -189,7 +202,7 @@
             }
 
             if ($(this).val() == 'Update') {
-                var requiredFields = ['#date', '#employee_id', '#employee_type', '#details'];
+                var requiredFields = ['#from_date', '#to_date',  '#employee_id', '#employee_type', '#details'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         showError('Please fill all required fields.');
@@ -198,7 +211,8 @@
                 }
 
                 var form_data = new FormData();
-                form_data.append("date", $("#date").val());
+                form_data.append("from_date", $("#from_date").val());
+                form_data.append("to_date", $("#to_date").val());
                 form_data.append("employee_type", $("#employee_type").val());
                 form_data.append("employee_id", $("#employee_id").val());
                 form_data.append("details", $("#details").val());
@@ -257,7 +271,8 @@
         });
 
         function populateForm(data) {
-            $("#date").val(data.date);
+            $("#from_date").val(data.from_date);
+            $("#to_date").val(data.to_date);
             $("#employee_id").val(data.employee_id).trigger('change');
             $("#employee_type").val(data.type);
             $("#details").val(data.details);
