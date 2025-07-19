@@ -5,34 +5,177 @@
 
 <style>
     #payslipContent table {
-    width: 100%;
-    margin-bottom: 20px;
-}
-#payslipContent th, #payslipContent td {
-    padding: 10px;
-    text-align: left;
-}
-#payslipContent .text-center {
-    text-align: center;
-}
-#payslipContent .text-right {
-    text-align: right;
-}
-#payslipContent .font-weight-bold {
-    font-weight: bold;
-}
-#payslipContent .payslip-input {
-    width: 100px;
-}
-@media print {
-    #payslipContent {
-        font-size: 12px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    #payslipContent th, #payslipContent td {
+        padding: 10px;
+        text-align: left;
+    }
+    #payslipContent .text-center {
+        text-align: center;
+    }
+    #payslipContent .text-right {
+        text-align: right;
+    }
+    #payslipContent .font-weight-bold {
+        font-weight: bold;
     }
     #payslipContent .payslip-input {
-        border: none;
-        background: transparent;
+        width: 100px;
     }
-}
+    @media print {
+        #payslipContent {
+            font-size: 12px;
+        }
+        #payslipContent .payslip-input {
+            border: none;
+            background: transparent;
+        }
+    }
+</style>
+
+
+<style>
+    .customModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(16, 17, 17, 0.709804);
+        z-index: 999999;
+        display: none;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: start;
+        -ms-flex-align: start;
+        align-items: flex-start;
+        padding-top: 3%;
+    }
+    .customModal.show {
+        display: flex;
+    }
+    .customModal .inner {
+        border-radius: 3px;
+        border-bottom: 5px solid #041e1f70;
+        width: 60%;
+        background: #fff;
+        max-height: 550px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin: auto; /* Center horizontally */
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        justify-content: center; /* Center vertically */
+        align-items: center;
+    }
+    .customModal .inner::-webkit-scrollbar {
+        background-color: #f5f5f5;
+        width: 5px;
+    }
+    .customModal .inner::-webkit-scrollbar-thumb {
+        border-radius: 50px;
+        background: -webkit-gradient(linear, left top, right top, from(#fff), to(#e4e4e4));
+        background: linear-gradient(to right, #fff, #e4e4e4);
+        border: 1px solid #ccc;
+    }
+    @media (max-width: 768px) {
+        .customModal .inner {
+            top: 4%;
+            width: 90%;
+            height: auto;
+            position: relative;
+        }
+    }
+    .customModal .inner .header {
+        padding: 4px 15px;
+        background: #40596E;
+        font-size: 14px;
+        color: #ededed;
+        letter-spacing: 1px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+    }
+    .customModal .inner .header .times {
+        color: #fff;
+        font-size: 16px;
+    }
+    .customModal .inner .header .times:hover {
+        color: red;
+        cursor: pointer;
+    }
+    .reAdjust {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 15px;
+    }
+    .reAdjust > div {
+        flex: 1;
+        min-width: 200px;
+    }
+    .verGap {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    .paySlip {
+        padding: 15px;
+    }
+    .manipulate {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    .manipulate th, .manipulate td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    .manipulate th {
+        background-color: #f2f2f2;
+    }
+    .slip-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .netPay {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    .payslip-input {
+        width: 100px;
+    }
+    @media print {
+        .customModal {
+            display: block;
+            background: none;
+        }
+        .customModal .inner {
+            width: 100%;
+            max-height: none;
+            border: none;
+        }
+        .customModal .inner .header {
+            display: none;
+        }
+        .payslip-input {
+            border: none;
+            background: transparent;
+        }
+        .reAdjust {
+            display: none;
+        }
+    }
 </style>
 
 @if (auth()->user()->canDo(8))
@@ -377,178 +520,168 @@
 <!-- /.content -->
 
 <!-- Payslip Modal -->
-<div class="modal fade" id="payslipModal" tabindex="-1" role="dialog" aria-labelledby="payslipModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="payslipModalLabel">Pay Report</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
+<div class="customModal" id="payslipModal" style="display: none;">
+    <div class="inner">
+        <div class="header">
+            <div>Pay Report</div>
+            <div class="times" data-dismiss="modal">×</div>
+        </div>
+        <div class="body">
+            <div class="slipHead">
                 <form id="payslipForm">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>From Date *</label>
-                                <div class="input-group date" id="fromDatePicker" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#fromDatePicker" id="from_date" name="from_date" required />
-                                    <div class="input-group-append" data-target="#fromDatePicker" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                    </div>
+                    <div class="reAdjust">
+                        <div>
+                            <label class="d-block">From Date</label>
+                            <div class="input-group date" id="fromDatePicker" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input" data-target="#fromDatePicker" id="from_date" name="from_date" value="{{ \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}" required />
+                                <div class="input-group-append" data-target="#fromDatePicker" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
                             </div>
+                            <div class="help is-danger" id="from_date_error" style="display: none;"></div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>To Date *</label>
-                                <div class="input-group date" id="toDatePicker" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#toDatePicker" id="to_date" name="to_date" required />
-                                    <div class="input-group-append" data-target="#toDatePicker" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                    </div>
+                        <div>
+                            <label class="d-block">To Date</label>
+                            <div class="input-group date" id="toDatePicker" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input" data-target="#toDatePicker" id="to_date" name="to_date" value="{{ \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}" required />
+                                <div class="input-group-append" data-target="#toDatePicker" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
                             </div>
+                            <div class="help is-danger" id="to_date_error" style="display: none;"></div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group mt-4">
-                                <button type="submit" class="btn btn-primary">Search</button>
-                                <button type="button" class="btn btn-secondary" id="printPayslip">Print</button>
-                            </div>
+                        <div class="verGap">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <button type="button" class="btn btn-secondary" id="printPayslip">Print</button>
                         </div>
                     </div>
                 </form>
-                <div id="payslipContent" style="display: none;">
-                    <div class="text-center">
-                        <h3>Diamonds Guest House</h3>
-                        <h5>Staff Pay Report</h5>
+            </div>
+            <div class="paySlip" id="payslipContent" style="display: none;">
+                <div class="infoPrint text-center">
+                    <h3>Diamonds Guest House</h3>
+                    <h5>Staff Pay Report</h5>
+                </div>
+                <div class="row_first">
+                    <table class="manipulate">
+                        <thead>
+                            <tr>
+                                <th>Staff Id</th>
+                                <th>Staff Name</th>
+                                <th>Process Date</th>
+                                <th>N.I Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="paySlipEmployeeID"></td>
+                                <td id="paySlipEmployeeName"></td>
+                                <td id="process_date"></td>
+                                <td id="paySlipEmployeeni"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row_second">
+                    <div>
+                        <table class="manipulate">
+                            <thead>
+                                <tr>
+                                    <th>Details</th>
+                                    <th>Hours</th>
+                                    <th>Rate</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Working details</td>
+                                    <td id="total_hours"></td>
+                                    <td id="paySlippay_rate"></td>
+                                    <td id="total_amount"></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>Holidays: <span id="paySlipentitled_holiday"></span></td>
+                                    <td>Taken: <span id="holiday_taken"></span></td>
+                                    <td>Remaining: <span id="holiday_remaining"></span></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Id</th>
-                                        <th>Staff Name</th>
-                                        <th>Process Date</th>
-                                        <th>N.I Number</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td id="employee_id"></td>
-                                        <td id="name"></td>
-                                        <td id="process_date"></td>
-                                        <td id="ni"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                </div>
+                <div class="row_third">
+                    <div>
+                        <p class="font-weight-bold">
+                            Diamonds Guest House<br>
+                            York, Yorkshire, UK
+                        </p>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Details</th>
-                                        <th>Hours</th>
-                                        <th>Rate</th>
-                                        <th>Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Working details</td>
-                                        <td id="total_hours"></td>
-                                        <td id="pay_rate"></td>
-                                        <td id="total_amount"></td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td>Holidays: <span id="entitled_holiday"></span></td>
-                                        <td>Taken: <span id="holiday_taken"></span></td>
-                                        <td>Remaining: <span id="holiday_remaining"></span></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sick Days: <span id="sick_days"></span></td>
-                                        <td>Absence Days: <span id="absence_days"></span></td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <p class="font-weight-bold">
-                                Diamonds Guest House<br>
-                                York, Yorkshire, UK
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="font-weight-bold">Diamonds Guest House</p>
-                            <table class="table table-bordered">
-                                <tr>
-                                    <td>Hourly Based Amount</td>
-                                    <td id="hourly_amount"></td>
-                                </tr>
-                                <tr>
-                                    <td>Overtime</td>
-                                    <td><input type="number" class="form-control payslip-input" id="overtime" name="overtime" step="any" value="0" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Maternity/Paternity</td>
-                                    <td><input type="number" class="form-control payslip-input" id="maternity" name="maternity" step="any" value="0" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Sick Pay</td>
-                                    <td><input type="number" class="form-control payslip-input" id="sickPay" name="sickPay" step="any" value="0" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Holiday Pay</td>
-                                    <td><input type="number" class="form-control payslip-input" id="holidayPay" name="holidayPay" step="any" value="0" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Bonus</td>
-                                    <td><input type="number" class="form-control payslip-input" id="bonus" name="bonus" step="any" value="0" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Other</td>
-                                    <td><input type="number" class="form-control payslip-input" id="other" name="other" step="any" value="0" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Adjustment (-)</td>
-                                    <td><input type="number" class="form-control payslip-input" id="adjustment" name="adjustment" step="any" value="0" /></td>
-                                </tr>
-                            </table>
-                            <div class="text-right">
-                                <strong>Gross Pay: </strong><span id="gross_pay"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <p class="font-weight-bold">Date and Tax Details</p>
-                            <table class="table table-bordered text-center">
-                                <tr>
-                                    <td><span>Tax code: <span id="tax_code"></span></span></td>
-                                    <td>From Date: <span id="from_date_display"></span></td>
-                                    <td>To Date: <span id="to_date_display"></span></td>
-                                </tr>
-                            </table>
+                    <div>
+                        <p class="slip-title">Diamonds Guest House</p>
+                        <table class="manipulate">
+                            <tr>
+                                <td><span>Hourly Based Amount</span></td>
+                                <td id="hourly_amount"></td>
+                            </tr>
+                            <tr>
+                                <td><span>Overtime</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="overtime" name="overtime" step="any" value="0" /></td>
+                            </tr>
+                            <tr>
+                                <td><span>Maternity/Paternity</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="maternity" name="maternity" step="any" value="0" /></td>
+                            </tr>
+                            <tr>
+                                <td><span>Sick Pay</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="sickPay" name="sickPay" step="any" value="0" /></td>
+                            </tr>
+                            <tr>
+                                <td><span>Holiday Pay</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="holidayPay" name="holidayPay" step="any" value="0" /></td>
+                            </tr>
+                            <tr>
+                                <td><span>Bonus</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="bonus" name="bonus" step="any" value="0" /></td>
+                            </tr>
+                            <tr>
+                                <td><span>Other</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="other" name="other" step="any" value="0" /></td>
+                            </tr>
+                            <tr>
+                                <td><span>Adjustment (-)</span></td>
+                                <td><input type="number" class="form-control payslip-input" id="adjustment" name="adjustment" step="any" value="0" /></td>
+                            </tr>
+                        </table>
+                        <div class="netPay text-right">
+                            <span>Gross pay: </span>
+                            <span id="gross_pay"></span>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="row_forth">
+                    <div>
+                        <p class="slip-title">Date and Tax Details</p>
+                        <table class="manipulate text-center">
+                            <tr class="tax">
+                                <td><span>Tax code: <span id="paySliptax_code"></span></span></td>
+                                <td>From Date: <span id="from_date_display"></span></td>
+                                <td>To Date: <span id="to_date_display"></span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+
 
 @endsection
 
@@ -564,6 +697,7 @@ $(document).ready(function() {
         "lengthChange": false,
         "autoWidth": false,
         "searching": true,
+        "pageLength": 20,
         "buttons": ["copy", "csv", "excel", "pdf", "print"]
     });
 
@@ -784,22 +918,23 @@ $(document).ready(function() {
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
+                console.log(response);
                 if (response.payslip && response.employee && response.holiday) {
                     $('#payslipContent').show();
-                    $('#employee_id').text(response.employee.employee_id);
-                    $('#name').text(response.employee.name);
+                    $('#paySlipEmployeeID').text(response.employee.employee_id);
+                    $('#paySlipEmployeeName').text(response.employee.name);
                     $('#process_date').text('{{ \Carbon\Carbon::today()->format('Y-m-d') }}');
-                    $('#ni').text(response.employee.ni || 'N/A');
-                    $('#total_hours').text(response.total_hours.toFixed(2));
-                    $('#pay_rate').text(response.employee.pay_rate);
-                    $('#total_amount').text(response.total_amount.toFixed(2));
-                    $('#hourly_amount').text(response.total_amount.toFixed(2));
-                    $('#entitled_holiday').text(response.employee.entitled_holiday);
+                    $('#paySlipEmployeeni').text(response.employee.ni || 'N/A');
+                    $('#total_hours').text(response.workingHours);
+                    $('#paySlippay_rate').text(response.employee.pay_rate);
+                    $('#total_amount').text((response.employee.pay_rate * response.workingHours).toFixed(2));
+                    $('#hourly_amount').text(parseFloat(response.employee.pay_rate).toFixed(2));
+                    $('#paySlipentitled_holiday').text(response.employee.entitled_holiday);
                     $('#holiday_taken').text(response.holiday.holidayDataCount);
                     $('#holiday_remaining').text((response.employee.entitled_holiday - response.holiday.holidayDataCount));
                     $('#sick_days').text(response.holiday.sickDays);
                     $('#absence_days').text(response.holiday.absenceDays);
-                    $('#tax_code').text(response.employee.tax_code);
+                    $('#paySliptax_code').text(response.employee.tax_code);
                     $('#from_date_display').text(fromDate);
                     $('#to_date_display').text(toDate);
                     // Reset additional inputs
@@ -816,12 +951,18 @@ $(document).ready(function() {
     });
 
     // Print Payslip
-    $('#printPayslip').on('click', function() {
-        var printContents = $('#payslipContent').html();
-        var originalContents = $('body').html();
-        $('body').html(printContents);
-        window.print();
-        $('body').html(originalContents);
+    // $('#printPayslip').on('click', function() {
+    //     var printContents = $('#payslipContent').html();
+    //     var originalContents = $('body').html();
+    //     $('body').html(printContents);
+    //     window.print();
+    //     $('body').html(originalContents);
+    //     location.reload();
+    // });
+
+    $('.customModal .times').on('click', function() {
+        $('#payslipModal').removeClass('show');
+        location.reload();
     });
 
     function populateForm(data) {
@@ -952,6 +1093,129 @@ $(document).ready(function() {
     function pagetop() {
         $('html, body').animate({ scrollTop: 0 }, 'fast');
     }
+
+    $('.customModal .times').on('click', function() {
+        $('#payslipModal').removeClass('show');
+    });
 });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#printPayslip').on('click', function() {
+            // Create a new style element for print-specific styles
+            const printStyles = `
+                <style>
+                    body {
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 12pt;
+                        color: #000;
+                        margin: 0;
+                        background: #fff;
+                    }
+                    .paySlip {
+                        width: 100%;
+                        max-width: 210mm;
+                        margin: 0 auto;
+                        padding: 15mm;
+                    }
+                    .infoPrint {
+                        text-align: center;
+                        margin-bottom: 20mm;
+                    }
+                    .infoPrint h3 {
+                        font-size: 18pt;
+                        margin: 0;
+                        font-weight: bold;
+                    }
+                    .infoPrint h5 {
+                        font-size: 14pt;
+                        margin: 5mm 0 0;
+                        font-weight: normal;
+                    }
+                    .row_first, .row_second, .row_third, .row_forth {
+                        margin-bottom: 15mm;
+                    }
+                    .manipulate {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 10mm;
+                    }
+                    .manipulate th, .manipulate td {
+                        border: 1px solid #000;
+                        padding: 3mm;
+                        text-align: left;
+                    }
+                    .manipulate th {
+                        background-color: #f2f2f2;
+                        font-weight: bold;
+                    }
+                    .manipulate td {
+                        font-size: 11pt;
+                    }
+                    .row_second table tfoot td {
+                        border: none;
+                        font-size: 10pt;
+                        padding: 2mm;
+                    }
+                    .row_third .slip-title, .row_forth .slip-title {
+                        font-size: 14pt;
+                        font-weight: bold;
+                        margin-bottom: 5mm;
+                    }
+                    .row_third p {
+                        margin: 0 0 5mm;
+                    }
+                    .row_third table tr td {
+                        border: none;
+                        padding: 2mm;
+                    }
+                    .netPay {
+                        text-align: right;
+                        font-weight: bold;
+                        font-size: 12pt;
+                        margin-top: 5mm;
+                    }
+                    .payslip-input {
+                        display: none;
+                    }
+                    .row_forth table {
+                        width: 100%;
+                    }
+                    .row_forth .tax td {
+                        border: none;
+                        text-align: center;
+                        font-size: 11pt;
+                    }
+                    .slipHead, .verGap, button {
+                        display: none;
+                    }
+                    @page {
+                        size: A4;
+                        margin: 10mm;
+                    }
+                </style>
+            `;
+
+            // Get the payslip content
+            const printContents = $('#payslipContent').html();
+            const originalContents = $('body').html();
+
+            // Set the body to the print content with styles
+            $('body').html(`
+                <div class="paySlip">
+                    ${printContents}
+                </div>
+                ${printStyles}
+            `);
+
+            // Trigger print
+            window.print();
+
+            // Restore original content
+            $('body').html(originalContents);
+            location.reload();
+        });
+    });
 </script>
 @endsection

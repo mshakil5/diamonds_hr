@@ -40,7 +40,12 @@ class EmployeeController extends Controller
         }
         $roles = Role::latest()->get();
         $branches = Branch::where('status', 1)->get();
-        return view('admin.employees.index', compact('query', 'roles', 'branches'));
+
+        $thisMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $thisMonthEnd = Carbon::now()->endOfMonth()->format('Y-m-d');
+
+        $paySlip = null;
+        return view('admin.employees.index', compact('query', 'roles', 'branches','thisMonthStart','thisMonthEnd','paySlip'));
     }
 
     public function payslip(Request $request)
@@ -59,11 +64,18 @@ class EmployeeController extends Controller
             ->whereBetween('clock_in',[$formDate,$toDate])
             ->get();
 
+        $contractDateBegin = date('Y') . '-04-01';
+        $workingHours = Attendance::whereEmployeeId($request->employee_id)
+            ->whereBetween('clock_in',[$contractDateBegin,Carbon::today()])
+            ->where('type','Regular')
+            ->sum(DB::raw('TIMESTAMPDIFF(HOUR, clock_in, clock_out)'));
+
         $holidayController = $this->getHolidayReport($request);
         return response()->json([
             'payslip'=>$payslip,
             'employee'=>$employee,
-            'holiday' =>$holidayController
+            'holiday' =>$holidayController,
+            'workingHours' => $workingHours
 
         ]);
     }
@@ -263,12 +275,7 @@ class EmployeeController extends Controller
         $contractDateBegin = date('Y') . '-04-01';
         $contractDateEnd = date('Y', strtotime('+1 year')) . '-03-31';
 
-        $employee= Employee::find($employeeId);
-        $holidayData=Holiday::with('employee')
-            ->whereEmployeeId($employeeId)
-            ->whereBetween('date',[$contractDateBegin,Carbon::today()])
-            ->where('type','Authorized holiday')
-            ->get();
+        
         $holidayDataCount=Holiday::whereEmployeeId($employeeId)
             ->whereBetween('date',[$contractDateBegin,$contractDateEnd])
             ->where('type','Authorized holiday')
@@ -282,9 +289,9 @@ class EmployeeController extends Controller
             ->where('type','Absence')
             ->count();
 
+        
+
         return response()->json([
-           'employee'=>$employee,
-           'holidayData'=>$holidayData,
             'sickDays'=>$sickDays,
             'absenceDays'=>$absenceDays,
             'holidayDataCount'=>$holidayDataCount
