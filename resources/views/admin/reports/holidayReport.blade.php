@@ -64,8 +64,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <button type="submit" id="searchBtn" className="btn btn-primary btn-block">
-                                            <i className="fas fa-search mr-2"></i> Generate Report
+                                        <button type="submit" id="searchBtn" class="btn btn-primary btn-block">
+                                            <i class="fas fa-search mr-2"></i> Generate Report
                                         </button>
                                     </div>
                                 </div>
@@ -149,25 +149,29 @@
                         <table class="table table-bordered table-hover">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Staff ID</th>
-                                    <th>Name</th>
-                                    <th>Holiday Entitlement</th>
                                     <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Type</th>
                                     <th>Duration (Days)</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($holidayData as $key => $item)
+                                @php
+                                    $start = Carbon\Carbon::parse($item->from_date);
+                                    $end = Carbon\Carbon::parse($item->to_date);
+                                    $diffInDays = $start->diffInDays($end) + 1;
+                                @endphp
                                     <tr>
-                                        <td>{{ $key + 1 }}</td>
-                                        <td>{{ $employeeName->id }}</td>
-                                        <td>{{ $employeeName->name }}</td>
-                                        <td>{{ $employeeName->entitled_holiday }}</td>
-                                        <td>{{ $item->date }}</td>
-                                        <td>1</td>
-                                        <td><span class="badge badge-success">Confirmed</span></td>
+                                        <td>{{ $item->from_date }}</td>
+                                        <td>{{ $item->to_date }}</td>
+                                        <td>{{ $item->type }}</td>
+                                        <td>{{ $diffInDays }} days</td>
+                                        <td>
+                                            <td><span class="badge badge-info">{{ $item->status }}</span></td>
+
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -193,7 +197,6 @@ $(document).ready(function() {
 
     // Initialize Select2
     $('.select2').select2({
-        theme: 'bootstrap4',
         width: '100%'
     });
 

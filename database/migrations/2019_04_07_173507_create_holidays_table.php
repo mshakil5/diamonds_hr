@@ -16,6 +16,8 @@ class CreateHolidaysTable extends Migration
         Schema::create('holidays', function (Blueprint $table) {
             $table->increments('id');
             $table->date('date');
+            $table->date('from_date')->nullable();
+            $table->date('to_date')->nullable();
             $table->unsignedInteger('employee_id')->nullable();
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->unsignedBigInteger('branch_id')->nullable();
