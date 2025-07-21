@@ -6,19 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Branch;
 
 class LocationController extends Controller
 {
     public function index()
     {
         $data = Location::where('branch_id', auth()->user()->branch_id)->get();
-        return view('admin.location.index', compact('data'));
+        $branches = Branch::where('status', 1)->get();
+        return view('admin.location.index', compact('data', 'branches'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:locations,name',
+            'branch_id' => 'required',
+            'location' => 'nullable|string|max:255',
+            'floor' => 'nullable|string|max:255',
+            'room' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ]);
@@ -30,7 +36,9 @@ class LocationController extends Controller
         $data = new Location();
         $data->name = $request->name;
         $data->location = $request->location;
-        $data->branch_id = auth()->user()->branch_id;
+        $data->branch_id = $request->branch_id;
+        $data->floor = $request->floor;
+        $data->room = $request->room;
         $data->status = $request->status;
         $data->created_by = auth()->id();
         $data->save();
@@ -48,6 +56,9 @@ class LocationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:locations,name,' . $request->codeid,
+            'branch_id' => 'required',
+            'floor' => 'nullable|string|max:255',
+            'room' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ]);
@@ -59,6 +70,9 @@ class LocationController extends Controller
         $data = Location::findOrFail($request->codeid);
         $data->name = $request->name;
         $data->location = $request->location;
+        $data->branch_id = $request->branch_id;
+        $data->floor = $request->floor;
+        $data->room = $request->room;
         $data->status = $request->status;
         $data->updated_by = auth()->id();
         $data->save();

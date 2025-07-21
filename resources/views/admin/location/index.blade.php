@@ -29,8 +29,26 @@
                                 <input type="text" class="form-control" id="name" name="name" placeholder="Enter location name">
                             </div>
                             <div class="form-group">
+                                <label>Branch <span class="text-danger">*</span></label>
+                                <select class="form-control" id="branch_id" name="branch_id" required>
+                                    <option value="">Select Branch</option>
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>Location</label>
                                 <input type="text" class="form-control" id="location" name="location" placeholder="Enter location details">
+                            </div>
+                            <div class="form-group">
+                                <label>Floor</label>
+                                <input type="text" class="form-control" id="floor" name="floor" placeholder="Enter floor">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Room Name/Number</label>
+                                <input type="text" class="form-control" id="room" name="room" placeholder="Enter room name or number">
                             </div>
                             <div class="form-group">
                                 <label>Status <span class="text-danger">*</span></label>
@@ -137,6 +155,9 @@
                 form_data.append("name", $("#name").val());
                 form_data.append("location", $("#location").val());
                 form_data.append("status", $("#status").val());
+                form_data.append("room", $("#room").val());
+                form_data.append("floor", $("#floor").val());
+                form_data.append("branch_id", $("#branch_id").val());
 
                 $.ajax({
                     url: url,
@@ -172,6 +193,9 @@
                 form_data.append("name", $("#name").val());
                 form_data.append("location", $("#location").val());
                 form_data.append("status", $("#status").val());
+                form_data.append("room", $("#room").val());
+                form_data.append("floor", $("#floor").val());
+                form_data.append("branch_id", $("#branch_id").val());
                 form_data.append("codeid", $("#codeid").val());
 
                 $.ajax({
@@ -229,6 +253,9 @@
             $("#name").val(data.name);
             $("#location").val(data.location);
             $("#status").val(data.status);
+            $("#branch_id").val(data.branch_id);
+            $("#floor").val(data.floor);
+            $("#room").val(data.room);
             $("#codeid").val(data.id);
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');

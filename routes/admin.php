@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ProrotaController;
 use App\Http\Controllers\Admin\AssetStockController;
+use App\Http\Controllers\Admin\MaintenanceController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
@@ -182,7 +183,15 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/location/{id}', [LocationController::class, 'delete']);
     Route::post('/location/update-status', [LocationController::class, 'updateStatus'])->name('locations.updateStatus');
 
-    // Locations crud
+    Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::post('/maintenance', [MaintenanceController::class, 'store']);
+    Route::get('/maintenance/{id}/edit', [MaintenanceController::class, 'edit']);
+    Route::post('/maintenance-update', [MaintenanceController::class, 'update']);
+    Route::get('/maintenance/{id}', [MaintenanceController::class, 'delete']);
+    Route::post('/maintenance/status', [MaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+
+
+    // Stock crud
     Route::get('/stock', [AssetStockController::class, 'index'])->name('stock');
     Route::post('/stock', [AssetStockController::class, 'store']);
     Route::get('/stock/{id}/edit', [AssetStockController::class, 'edit']);
