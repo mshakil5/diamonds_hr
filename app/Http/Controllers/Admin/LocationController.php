@@ -98,4 +98,13 @@ class LocationController extends Controller
 
         return response()->json(['status' => 200, 'message' => 'Status updated successfully.']);
     }
+
+    public function getLocationsByBranch($branchId)
+    {
+        $locations = Location::where('branch_id', $branchId)
+                            ->where('status', 1)
+                            ->get(['id', 'name']);
+
+        return response()->json($locations);
+    }
 }

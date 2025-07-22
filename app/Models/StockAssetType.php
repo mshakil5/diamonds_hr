@@ -18,4 +18,14 @@ class StockAssetType extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function maintenance()
+    {
+        return $this->belongsTo(Maintenance::class);
+    }
 }

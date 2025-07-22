@@ -25,4 +25,9 @@ class Branch extends Model
             ->useLogName('branch')
             ->setDescriptionForEvent(fn(string $eventName) => "Branch record has been {$eventName}");
     }
+
+    public function locations()
+    {
+        return $this->hasMany(Location::class);
+    }
 }

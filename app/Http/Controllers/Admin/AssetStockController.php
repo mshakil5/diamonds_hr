@@ -9,6 +9,8 @@ use App\Models\Location;
 use App\Models\Stock;
 use App\Models\StockAssetType;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Maintenance;
+use App\Models\Branch;
 
 class AssetStockController extends Controller
 {
@@ -17,6 +19,14 @@ class AssetStockController extends Controller
         $data = Stock::with('stockAssetTypes', 'assetType')->latest()->get();
         $assetTypes = AssetType::where('status', 1)->get();
         $locations = Location::where('status', 1)->get();
+        $branches = Branch::with('locations')
+            ->where('status', 1)
+            ->whereHas('locations', function($q) {
+                $q->where('status', 1);
+            })
+            ->get();
+            
+        $maintainances = Maintenance::where('status', 1)->get();
 
         foreach ($data as $stock) {
             $stock->assigned_count = $stock->stockAssetTypes->where('asset_status', 1)->count();
@@ -25,7 +35,7 @@ class AssetStockController extends Controller
             $stock->damaged_count = $stock->stockAssetTypes->where('asset_status', 4)->count();
         }
 
-        return view('admin.stock_asset.index', compact('data', 'assetTypes', 'locations'));
+        return view('admin.stock_asset.index', compact('data', 'assetTypes', 'locations', 'branches', 'maintainances'));
     }
 
     public function store(Request $request)
@@ -50,17 +60,16 @@ class AssetStockController extends Controller
         $data->note = $request->note;
         $data->created_by = auth()->id();
         if( $data->save()){
-            $productCodes = $request->product_code ?? [];
-            $assetStatuses = $request->asset_status ?? [];
-            $locationIds = $request->location_id ?? [];
 
-            foreach ($productCodes as $index => $code) {
+            foreach ($request->product_code as $index => $code) {
               $assetType = new StockAssetType();
               $assetType->stock_id = $data->id;
               $assetType->asset_type_id = $request->asset_type_id;
               $assetType->product_code = $code;
-              $assetType->asset_status = $assetStatuses[$index] ?? null;
-              $assetType->location_id = $locationIds[$index] ?? null;
+              $assetType->asset_status = $request->asset_status[$index] ?? null;
+              $assetType->branch_id = $request->branch_id[$index] ?? null;
+              $assetType->location_id = $request->location_id[$index] ?? null;
+              $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
               $assetType->assigned_by = auth()->id();
               $assetType->created_by = auth()->id();
               $assetType->save();
@@ -74,7 +83,7 @@ class AssetStockController extends Controller
 
     public function edit($id)
     {
-        $data = Stock::with('stockAssetTypes.location')->find($id);
+        $data = Stock::with(['stockAssetTypes.location', 'stockAssetTypes.branch', 'stockAssetTypes.maintenance'])->find($id);
         if (!$data) {
             return response()->json(['status' => 404, 'message' => 'Stock not found']);
         }
@@ -107,20 +116,19 @@ class AssetStockController extends Controller
         $data->quantity = $request->quantity;
         $data->note = $request->note;
         $data->updated_by = auth()->id();
-        
-        if($data->save()){
-            StockAssetType::where('stock_id', $data->id)->delete();
-            $productCodes = $request->product_code ?? [];
-            $assetStatuses = $request->asset_status ?? [];
-            $locationIds = $request->location_id ?? [];
 
-            foreach ($productCodes as $index => $code) {
+        if ($data->save()) {
+            StockAssetType::where('stock_id', $data->id)->delete();
+
+            foreach ($request->product_code as $index => $code) {
                 $assetType = new StockAssetType();
                 $assetType->stock_id = $data->id;
                 $assetType->asset_type_id = $request->asset_type_id;
                 $assetType->product_code = $code;
-                $assetType->asset_status = $assetStatuses[$index] ?? null;
-                $assetType->location_id = $locationIds[$index] ?? null;
+                $assetType->asset_status = $request->asset_status[$index] ?? null;
+                $assetType->branch_id = $request->branch_id[$index] ?? null;
+                $assetType->location_id = $request->location_id[$index] ?? null;
+                $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
                 $assetType->assigned_by = auth()->id();
                 $assetType->created_by = auth()->id();
                 $assetType->save();
@@ -150,7 +158,7 @@ class AssetStockController extends Controller
     {
         $stock = Stock::with('assetType')->findOrFail($stockId);
 
-        $assets = StockAssetType::with('location')
+        $assets = StockAssetType::with(['location', 'branch', 'maintenance'])
             ->where('stock_id', $stockId)
             ->where('asset_status', $status)
             ->get();

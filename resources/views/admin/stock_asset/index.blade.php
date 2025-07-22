@@ -114,7 +114,7 @@
                                   <th>Assigned</th>
                                   <th>In storage</th>
                                   <th>Under Repair</th>
-                                  <th>Under Repair</th>
+                                  <th>Damaged</th>
                                   <th>Action</th>
                               </tr>
                           </thead>
@@ -151,8 +151,12 @@
 @section('script')
 
 <script>
-    const locationOptions = `@foreach($locations as $loc)
-        <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+    const branchOptions = `@foreach($branches as $branch)
+        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+    @endforeach`;
+
+    const maintenanceOptions = `@foreach($maintainances as $maintenance)
+        <option value="{{ $maintenance->id }}">{{ $maintenance->name }}</option>
     @endforeach`;
 </script>
 
@@ -189,20 +193,60 @@
             const $wrap = $(this).closest('.status-wrap');
             const $row = $wrap.closest('.row');
 
-            $row.find('.location-col').remove();
+            $row.find('.branch-col, .location-col, .maintenance-col').remove();
 
-            if (selected === '1') {
+            if (selected === '1' || selected === '2') {
                 $wrap.removeClass('col-md-6').addClass('col-md-3');
+                
                 $row.append(`
-                    <div class="col-md-3 location-col">
-                        <select name="location_id[]" class="form-control">
-                            <option value="">Select Location</option>
-                            ${locationOptions}
+                    <div class="col-md-3 branch-col">
+                        <select name="branch_id[]" class="form-control branch-select">
+                            <option value="">Select Branch</option>
+                            ${branchOptions}
                         </select>
                     </div>
                 `);
-            } else {
+
+                $row.append(`
+                    <div class="col-md-3 location-col mt-2" style="display:none;">
+                        <select name="location_id[]" class="form-control location-select">
+                            <option value="">Select Location</option>
+                        </select>
+                    </div>
+                `);
+            } 
+            else if (selected === '3') {
+                $wrap.removeClass('col-md-6').addClass('col-md-3');
+                $row.append(`
+                    <div class="col-md-3 maintenance-col">
+                        <select name="maintenance_id[]" class="form-control">
+                            <option value="">Select Maintenance</option>
+                            ${maintenanceOptions}
+                        </select>
+                    </div>
+                `);
+            } 
+            else {
                 $wrap.removeClass('col-md-3').addClass('col-md-6');
+            }
+        });
+
+        $(document).on('change', '.branch-select', function() {
+            const branchId = $(this).val();
+            const $locationSelect = $(this).closest('.row').find('.location-select');
+            const $locationCol = $(this).closest('.row').find('.location-col');
+
+            $locationSelect.empty().append('<option value="">Select Location</option>');
+            
+            if (branchId) {
+                $.get(`/admin/get-locations/${branchId}`, function(locations) {
+                    locations.forEach(loc => {
+                        $locationSelect.append(`<option value="${loc.id}">${loc.name}</option>`);
+                    });
+                    $locationCol.show();
+                });
+            } else {
+                $locationCol.hide();
             }
         });
 
@@ -227,7 +271,7 @@
 
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
-                var requiredFields = ['#date', '#asset_type_id'];
+                var requiredFields = ['#date', '#asset_type_id', '#quantity'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
@@ -243,16 +287,17 @@
                 form_data.append("quantity", $("#quantity").val());
                 form_data.append("note", $("#note").val());
 
-                $('input[name="product_code[]"]').each(function () {
-                    form_data.append("product_code[]", $(this).val());
-                });
+                $('#dynamicRows .row').each(function () {
+                    form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
+                    form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
+                    
+                    const branchVal = $(this).find('select[name="branch_id[]"]').val();
+                    const locationVal = $(this).find('select[name="location_id[]"]').val();
+                    const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
 
-                $('select[name="asset_status[]"]').each(function () {
-                    form_data.append("asset_status[]", $(this).val());
-                });
-
-                $('select[name="location_id[]"]').each(function () {
-                    form_data.append("location_id[]", $(this).val());
+                    form_data.append('branch_id[]', branchVal ? branchVal : '');
+                    form_data.append('location_id[]', locationVal ? locationVal : '');
+                    form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
                 });
 
                 $.ajax({
@@ -304,16 +349,17 @@
                 form_data.append("note", $("#note").val());
                 form_data.append("codeid", $("#codeid").val());
 
-                $('input[name="product_code[]"]').each(function() {
-                    form_data.append("product_code[]", $(this).val());
-                });
+                $('#dynamicRows .row').each(function () {
+                    form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
+                    form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
 
-                $('select[name="asset_status[]"]').each(function() {
-                    form_data.append("asset_status[]", $(this).val());
-                });
+                    const branchVal = $(this).find('select[name="branch_id[]"]').val();
+                    const locationVal = $(this).find('select[name="location_id[]"]').val();
+                    const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
 
-                $('select[name="location_id[]"]').each(function() {
-                    form_data.append("location_id[]", $(this).val());
+                    form_data.append('branch_id[]', branchVal ? branchVal : '');
+                    form_data.append('location_id[]', locationVal ? locationVal : '');
+                    form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
                 });
 
                 $.ajax({
@@ -346,7 +392,6 @@
             $.get(info_url, {}, function(d) {
                 if (d.status == 200) {
                     populateForm(d.data);
-                    console.log(d.data);
                     pagetop();
                 } else {
                     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
@@ -386,18 +431,17 @@
             $("#note").val(data.note);
             $("#codeid").val(data.id);
             
-            // Clear and rebuild dynamic rows
             $('#dynamicRows').empty();
             
-            // Add rows for each asset type
             if (data.stock_asset_types && data.stock_asset_types.length > 0) {
                 data.stock_asset_types.forEach(function(asset) {
                     let rowHtml = `
                     <div class="row mb-2 align-items-end">
                         <div class="col-md-6">
-                            <input type="text" name="product_code[]" class="form-control" placeholder="Product Code" value="${asset.product_code || ''}">
+                            <input type="text" name="product_code[]" class="form-control" 
+                                  placeholder="Product Code" value="${asset.product_code || ''}">
                         </div>
-                        <div class="col-md-${asset.asset_status == 1 ? '3' : '6'} status-wrap">
+                        <div class="col-md-${[1,2,3].includes(asset.asset_status) ? '3' : '6'} status-wrap">
                             <select name="asset_status[]" class="form-control asset-status">
                                 <option value="">Select Status</option>
                                 <option value="1" ${asset.asset_status == 1 ? 'selected' : ''}>Assigned</option>
@@ -407,23 +451,58 @@
                             </select>
                         </div>`;
                     
-                    if (asset.asset_status == 1) {
-                        rowHtml += `
-                        <div class="col-md-3 location-col">
-                            <select name="location_id[]" class="form-control">
-                                <option value="">Select Location</option>
-                                ${locationOptions}
-                            </select>
-                        </div>`;
-                    }
-                    
-                    rowHtml += `</div>`;
-                    
                     $('#dynamicRows').append(rowHtml);
+                    
+                    const $row = $('#dynamicRows .row:last');
+                    
+                    if (asset.asset_status == 1 || asset.asset_status == 2) {
+                        $row.find('.status-wrap').removeClass('col-md-6').addClass('col-md-3');
+                        
+                        $row.append(`
+                            <div class="col-md-3 branch-col">
+                                <select name="branch_id[]" class="form-control branch-select">
+                                    <option value="">Select Branch</option>
+                                    ${branchOptions}
+                                </select>
+                            </div>
+                            <div class="col-md-3 location-col mt-2">
+                                <select name="location_id[]" class="form-control location-select">
+                                    <option value="">Select Location</option>
+                                </select>
+                            </div>
+                        `);
+                        
+                          if (asset.branch_id) {
+                              const $branchSelect = $row.find('.branch-select');
+                              const $locationSelect = $row.find('.location-select');
 
-                        if (asset.asset_status == 1 && asset.location_id) {
-                            $('#dynamicRows .row:last .location-col select').val(asset.location_id);
+                              $branchSelect.val(asset.branch_id).trigger('change');
+
+                              const checkLocationLoaded = setInterval(() => {
+                                  if ($locationSelect.children('option').length > 1) {
+                                      $locationSelect.val(asset.location_id);
+                                      clearInterval(checkLocationLoaded);
+                                  }
+                              }, 100);
+                          }
+
+                    }
+                    else if (asset.asset_status == 3) {
+                        $row.find('.status-wrap').removeClass('col-md-6').addClass('col-md-3');
+                        
+                        $row.append(`
+                            <div class="col-md-3 maintenance-col">
+                                <select name="maintenance_id[]" class="form-control">
+                                    <option value="">Select Maintenance</option>
+                                    ${maintenanceOptions}
+                                </select>
+                            </div>
+                        `);
+
+                        if (asset.maintenance_id) {
+                            $row.find('.maintenance-col select').val(asset.maintenance_id);
                         }
+                    }
                 });
             }
             
@@ -432,7 +511,7 @@
             $("#header-title").html('Update Stock');
             $("#addThisFormContainer").show(300);
             $("#newBtn").hide(100);
-        }
+        }        
 
         function clearform() {
             $('#createThisForm')[0].reset();

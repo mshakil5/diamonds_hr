@@ -22,8 +22,14 @@
                 <tr>
                   <th>SL</th>
                   <th>Product Code</th>
+                  @if(in_array($status, [1, 2]))
+                    <th>Branch</th>
+                  @endif
                   @if($status == 1)
                     <th>Location</th>
+                  @endif
+                  @if($status == 3)
+                    <th>Maintenance</th>
                   @endif
                 </tr>
               </thead>
@@ -32,8 +38,14 @@
                   <tr>
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $item->product_code }}</td>
+                    @if(in_array($status, [1, 2]))
+                      <td>{{ $item->branch->name ?? 'N/A' }}</td>
+                    @endif
                     @if($status == 1)
                       <td>{{ $item->location->name ?? 'N/A' }}</td>
+                    @endif
+                    @if($status == 3)
+                      <td>{{ $item->maintenance->name ?? 'N/A' }}</td>
                     @endif
                   </tr>
                 @endforeach
