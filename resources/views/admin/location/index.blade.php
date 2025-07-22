@@ -25,10 +25,6 @@
                             @csrf
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
                             <div class="form-group">
-                                <label>Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter location name">
-                            </div>
-                            <div class="form-group">
                                 <label>Branch <span class="text-danger">*</span></label>
                                 <select class="form-control" id="branch_id" name="branch_id" required>
                                     <option value="">Select Branch</option>
@@ -38,16 +34,17 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Location</label>
-                                <input type="text" class="form-control" id="location" name="location" placeholder="Enter location details">
-                            </div>
-                            <div class="form-group">
-                                <label>Floor</label>
-                                <input type="text" class="form-control" id="floor" name="floor" placeholder="Enter floor">
+                                <label>Floor <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="floor_id" name="floor_id" required>
+                                    <option value="">Select Floor</option>
+                                    @foreach($floors as $floor)
+                                        <option value="{{ $floor->id }}">{{ $floor->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="form-group">
-                                <label>Room Name/Number</label>
+                                <label>Room Name/Number <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="room" name="room" placeholder="Enter room name or number">
                             </div>
                             <div class="form-group">
@@ -83,8 +80,9 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Date</th>
-                                    <th>Name</th>
-                                    <th>Location</th>
+                                    <th>Branch</th>
+                                    <th>Floor</th>
+                                    <th>Room</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -94,8 +92,9 @@
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
-                                    <td>{{ $data->name }}</td>
-                                    <td>{{ $data->location }}</td>
+                                    <td>{{ $data->branch->name ?? '' }}</td>
+                                    <td>{{ $data->flooor->name ?? '' }}</td>
+                                    <td>{{ $data->room ?? '' }}</td>
                                     <td>
                                         <div class="custom-control custom-switch">
                                             <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus{{ $data->id }}" data-id="{{ $data->id }}" {{ $data->status == 1 ? 'checked' : '' }}>
@@ -143,7 +142,7 @@
 
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
-                var requiredFields = ['#name', '#status'];
+                var requiredFields = ['#branch_id', '#floor_id', '#room', '#status',];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
@@ -152,12 +151,10 @@
                 }
 
                 var form_data = new FormData();
-                form_data.append("name", $("#name").val());
-                form_data.append("location", $("#location").val());
-                form_data.append("status", $("#status").val());
-                form_data.append("room", $("#room").val());
-                form_data.append("floor", $("#floor").val());
                 form_data.append("branch_id", $("#branch_id").val());
+                form_data.append("floor_id", $("#floor_id").val());
+                form_data.append("room", $("#room").val());
+                form_data.append("status", $("#status").val());
 
                 $.ajax({
                     url: url,
@@ -181,7 +178,7 @@
             }
 
             if ($(this).val() == 'Update') {
-                var requiredFields = ['#name', '#status'];
+                var requiredFields = ['#branch_id', '#floor_id', '#room', '#status',];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
@@ -190,12 +187,10 @@
                 }
 
                 var form_data = new FormData();
-                form_data.append("name", $("#name").val());
-                form_data.append("location", $("#location").val());
-                form_data.append("status", $("#status").val());
-                form_data.append("room", $("#room").val());
-                form_data.append("floor", $("#floor").val());
                 form_data.append("branch_id", $("#branch_id").val());
+                form_data.append("floor_id", $("#floor_id").val());
+                form_data.append("room", $("#room").val());
+                form_data.append("status", $("#status").val());
                 form_data.append("codeid", $("#codeid").val());
 
                 $.ajax({
@@ -250,12 +245,10 @@
         });
 
         function populateForm(data) {
-            $("#name").val(data.name);
-            $("#location").val(data.location);
-            $("#status").val(data.status);
             $("#branch_id").val(data.branch_id);
-            $("#floor").val(data.floor);
+            $("#floor_id").val(data.floor_id);
             $("#room").val(data.room);
+            $("#status").val(data.status);
             $("#codeid").val(data.id);
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');

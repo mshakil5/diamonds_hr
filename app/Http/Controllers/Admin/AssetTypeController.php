@@ -11,7 +11,7 @@ class AssetTypeController extends Controller
 {
     public function index()
     {
-        $data = AssetType::where('branch_id', auth()->user()->branch_id)->get();
+        $data = AssetType::latest()->get();
         return view('admin.asset-type.index', compact('data'));
     }
 

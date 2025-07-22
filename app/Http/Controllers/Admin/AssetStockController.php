@@ -11,6 +11,7 @@ use App\Models\StockAssetType;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Maintenance;
 use App\Models\Branch;
+use App\Models\Floor;
 
 class AssetStockController extends Controller
 {
@@ -19,6 +20,7 @@ class AssetStockController extends Controller
         $data = Stock::with('stockAssetTypes', 'assetType')->latest()->get();
         $assetTypes = AssetType::where('status', 1)->get();
         $locations = Location::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
         $branches = Branch::with('locations')
             ->where('status', 1)
             ->whereHas('locations', function($q) {
@@ -35,7 +37,7 @@ class AssetStockController extends Controller
             $stock->damaged_count = $stock->stockAssetTypes->where('asset_status', 4)->count();
         }
 
-        return view('admin.stock_asset.index', compact('data', 'assetTypes', 'locations', 'branches', 'maintainances'));
+        return view('admin.stock_asset.index', compact('data', 'assetTypes', 'locations', 'branches', 'maintainances', 'floors'));
     }
 
     public function store(Request $request)
@@ -70,6 +72,7 @@ class AssetStockController extends Controller
               $assetType->branch_id = $request->branch_id[$index] ?? null;
               $assetType->location_id = $request->location_id[$index] ?? null;
               $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
+              $assetType->floor_id = $request->floor_id[$index] ?? null;
               $assetType->assigned_by = auth()->id();
               $assetType->created_by = auth()->id();
               $assetType->save();
@@ -129,6 +132,7 @@ class AssetStockController extends Controller
                 $assetType->branch_id = $request->branch_id[$index] ?? null;
                 $assetType->location_id = $request->location_id[$index] ?? null;
                 $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
+                $assetType->floor_id = $request->floor_id[$index] ?? null;
                 $assetType->assigned_by = auth()->id();
                 $assetType->created_by = auth()->id();
                 $assetType->save();
@@ -158,7 +162,7 @@ class AssetStockController extends Controller
     {
         $stock = Stock::with('assetType')->findOrFail($stockId);
 
-        $assets = StockAssetType::with(['location', 'branch', 'maintenance'])
+        $assets = StockAssetType::with(['location.flooor', 'branch', 'maintenance'])
             ->where('stock_id', $stockId)
             ->where('asset_status', $status)
             ->get();

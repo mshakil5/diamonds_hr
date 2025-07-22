@@ -24,9 +24,8 @@
                   <th>Product Code</th>
                   @if(in_array($status, [1, 2]))
                     <th>Branch</th>
-                  @endif
-                  @if($status == 1)
-                    <th>Location</th>
+                    <th>Floor</th>
+                    <th>Room</th>
                   @endif
                   @if($status == 3)
                     <th>Maintenance</th>
@@ -40,9 +39,8 @@
                     <td>{{ $item->product_code }}</td>
                     @if(in_array($status, [1, 2]))
                       <td>{{ $item->branch->name ?? 'N/A' }}</td>
-                    @endif
-                    @if($status == 1)
-                      <td>{{ $item->location->name ?? 'N/A' }}</td>
+                      <td>{{ $item->location->flooor->name ?? 'N/A' }}</td>
+                      <td>{{ $item->location->room ?? 'N/A' }}</td>
                     @endif
                     @if($status == 3)
                       <td>{{ $item->maintenance->name ?? 'N/A' }}</td>

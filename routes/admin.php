@@ -201,7 +201,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
 
     Route::get('/admin/stock/{stock}/status/{status}', [AssetStockController::class, 'viewByStatus'])->name('stock.view.status');
 
-  Route::get('/get-locations/{branchId}', [LocationController::class, 'getLocationsByBranch']);
+    Route::get('/get-locations/{branchId}/{floorId}', [LocationController::class, 'getLocationsByBranchAndFloor']);
 
   // Assets crud
   Route::get('/asset', [AssetController::class, 'index'])->name('assets');

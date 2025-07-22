@@ -7,25 +7,24 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Branch;
+use App\Models\Floor;
 
 class LocationController extends Controller
 {
     public function index()
     {
-        $data = Location::where('branch_id', auth()->user()->branch_id)->get();
+        $data = Location::where('branch_id', auth()->user()->branch_id)->latest()->get();
         $branches = Branch::where('status', 1)->get();
-        return view('admin.location.index', compact('data', 'branches'));
+        $floors = Floor::where('status', 1)->get();
+        return view('admin.location.index', compact('data', 'branches', 'floors'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:locations,name',
             'branch_id' => 'required',
-            'location' => 'nullable|string|max:255',
-            'floor' => 'nullable|string|max:255',
-            'room' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
+            'floor_id' => 'required',
+            'room' => 'required',
             'status' => 'required|boolean',
         ]);
 
@@ -34,10 +33,8 @@ class LocationController extends Controller
         }
 
         $data = new Location();
-        $data->name = $request->name;
-        $data->location = $request->location;
         $data->branch_id = $request->branch_id;
-        $data->floor = $request->floor;
+        $data->floor_id = $request->floor_id;
         $data->room = $request->room;
         $data->status = $request->status;
         $data->created_by = auth()->id();
@@ -55,11 +52,9 @@ class LocationController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:locations,name,' . $request->codeid,
             'branch_id' => 'required',
-            'floor' => 'nullable|string|max:255',
-            'room' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
+            'floor_id' => 'required',
+            'room' => 'required',
             'status' => 'required|boolean',
         ]);
 
@@ -68,10 +63,8 @@ class LocationController extends Controller
         }
 
         $data = Location::findOrFail($request->codeid);
-        $data->name = $request->name;
-        $data->location = $request->location;
         $data->branch_id = $request->branch_id;
-        $data->floor = $request->floor;
+        $data->floor_id = $request->floor_id;
         $data->room = $request->room;
         $data->status = $request->status;
         $data->updated_by = auth()->id();
@@ -99,12 +92,13 @@ class LocationController extends Controller
         return response()->json(['status' => 200, 'message' => 'Status updated successfully.']);
     }
 
-    public function getLocationsByBranch($branchId)
+    public function getLocationsByBranchAndFloor($branchId, $floorId)
     {
         $locations = Location::where('branch_id', $branchId)
+                            ->where('floor_id', $floorId)
                             ->where('status', 1)
-                            ->get(['id', 'name']);
-
+                            ->get();
+        
         return response()->json($locations);
     }
 }

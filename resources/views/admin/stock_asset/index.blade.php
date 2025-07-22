@@ -155,6 +155,10 @@
         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
     @endforeach`;
 
+    const floorOptions = `@foreach($floors as $floor)
+        <option value="{{ $floor->id }}">{{ $floor->name }}</option>
+    @endforeach`;
+
     const maintenanceOptions = `@foreach($maintainances as $maintenance)
         <option value="{{ $maintenance->id }}">{{ $maintenance->name }}</option>
     @endforeach`;
@@ -208,9 +212,18 @@
                 `);
 
                 $row.append(`
+                    <div class="col-md-3 floor-col mt-2">
+                        <select name="floor_id[]" class="form-control floor-select">
+                            <option value="">Select Floor</option>
+                            ${floorOptions}
+                        </select>
+                    </div>
+                `);
+
+                $row.append(`
                     <div class="col-md-3 location-col mt-2" style="display:none;">
                         <select name="location_id[]" class="form-control location-select">
-                            <option value="">Select Location</option>
+                            <option value="">Select Room</option>
                         </select>
                     </div>
                 `);
@@ -231,19 +244,26 @@
             }
         });
 
-        $(document).on('change', '.branch-select', function() {
-            const branchId = $(this).val();
-            const $locationSelect = $(this).closest('.row').find('.location-select');
-            const $locationCol = $(this).closest('.row').find('.location-col');
+        $(document).on('change', '.branch-select, .floor-select', function() {
+            const $row = $(this).closest('.row');
+            const branchId = $row.find('.branch-select').val();
+            const floorId = $row.find('.floor-select').val();
+            const $locationSelect = $row.find('.location-select');
+            const $locationCol = $row.find('.location-col');
 
-            $locationSelect.empty().append('<option value="">Select Location</option>');
+            $locationSelect.empty().append('<option value="">Select Room</option>');
             
-            if (branchId) {
-                $.get(`/admin/get-locations/${branchId}`, function(locations) {
-                    locations.forEach(loc => {
-                        $locationSelect.append(`<option value="${loc.id}">${loc.name}</option>`);
-                    });
-                    $locationCol.show();
+            if (branchId && floorId) {
+                $.get(`/admin/get-locations/${branchId}/${floorId}`, function(locations) {
+                  console.log(locations);
+                    if (locations.length > 0) {
+                        locations.forEach(loc => {
+                            $locationSelect.append(`<option value="${loc.id}">${loc.room}</option>`);
+                        });
+                        $locationCol.show();
+                    } else {
+                        $locationCol.hide();
+                    }
                 });
             } else {
                 $locationCol.hide();
@@ -294,10 +314,12 @@
                     const branchVal = $(this).find('select[name="branch_id[]"]').val();
                     const locationVal = $(this).find('select[name="location_id[]"]').val();
                     const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
+                    const floorVal = $(this).find('select[name="floor_id[]"]').val();
 
                     form_data.append('branch_id[]', branchVal ? branchVal : '');
                     form_data.append('location_id[]', locationVal ? locationVal : '');
                     form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
+                    form_data.append('floor_id[]', floorVal ? floorVal : '');
                 });
 
                 $.ajax({
@@ -356,10 +378,12 @@
                     const branchVal = $(this).find('select[name="branch_id[]"]').val();
                     const locationVal = $(this).find('select[name="location_id[]"]').val();
                     const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
+                    const floorVal = $(this).find('select[name="floor_id[]"]').val();
 
                     form_data.append('branch_id[]', branchVal ? branchVal : '');
                     form_data.append('location_id[]', locationVal ? locationVal : '');
                     form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
+                    form_data.append('floor_id[]', floorVal ? floorVal : '');
                 });
 
                 $.ajax({
@@ -465,27 +489,40 @@
                                     ${branchOptions}
                                 </select>
                             </div>
-                            <div class="col-md-3 location-col mt-2">
+                            <div class="col-md-3 floor-col mt-2">
+                                <select name="floor_id[]" class="form-control floor-select">
+                                    <option value="">Select Floor</option>
+                                    ${floorOptions}
+                                </select>
+                            </div>
+                            <div class="col-md-3 location-col mt-2" style="display:none;">
                                 <select name="location_id[]" class="form-control location-select">
-                                    <option value="">Select Location</option>
+                                    <option value="">Select Room</option>
                                 </select>
                             </div>
                         `);
                         
-                          if (asset.branch_id) {
-                              const $branchSelect = $row.find('.branch-select');
-                              const $locationSelect = $row.find('.location-select');
+                        if (asset.branch_id && asset.floor_id) {
+                            const $branchSelect = $row.find('.branch-select');
+                            const $floorSelect = $row.find('.floor-select');
+                            const $locationSelect = $row.find('.location-select');
+                            const $locationCol = $row.find('.location-col');
 
-                              $branchSelect.val(asset.branch_id).trigger('change');
+                            $branchSelect.val(asset.branch_id);
+                            $floorSelect.val(asset.floor_id);
 
-                              const checkLocationLoaded = setInterval(() => {
-                                  if ($locationSelect.children('option').length > 1) {
-                                      $locationSelect.val(asset.location_id);
-                                      clearInterval(checkLocationLoaded);
-                                  }
-                              }, 100);
-                          }
-
+                            $.get(`/admin/get-locations/${asset.branch_id}/${asset.floor_id}`, function(locations) {
+                                $locationSelect.empty().append('<option value="">Select Room</option>');
+                                
+                                if (locations.length > 0) {
+                                    locations.forEach(loc => {
+                                        $locationSelect.append(`<option value="${loc.id}">${loc.room}</option>`);
+                                    });
+                                    $locationSelect.val(asset.location_id);
+                                    $locationCol.show();
+                                }
+                            });
+                        }
                     }
                     else if (asset.asset_status == 3) {
                         $row.find('.status-wrap').removeClass('col-md-6').addClass('col-md-3');
@@ -511,7 +548,7 @@
             $("#header-title").html('Update Stock');
             $("#addThisFormContainer").show(300);
             $("#newBtn").hide(100);
-        }        
+        }
 
         function clearform() {
             $('#createThisForm')[0].reset();
