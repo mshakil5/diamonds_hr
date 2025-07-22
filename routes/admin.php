@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ProrotaController;
 use App\Http\Controllers\Admin\AssetStockController;
 use App\Http\Controllers\Admin\MaintenanceController;
+use App\Http\Controllers\Admin\FloorController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
@@ -209,6 +210,14 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   Route::post('/asset-update', [AssetController::class, 'update']);
   Route::get('/asset/{id}', [AssetController::class, 'delete']);
   Route::post('/asset/update-status', [AssetController::class, 'updateStatus'])->name('assets.updateStatus');
+
+    // Floors crud
+  Route::get('/floor', [FloorController::class, 'index'])->name('floors');
+  Route::post('/floor', [FloorController::class, 'store']);
+  Route::get('/floor/{id}/edit', [FloorController::class, 'edit']);
+  Route::post('/floor-update', [FloorController::class, 'update']);
+  Route::get('/floor/{id}', [FloorController::class, 'delete']);
+  Route::post('/floor/update-status', [FloorController::class, 'updateStatus'])->name('floors.updateStatus');
         
 });
   
