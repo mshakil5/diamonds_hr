@@ -114,30 +114,39 @@
                             <div class="col-md-12">
                                 <h4>Summary</h4>
                                 <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="info-box bg-light">
-                                            <span class="info-box-icon bg-primary"><i class="fas fa-procedures"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">Sick Days</span>
-                                                <span class="info-box-number">{{ $sickDays }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="info-box bg-light">
-                                            <span class="info-box-icon bg-warning"><i class="fas fa-user-times"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">Absence Days</span>
-                                                <span class="info-box-number">{{ $absenceDays }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <div class="info-box bg-light">
                                             <span class="info-box-icon bg-success"><i class="fas fa-umbrella-beach"></i></span>
                                             <div class="info-box-content">
                                                 <span class="info-box-text">Holiday Entitlement</span>
                                                 <span class="info-box-number">{{ $employeeName->entitled_holiday }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="info-box bg-light">
+                                            <span class="info-box-icon bg-primary"><i class="fas fa-hand-holding-medical"></i></span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text">Taken</span>
+                                                <span class="info-box-number">{{ $counts['taken'] ?? 0 }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="info-box bg-light">
+                                            <span class="info-box-icon bg-primary"><i class="fas fa-calendar-check"></i></span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text">Booked</span>
+                                                <span class="info-box-number">{{ $counts['booked'] ?? 0 }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="info-box bg-light">
+                                            <span class="info-box-icon bg-warning"><i class="fas fa-hourglass-half"></i></span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text">Remaining</span>
+                                                <span class="info-box-number">{{ $employeeName->entitled_holiday - (($counts['booked'] ?? 0) + ($counts['not_taken'] ?? 0) + ($counts['taken'] ?? 0)) }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -164,14 +173,11 @@
                                     $diffInDays = $start->diffInDays($end) + 1;
                                 @endphp
                                     <tr>
-                                        <td>{{ $item->from_date }}</td>
-                                        <td>{{ $item->to_date }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($item->from_date)->format('d-m-Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($item->to_date)->format('d-m-Y') }}</td>
                                         <td>{{ $item->type }}</td>
                                         <td>{{ $diffInDays }} days</td>
-                                        <td>
-                                            <td><span class="badge badge-info">{{ $item->status }}</span></td>
-
-                                        </td>
+                                        <td><span class="badge badge-info">{{ $item->status }}</span></td>
                                     </tr>
                                 @endforeach
                             </tbody>

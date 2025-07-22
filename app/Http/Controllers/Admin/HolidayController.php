@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Holiday;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class HolidayController extends Controller
 {
@@ -30,6 +31,26 @@ class HolidayController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
+        }
+
+        $employee = Employee::find($request->employee_id);
+        if (!$employee) {
+            return response()->json(['status' => 404, 'message' => 'Employee not found.']);
+        }
+
+        $from = Carbon::parse($request->from_date);
+        $to = Carbon::parse($request->to_date);
+        $duration = $from->diffInDays($to) + 1;
+
+        $counts = $employee->leave_status_counts;
+        $used = ($counts['booked'] ?? 0) + ($counts['taken'] ?? 0);
+        $available = $employee->entitled_holiday - $used;
+
+        if ($duration > $available) {
+            return response()->json([
+                'status' => 422,
+                'message' => "Only $available holiday(s) available, but $duration requested."
+            ]);
         }
 
         $data = new Holiday();
@@ -67,6 +88,30 @@ class HolidayController extends Controller
         }
 
         $data = Holiday::findOrFail($request->codeid);
+
+        $employee = Employee::find($request->employee_id);
+        if (!$employee) {
+            return response()->json(['status' => 404, 'message' => 'Employee not found.']);
+        }
+
+        $from = Carbon::parse($request->from_date);
+        $to = Carbon::parse($request->to_date);
+        $newDuration = $from->diffInDays($to) + 1;
+
+        $counts = $employee->leave_status_counts;
+        $currentDuration = Carbon::parse($data->from_date)->diffInDays(Carbon::parse($data->to_date)) + 1;
+
+        $used = ($counts['booked'] ?? 0) + ($counts['taken'] ?? 0) - $currentDuration;
+
+        $available = $employee->entitled_holiday - $used;
+
+        if ($newDuration > $available) {
+            return response()->json([
+                'status' => 422,
+                'message' => "Only $available holiday(s) available, but $newDuration requested."
+            ]);
+        }
+
         $data->from_date = $request->from_date;
         $data->to_date = $request->to_date;
         $data->employee_id = $request->employee_id;

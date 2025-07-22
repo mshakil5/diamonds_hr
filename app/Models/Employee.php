@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Carbon;
 
 class Employee extends Model
 {
@@ -63,4 +64,28 @@ class Employee extends Model
         return $this->belongsToMany(PreRota::class, 'employee_pre_rotas', 'employee_id', 'pre_rota_id');
     }
     
+    public function holidays()
+    {
+        return $this->hasMany(Holiday::class);
+    }
+
+    public function getLeaveStatusCountsAttribute()
+    {
+        $holidays = $this->holidays()->get();
+
+        $durations = $holidays->groupBy('status')->map(function ($group) {
+            return $group->sum(function ($holiday) {
+                $start = Carbon::parse($holiday->from_date);
+                $end = Carbon::parse($holiday->to_date);
+                return $start->diffInDays($end) + 1;
+            });
+        });
+
+        return [
+            'booked' => $durations['Booked'] ?? 0,
+            'not_taken' => $durations['Not Taken'] ?? 0,
+            'taken' => $durations['Taken'] ?? 0,
+        ];
+    }
+
 }

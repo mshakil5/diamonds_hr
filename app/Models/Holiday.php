@@ -59,7 +59,7 @@ class Holiday extends Model
             ->toArray();
 
         if ($start->isFuture()) {
-            return 'Coming Soon';
+            return 'Booked';
         } elseif (!empty(array_intersect($dates, $attendances))) {
             return 'Not Taken';
         } else {

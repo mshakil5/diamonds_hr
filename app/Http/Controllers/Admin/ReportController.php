@@ -65,6 +65,7 @@ class ReportController extends Controller
                 ->whereEmployeeId($employeeId)
                 ->where('branch_id', $employee->branch_id)
                 ->get();
+            $counts = $employee->leave_status_counts;
                 // dd($holidayData);
             $holidayDataCount=Holiday::whereEmployeeId($employeeId)
                 ->whereBetween('date',[$contractDateBegin,$contractDateEnd])
@@ -87,7 +88,7 @@ class ReportController extends Controller
             $employeeName = Employee::where('id', $request->input('employee_id'))->where('branch_id', Auth::user()->branch_id)->first();
             
             $employees = Employee::where('is_active', 1)->get();
-            return view('admin.reports.holidayReport', compact('employees','employeeName','holidayData','holidayDataCount','sickDays','absenceDays','employee'));
+            return view('admin.reports.holidayReport', compact('employees','employeeName','holidayData','holidayDataCount','sickDays','absenceDays','employee','counts'));
 
         } else {
 
