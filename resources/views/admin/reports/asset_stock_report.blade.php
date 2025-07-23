@@ -95,7 +95,7 @@
 <script>
 $(function () {
     $('#reportTable').DataTable({
-        pageLength: 25,
+        pageLength: 10,
         responsive: true,
         dom: 'Bfrtip',
         buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
