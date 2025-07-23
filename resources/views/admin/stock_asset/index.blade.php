@@ -99,7 +99,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">All Asset Types</h3>
+                        <h3 class="card-title">Stock</h3>
                     </div>
                     <div class="card-body">
                       <table id="example1" class="table table-bordered table-striped">
@@ -108,6 +108,7 @@
                                   <th>Sl</th>
                                   <th>Date</th>
                                   <th>Asset Type</th>
+                                  <th>Branch</th>
                                   <th>Brand</th>
                                   <th>Model</th>
                                   <th>Qty</th>
@@ -124,6 +125,7 @@
                                   <td>{{ $key + 1 }}</td>
                                   <td>{{ \Carbon\Carbon::parse($item->date)->format('d-m-Y') }}</td>
                                   <td>{{ $item->assetType->name ?? 'N/A' }}</td>
+                                  <td>{{ $item->branch->name ?? 'N/A' }}</td>
                                   <td>{{ $item->brand }}</td>
                                   <td>{{ $item->model }}</td>
                                   <td>{{ $item->quantity }}</td>
@@ -197,7 +199,8 @@
             const $wrap = $(this).closest('.status-wrap');
             const $row = $wrap.closest('.row');
 
-            $row.find('.branch-col, .location-col, .maintenance-col').remove();
+            $row.find('.branch-col, .floor-col, .location-col, .maintenance-col').remove();
+            $wrap.removeClass('col-md-3').addClass('col-md-6');
 
             if (selected === '1' || selected === '2') {
                 $wrap.removeClass('col-md-6').addClass('col-md-3');

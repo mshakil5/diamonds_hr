@@ -177,6 +177,12 @@
                   </a>
               </li>
               @endif
+              <li class="nav-item">
+                  <a href="{{ route('assetStockReport') }}" class="nav-link {{ request()->routeIs('assetStockReport') ? 'active' : '' }}">
+                      <i class="fas fa-tags nav-icon"></i>
+                      <p>Asset Stock Report</p>
+                  </a>
+              </li>
               @if (auth()->user()->canDo(24))
               <li class="nav-item">
                   <a href="{{ route('holidayReport') }}" class="nav-link {{ request()->routeIs('holidayReport') ? 'active' : '' }}">

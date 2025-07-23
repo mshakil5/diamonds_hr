@@ -28,4 +28,10 @@ class StockAssetType extends Model
     {
         return $this->belongsTo(Maintenance::class);
     }
+
+    public function assetType()
+    {
+        return $this->belongsTo(AssetType::class);
+    }
+
 }

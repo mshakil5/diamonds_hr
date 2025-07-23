@@ -19,6 +19,11 @@ class Stock extends Model
         return $this->belongsTo(AssetType::class);
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     protected static function boot()
     {
       parent::boot();

@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PDF;
+use App\Models\AssetType;
+use App\Models\StockAssetType;
 
 class ReportController extends Controller
 {
@@ -257,6 +259,46 @@ class ReportController extends Controller
             'endDate',
             'branchName'
         ));
+    }
+
+    public function assetStockReport(Request $request)
+    {
+        $assetTypes = AssetType::where('status', 1)->get();
+        $branches = Branch::where('status', 1)->get();
+        $statuses = [
+            1 => 'Assigned',
+            2 => 'In Storage',
+            3 => 'Under Repair',
+            4 => 'Damaged',
+        ];
+
+        $query = StockAssetType::with(['stock', 'assetType', 'branch', 'location.flooor', 'maintenance'])
+            ->whereHas('stock', function ($q) {
+                $q->whereNotNull('id');
+            });
+
+        if ($request->from_date && $request->to_date) {
+            $query->whereHas('stock', function ($q) use ($request) {
+                $q->whereBetween('date', [$request->from_date, $request->to_date]);
+            });
+        }
+
+        if ($request->asset_type_id) {
+            $query->where('asset_type_id', $request->asset_type_id);
+        }
+
+        if ($request->status !== null) {
+            $query->where('asset_status', $request->status);
+        }
+
+        if ($request->branch_id) {
+            $query->where('branch_id', $request->branch_id);
+        }
+
+        $results = $query->get();
+        // dd($results);
+
+        return view('admin.reports.asset_stock_report', compact('results', 'assetTypes', 'branches', 'statuses', 'request'));
     }
 
 }
