@@ -18,7 +18,7 @@
           <input type="hidden" id="codeid" name="codeid">
           <div class="row">
             <div class="col-6">
-                <div class="form-group"><label>Name *</label><input type="text" id="name" name="name" class="form-control"></div>
+                <div class="form-group"><label>Name <span class="text-danger">*</span></label><input type="text" id="name" name="name" class="form-control"></div>
             </div>
             <div class="col-6">
                 <div class="form-group"><label>Phone</label><input type="text" id="phone" name="phone" class="form-control"></div>

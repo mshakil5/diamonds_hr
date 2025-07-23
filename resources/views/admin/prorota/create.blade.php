@@ -33,7 +33,7 @@
                             <div class="row">
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>From Date</label>
+                                        <label>From Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="start_date" name="start_date" />
                                     </div>
                                 </div>
@@ -45,7 +45,7 @@
                                 </div>
                                 <div class="col-lg-3">
                                     <div class="form-group">
-                                        <label for="type">Type</label>
+                                        <label for="type">Type <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="type" name="type">
                                             <option value="" disabled>Choose type</option>
                                             <option value="Regular">Regular</option>
@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>Employee *</label>
+                                        <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id[]" multiple>
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)

@@ -32,7 +32,7 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Employee *</label>
+                                        <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id">
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)

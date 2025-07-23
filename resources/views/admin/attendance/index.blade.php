@@ -32,7 +32,7 @@
                             <div class="row">
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>Employee *</label>
+                                        <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id">
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>Type *</label>
+                                        <label>Type <span class="text-danger">*</span></label>
                                         <select class="form-control" id="type" name="type">
                                             <option value="">Select Type</option>
                                             <option value="Regular">Regular</option>
@@ -55,7 +55,7 @@
 
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>Clock In Date</label>
+                                        <label>Clock In Date <span class="text-danger">*</span></label>
                                         <div class="input-group date" id="clockInDate" data-target-input="nearest">
                                             <input type="text" class="form-control datetimepicker-input" data-target="#clockInDate" id="clock_in_date" name="clock_in_date" />
                                             <div class="input-group-append" data-target="#clockInDate" data-toggle="datetimepicker">
@@ -67,7 +67,7 @@
 
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>Clock In Time</label>
+                                        <label>Clock In Time <span class="text-danger">*</span></label>
                                         <div class="input-group date" id="clockInTime" data-target-input="nearest">
                                             <input type="text" class="form-control datetimepicker-input" data-target="#clockInTime" id="clock_in_time" name="clock_in_time" />
                                             <div class="input-group-append" data-target="#clockInTime" data-toggle="datetimepicker">

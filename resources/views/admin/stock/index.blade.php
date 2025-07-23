@@ -41,7 +41,7 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Product *</label>
+                                        <label>Product <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="product_id" name="product_id">
                                             <option value="">Select Product</option>
                                             @foreach ($products as $product)
@@ -53,7 +53,7 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Type *</label>
+                                        <label>Type <span class="text-danger">*</span></label>
                                         <select class="form-control" id="cloth_type" name="cloth_type">
                                             <option value="">Select Type</option>
                                             <option value="Dirty">Dirty</option>
@@ -69,7 +69,7 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Quantity</label>
+                                        <label>Quantity <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" id="quantity" name="quantity" >
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@
                                 <div class="col-sm-3 d-none">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Marks</label>
+                                        <label>Marks <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" name="marks" id="marks">
                                     </div>
                                 </div>
@@ -87,7 +87,7 @@
                                 <div class="col-sm-12">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Details</label>
+                                        <label>Details <span class="text-danger">*</span></label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
                                     </div>
                                 </div>

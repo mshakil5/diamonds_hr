@@ -32,7 +32,7 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>From Date</label>
+                                        <label>From Date <span class="text-danger">*</span></label>
                                             <input type="date" class="form-control" id="from_date" name="from_date" />
                                     </div>
                                 </div>
@@ -40,14 +40,14 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>To Date</label>
+                                        <label>To Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="to_date" name="to_date"/>
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Employee *</label>
+                                        <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id">
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
@@ -59,7 +59,7 @@
                                 <div class="col-sm-3">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Type *</label>
+                                        <label>Type <span class="text-danger">*</span></label>
                                         <select class="form-control" id="employee_type" name="employee_type">
                                             <option value="">Select Type</option>
                                             <option value="Authorized holiday">Authorized holiday</option>
@@ -70,7 +70,7 @@
                                 <div class="col-sm-12">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Details</label>
+                                        <label>Details <span class="text-danger">*</span></label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
                                     </div>
                                 </div>

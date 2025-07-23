@@ -37,7 +37,7 @@
                   <div class="row">
                     <div class="col-sm-6">
                       <div class="form-group">
-                        <label>Name</label>
+                        <label>Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
                       </div>
                     </div>
@@ -52,7 +52,7 @@
                   <div class="row">
                     <div class="col-sm-6">
                       <div class="form-group">
-                        <label>Email</label>
+                        <label>Email <span class="text-danger">*</span></label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
                       </div>
                     </div>
@@ -64,7 +64,7 @@
                     </div>
                     <div class="col-sm-6">
                       <div class="form-group">
-                        <label>Branch</label>
+                        <label>Branch <span class="text-danger">*</span></label>
                         <select name="branch_id" id="branch_id" class="form-control">
                           <option value="">Select</option>
                           @foreach ($branches as $branch)
@@ -75,7 +75,7 @@
                     </div>
                     <div class="col-sm-6">
                       <div class="form-group">
-                        <label>Role</label>
+                        <label>Role <span class="text-danger">*</span></label>
                         <select name="role_id" id="role_id" class="form-control">
                           <option value="">Select</option>
                           @foreach ($roles as $role)
@@ -89,13 +89,13 @@
                   <div class="row">
                     <div class="col-sm-6">
                       <div class="form-group">
-                        <label>Password</label>
+                        <label>Password <span class="text-danger">*</span></label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
                       </div>
                     </div>
                     <div class="col-sm-6">
                       <div class="form-group">
-                        <label>Confirm Password</label>
+                        <label>Confirm Password <span class="text-danger">*</span></label>
                         <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Enter confirm password">
                       </div>
                     </div>

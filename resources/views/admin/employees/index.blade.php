@@ -217,21 +217,21 @@
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Staff ID *</label>
+                                                <label>Staff ID <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="employee_id" name="employee_id">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Name *</label>
+                                                <label>Name <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="name" name="name">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Staff Type *</label>
+                                                <label>Staff Type <span class="text-danger">*</span></label>
                                                 <select class="form-control" id="employee_type" name="employee_type">
                                                     <option value="">Select Staff Type</option>
                                                     <option value="full time">Full Time</option>
@@ -290,7 +290,7 @@
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Email*</label>
+                                                <label>Email <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="email" name="email">
                                             </div>
                                         </div>
@@ -335,21 +335,21 @@
                                         <div class="col-sm-4">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Pay Rate *</label>
+                                                <label>Pay Rate <span class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" id="pay_rate" name="pay_rate">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Tax Code *</label>
+                                                <label>Tax Code <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="tax_code" name="tax_code">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Entitled Holiday *</label>
+                                                <label>Entitled Holiday <span class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" id="entitled_holiday" name="entitled_holiday">
                                             </div>
                                         </div>
@@ -375,14 +375,14 @@
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Username*</label>
+                                                <label>Username <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="username" name="username">
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
-                                                <label>Password *</label>
+                                                <label>Password <span class="text-danger">*</span></label>
                                                 <input type="password" class="form-control" id="password" name="password">
                                             </div>
                                         </div>
