@@ -35,6 +35,9 @@ class AssetTypeController extends Controller
         $data->branch_id = auth()->user()->branch_id;
         $data->status = $request->status;
         $data->created_by = auth()->id();
+        $lastCode = AssetType::max('code');
+        $newCode = $lastCode ? ((int)$lastCode + 1) : 1;
+        $data->code = $newCode;
         $data->save();
 
         return response()->json(['status' => 200, 'message' => 'Data created successfully.']);

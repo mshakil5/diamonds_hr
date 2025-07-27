@@ -62,6 +62,7 @@
                             <th>Date</th>
                             <th>Asset Type</th>
                             <th>Product Code</th>
+                            <th>Asset No.</th>
                             <th>Status</th>
                             <th>Branch</th>
                             <th>Floor</th>
@@ -76,6 +77,7 @@
                                 <td>{{ \Carbon\Carbon::parse($row->stock->date)->format('d-m-Y') ?? '' }}</td>
                                 <td>{{ $row->assetType->name ?? '' }}</td>
                                 <td>{{ $row->product_code }}</td>
+                                <td>{{ $row->code ?? '' }}</td>
                                 <td>{{ $statuses[$row->asset_status] ?? 'N/A' }}</td>
                                 <td>{{ $row->branch->name ?? '' }}</td>
                                 <td>{{ $row->location->flooor->name ?? '' }}</td>

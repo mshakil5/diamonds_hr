@@ -75,6 +75,16 @@ class AssetStockController extends Controller
               $assetType->floor_id = $request->floor_id[$index] ?? null;
               $assetType->assigned_by = auth()->id();
               $assetType->created_by = auth()->id();
+              $assetTypeCode = AssetType::where('id', $request->asset_type_id)->value('code');
+              $assetTypeCode = $assetTypeCode ?: '1';
+              $maxCode = StockAssetType::where('code', 'like', $assetTypeCode . '%')->max('code');
+              if ($maxCode) {
+                  $suffix = (int)substr($maxCode, strlen($assetTypeCode));
+                  $suffix++;
+              } else {
+                  $suffix = 1;
+              }
+              $assetType->code = $assetTypeCode . str_pad($suffix, 7, '0', STR_PAD_LEFT);
               $assetType->save();
             }
           
@@ -134,7 +144,21 @@ class AssetStockController extends Controller
                 $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
                 $assetType->floor_id = $request->floor_id[$index] ?? null;
                 $assetType->assigned_by = auth()->id();
-                $assetType->created_by = auth()->id();
+                $assetType->updated_by = auth()->id();
+                $assetTypeCode = AssetType::where('id', $request->asset_type_id)->value('code');
+                $assetTypeCode = $assetTypeCode ?: '1';
+
+                $maxCode = StockAssetType::where('code', 'like', $assetTypeCode . '%')->max('code');
+
+                if ($maxCode) {
+                    $suffix = (int)substr($maxCode, strlen($assetTypeCode));
+                    $suffix++;
+                } else {
+                    $suffix = 1;
+                }
+
+                $assetType->code = $assetTypeCode . str_pad($suffix, 7, '0', STR_PAD_LEFT);
+
                 $assetType->save();
             }
         }
