@@ -150,7 +150,7 @@
                   </a>
               </li>
           </ul>
-          <ul class="nav nav-treeview">
+          <ul class="nav nav-treeview d-none">
               <li class="nav-item">
                   <a href="{{ route('assets') }}" class="nav-link {{ request()->routeIs('assets') ? 'active' : '' }}">
                     <i class="fas fa-list nav-icon"></i>

@@ -220,6 +220,8 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   Route::post('/floor-update', [FloorController::class, 'update']);
   Route::get('/floor/{id}', [FloorController::class, 'delete']);
   Route::post('/floor/update-status', [FloorController::class, 'updateStatus'])->name('floors.updateStatus');
+
+  Route::get('/stock/status/codes/{stock}/{status}', [StockController::class, 'printCodes'])->name('stock.codes.print');
         
 });
   

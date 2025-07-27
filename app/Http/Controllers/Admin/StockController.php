@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Stock;
 
 class StockController extends Controller
 {
@@ -105,4 +106,16 @@ class StockController extends Controller
 
         return true;
     }
+
+    public function printCodes($stockId, $status)
+    {
+        $stock = Stock::with(['stockAssetTypes' => function ($q) use ($status) {
+            $q->where('asset_status', $status);
+        }])->findOrFail($stockId);
+
+        $codes = $stock->stockAssetTypes;
+
+        return view('admin.stock.print-codes', compact('codes'));
+    }
+
 }

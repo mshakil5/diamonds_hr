@@ -500,7 +500,7 @@
                                         @if (auth()->user()->canDo(10))
                                         <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px; margin-right:8px;"></i></a>
                                         @endif
-                                        <a id="PayslipBtn" rid="{{ $data->id }}" title="Payslip"><i class="fa fa-file-text" style="color: #28a745; font-size:16px;"></i></a>
+                                        <a id="PayslipBtn" class="d-none" rid="{{ $data->id }}" title="Payslip"><i class="fa fa-file-text" style="color: #28a745; font-size:16px;"></i></a>
                                     </td>
                                 </tr>
                                 @endforeach

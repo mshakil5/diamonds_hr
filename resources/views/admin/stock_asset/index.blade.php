@@ -129,10 +129,50 @@
                                   <td>{{ $item->brand }}</td>
                                   <td>{{ $item->model }}</td>
                                   <td>{{ $item->quantity }}</td>
-                                  <td><a href="{{ route('stock.view.status', [$item->id, 1]) }}"><span class="badge bg-info">{{ $item->assigned_count }}</span></a></td>
-                                  <td><a href="{{ route('stock.view.status', [$item->id, 2]) }}"><span class="badge bg-primary">{{ $item->storage_count }}</span></a></td>
-                                  <td><a href="{{ route('stock.view.status', [$item->id, 3]) }}"><span class="badge bg-warning text-dark">{{ $item->repair_count }}</span></a></td>
-                                  <td><a href="{{ route('stock.view.status', [$item->id, 4]) }}"><span class="badge bg-danger">{{ $item->damaged_count }}</span></a></td>
+                                  <td><a href="{{ route('stock.view.status', [$item->id, 1]) }}"><span class="badge bg-info">{{ $item->assigned_count }}</span></a> 
+                                        @if ($item->assigned_count > 0) 
+                                        <a href="{{ route('stock.codes.print', [$item->id, 1]) }}" target="_blank" title="Print Codes">
+                                            <i class="fa fa-print text-secondary ml-2"></i>
+                                        </a>
+                                         @endif
+                                    <br>
+                                      @foreach($item->stockAssetTypes->where('asset_status', 1) as $code)
+                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                      @endforeach
+                                  </td>
+                                  <td><a href="{{ route('stock.view.status', [$item->id, 2]) }}"><span class="badge bg-primary">{{ $item->storage_count }}</span></a>
+                                        @if ($item->storage_count > 0)
+                                        <a href="{{ route('stock.codes.print', [$item->id, 2]) }}" target="_blank" title="Print Codes">
+                                            <i class="fa fa-print text-secondary ml-2"></i>
+                                        </a>
+                                         @endif
+                                    <br>
+                                      @foreach($item->stockAssetTypes->where('asset_status', 2) as $code)
+                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                      @endforeach
+                                  </td>
+                                  <td><a href="{{ route('stock.view.status', [$item->id, 3]) }}"><span class="badge bg-warning text-dark">{{ $item->repair_count }}</span></a>
+                                        @if ($item->repair_count > 0)  
+                                        <a href="{{ route('stock.codes.print', [$item->id, 3]) }}" target="_blank" title="Print Codes">
+                                            <i class="fa fa-print text-secondary ml-2"></i>
+                                        </a>
+                                         @endif
+                                    <br>
+                                      @foreach($item->stockAssetTypes->where('asset_status', 3) as $code)
+                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                      @endforeach
+                                  </td>
+                                  <td><a href="{{ route('stock.view.status', [$item->id, 4]) }}"><span class="badge bg-danger">{{ $item->damaged_count }}</span></a>
+                                        @if ($item->damaged_count > 0)
+                                        <a href="{{ route('stock.codes.print', [$item->id, 4]) }}" target="_blank" title="Print Codes">
+                                            <i class="fa fa-print text-secondary ml-2"></i>
+                                        </a>
+                                         @endif
+                                    <br>
+                                      @foreach($item->stockAssetTypes->where('asset_status', 4) as $code)
+                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                      @endforeach
+                                  </td>
                                   <td>
                                       <a id="EditBtn" rid="{{ $item->id }}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
                                       <a id="deleteBtn" rid="{{ $item->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>

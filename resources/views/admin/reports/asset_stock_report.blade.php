@@ -46,6 +46,18 @@
                     <button type="submit" class="btn btn-secondary btn-block mt-2"><i class="fa fa-search"></i> Filter</button>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-sm-3">
+                  
+                </div>
+                <div class="col-sm-4">
+                    <label>Asset No.</label>
+                    <input type="text" name="asset_no" class="form-control" value="{{ $request->asset_no }}">
+                </div>
+                <div class="col-sm-2 mt-4">
+                    <button type="submit" class="btn btn-secondary btn-block mt-2"><i class="fa fa-search"></i> Filter</button>
+                </div>
+            </div>
         </form>
     </div>
 </section>

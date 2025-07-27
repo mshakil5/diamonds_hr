@@ -295,6 +295,10 @@ class ReportController extends Controller
             $query->where('branch_id', $request->branch_id);
         }
 
+        if ($request->asset_no) {
+            $query->where('code', 'like', '%' . $request->asset_no . '%');
+        }
+
         $results = $query->get();
         // dd($results);
 

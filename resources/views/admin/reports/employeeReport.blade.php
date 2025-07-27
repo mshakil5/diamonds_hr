@@ -36,7 +36,9 @@
                                         <select class="form-control select2" id="employee_id" name="employee_id">
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
-                                            <option value="{{$employee->id}}">{{$employee->name}}</option>
+                                            <option value="{{ $employee->id }}" {{ request('employee_id') == $employee->id ? 'selected' : '' }}>
+                                                {{ $employee->name }}
+                                            </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -47,7 +49,7 @@
                                 <!-- text input -->
                                     <div class="form-group">
                                         <label>From Date</label>
-                                        <input type="date" class="form-control" id="from_date" name="from_date" value="">
+                                        <input type="date" class="form-control" id="from_date" name="from_date" value="{{ request('from_date') }}">
                                     </div>
                                 </div>
 
@@ -55,7 +57,7 @@
                                 <!-- text input -->
                                     <div class="form-group">
                                         <label>To Date</label>
-                                        <input type="date" class="form-control" id="to_date" name="to_date" value="">
+                                        <input type="date" class="form-control" id="to_date" name="to_date" value="{{ request('to_date') }}">
                                     </div>
                                 </div>
 
@@ -104,6 +106,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $totalSeconds = 0; @endphp
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{$key + 1}}</td>
@@ -114,22 +117,32 @@
                                     <td>
                                         @if($data->clock_in && $data->clock_out)
                                             @php
-                                                $diff = \Carbon\Carbon::parse($data->clock_out)->diff(\Carbon\Carbon::parse($data->clock_in));
-                                                $formatted = $diff->h . ' Hours ' . $diff->i . ' Minutes ' . $diff->s . ' Seconds';
+                                                $in = \Carbon\Carbon::parse($data->clock_in);
+                                                $out = \Carbon\Carbon::parse($data->clock_out);
+                                                $diff = $out->diff($in);
+                                                $totalSeconds += $out->diffInSeconds($in);
                                             @endphp
 
                                             <span style="background-color: #f0f8ff; padding: 6px 12px; border-radius: 20px; display: inline-block; color: #333;">
-                                                {{ $formatted }}
+                                                {{ $diff->h }} Hours {{ $diff->i }} Minutes {{ $diff->s }} Seconds
                                             </span>
                                         @else
-                                            <span style="background-color: #f8d7da; padding: 6px 12px; border-radius: 20px; display: inline-block; color: #721c24;">
-                                                N/A
-                                            </span>
+                                            -
                                         @endif
-
                                     </td>
                                 </tr>
                                 @endforeach
+
+                                @php
+                                    $h = floor($totalSeconds / 3600);
+                                    $m = floor(($totalSeconds % 3600) / 60);
+                                    $s = $totalSeconds % 60;
+                                @endphp
+
+                                <tr>
+                                    <td colspan="5" class="text-right"><strong>Total Time</strong></td>
+                                    <td><strong>{{ $h }}h {{ $m }}m {{ $s }}s</strong></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
