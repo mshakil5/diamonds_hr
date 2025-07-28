@@ -137,7 +137,7 @@
                                          @endif
                                     <br>
                                       @foreach($item->stockAssetTypes->where('asset_status', 1) as $code)
-                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                          <small>{{ $code->product_code }}</small>@if (!$loop->last),<br>@endif
                                       @endforeach
                                   </td>
                                   <td><a href="{{ route('stock.view.status', [$item->id, 2]) }}"><span class="badge bg-primary">{{ $item->storage_count }}</span></a>
@@ -148,7 +148,7 @@
                                          @endif
                                     <br>
                                       @foreach($item->stockAssetTypes->where('asset_status', 2) as $code)
-                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                          <small>{{ $code->product_code }}</small>@if (!$loop->last),<br>@endif
                                       @endforeach
                                   </td>
                                   <td><a href="{{ route('stock.view.status', [$item->id, 3]) }}"><span class="badge bg-warning text-dark">{{ $item->repair_count }}</span></a>
@@ -159,7 +159,7 @@
                                          @endif
                                     <br>
                                       @foreach($item->stockAssetTypes->where('asset_status', 3) as $code)
-                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                          <small>{{ $code->product_code }}</small>@if (!$loop->last),<br>@endif
                                       @endforeach
                                   </td>
                                   <td><a href="{{ route('stock.view.status', [$item->id, 4]) }}"><span class="badge bg-danger">{{ $item->damaged_count }}</span></a>
@@ -170,7 +170,7 @@
                                          @endif
                                     <br>
                                       @foreach($item->stockAssetTypes->where('asset_status', 4) as $code)
-                                          <small>{{ $code->code }}</small>@if (!$loop->last),<br>@endif
+                                          <small>{{ $code->product_code }}</small>@if (!$loop->last),<br>@endif
                                       @endforeach
                                   </td>
                                   <td>
@@ -211,27 +211,54 @@
 
         $('#quantity').on('input', function () {
             let qty = +$(this).val() || 0;
-            let html = '';
-
-            for (let i = 0; i < qty; i++) {
-                html += `
-                <div class="row mb-2 align-items-end">
-                    <div class="col-md-6">
-                        <input type="text" name="product_code[]" class="form-control" placeholder="Product Code">
-                    </div>
-                    <div class="col-md-6 status-wrap">
-                        <select name="asset_status[]" class="form-control asset-status">
-                            <option value="">Select Status</option>
-                            <option value="1">Assigned</option>
-                            <option value="2">In storage</option>
-                            <option value="3">Under Repair</option>
-                            <option value="4">Damaged</option>
-                        </select>
-                    </div>
-                </div>`;
+            let assetTypeId = $('#asset_type_id').val();
+            
+            if (!assetTypeId) {
+                alert('Please select an asset type first');
+                $(this).val('');
+                return;
             }
+            
+            $.get('/admin/get-latest-code/' + assetTypeId, function(response) {
+                if (response.status === 200) {
+                  console.log(assetTypeId);
+                  console.log(response);
+                    let lastNumber = response.lastNumber || 0;
+                    let html = '';
+                    
+                    for (let i = 1; i <= qty; i++) {
+                        let nextNumber = lastNumber + i;
+                        let paddedNumber = String(nextNumber).padStart(5, '0');
+                        let productCode = assetTypeId + '-' + paddedNumber;
+                        
+                        html += `
+                        <div class="row mb-2 align-items-end">
+                            <div class="col-md-6">
+                                <input type="text" name="product_code[]" class="form-control" 
+                                      value="${productCode}">
+                            </div>
+                            <div class="col-md-6 status-wrap">
+                                <select name="asset_status[]" class="form-control asset-status">
+                                    <option value="">Select Status</option>
+                                    <option value="1">Assigned</option>
+                                    <option value="2">In storage</option>
+                                    <option value="3">Under Repair</option>
+                                    <option value="4">Damaged</option>
+                                </select>
+                            </div>
+                        </div>`;
+                    }
+                    
+                    $('#dynamicRows').html(html);
+                } else {
+                    alert('Failed to generate product codes');
+                }
+            });
+        });
 
-            $('#dynamicRows').html(html);
+        $('#asset_type_id').on('change', function() {
+            $('#quantity').val('');
+            $('#dynamicRows').empty();
         });
 
         $(document).on('change', '.asset-status', function () {

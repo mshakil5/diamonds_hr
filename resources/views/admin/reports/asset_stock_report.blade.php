@@ -51,8 +51,8 @@
                   
                 </div>
                 <div class="col-sm-4">
-                    <label>Asset No.</label>
-                    <input type="text" name="asset_no" class="form-control" value="{{ $request->asset_no }}">
+                    <label>Product Code</label>
+                    <input type="text" name="product_code" class="form-control" value="{{ $request->product_code }}">
                 </div>
                 <div class="col-sm-2 mt-4">
                     <button type="submit" class="btn btn-secondary btn-block mt-2"><i class="fa fa-search"></i> Filter</button>
@@ -74,7 +74,7 @@
                             <th>Date</th>
                             <th>Asset Type</th>
                             <th>Product Code</th>
-                            <th>Asset No.</th>
+                            {{-- <th>Asset No.</th> --}}
                             <th>Status</th>
                             <th>Branch</th>
                             <th>Floor</th>
@@ -88,8 +88,8 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ \Carbon\Carbon::parse($row->stock->date)->format('d-m-Y') ?? '' }}</td>
                                 <td>{{ $row->assetType->name ?? '' }}</td>
-                                <td>{{ $row->product_code }}</td>
-                                <td>{{ $row->code ?? '' }}</td>
+                                <td>{{ $row->product_code ?? '' }}</td>
+                                {{-- <td>{{ $row->code ?? '' }}</td> --}}
                                 <td>{{ $statuses[$row->asset_status] ?? 'N/A' }}</td>
                                 <td>{{ $row->branch->name ?? '' }}</td>
                                 <td>{{ $row->location->flooor->name ?? '' }}</td>

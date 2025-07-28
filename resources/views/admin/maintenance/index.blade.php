@@ -49,17 +49,19 @@
         <table id="example1" class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th>Sl</th><th>Name</th><th>Phone</th><th>Email</th><th>Business</th><th>Status</th><th>Action</th>
+              <th>Sl</th><th>Date</th><th>Name</th><th>Phone</th><th>Email</th><th>Business</th><th>Description</th><th>Status</th><th>Action</th>
             </tr>
           </thead>
           <tbody>
             @foreach ($data as $i => $m)
             <tr>
               <td>{{$i+1}}</td>
+              <td>{{ \Carbon\Carbon::parse($m->date)->format('d-m-Y') }}</td>
               <td>{{$m->name}}</td>
               <td>{{$m->phone}}</td>
               <td>{{$m->email}}</td>
               <td>{{$m->business_name}}</td>
+              <td>{!! $m->description !!}</td>
               <td>
                 <div class="custom-control custom-switch">
                   <input type="checkbox" class="custom-control-input toggle-status" id="sw{{$m->id}}" data-id="{{$m->id}}"

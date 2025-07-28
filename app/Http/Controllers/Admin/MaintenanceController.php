@@ -11,7 +11,7 @@ class MaintenanceController extends Controller
 {
     public function index()
     {
-        $data = Maintenance::all();
+        $data = Maintenance::latest()->get();
         return view('admin.maintenance.index', compact('data'));
     }
 

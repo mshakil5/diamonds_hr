@@ -44,52 +44,67 @@ class AssetStockController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'date' => 'required',
-            'asset_type_id' => 'required',
-            'quantity' => 'required',
+            'asset_type_id' => 'required|numeric',
+            'quantity' => 'required|numeric|min:1'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
+        $assetTypeId = $request->asset_type_id;
+
+        $codes = collect($request->product_code);
+        $uniqueCodes = $codes->unique();
+
+        foreach ($codes as $code) {
+            if (!str_starts_with($code, $assetTypeId . '-')) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "Invalid format: $code (must start with {$assetTypeId}-)"
+                ]);
+            }
+
+            if ($codes->count() !== $uniqueCodes->count()) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "Duplicate product codes found in the form."
+                ]);
+            }
+
+            if (StockAssetType::where('product_code', $code)->exists()) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "Product code already exists: $code"
+                ]);
+            }
+        }
+
         $data = new Stock();
         $data->date = $request->date;
-        $data->asset_type_id = $request->asset_type_id;
+        $data->asset_type_id = $assetTypeId;
         $data->branch_id = auth()->user()->branch_id;
         $data->brand = $request->brand;
         $data->model = $request->model;
         $data->quantity = $request->quantity;
         $data->note = $request->note;
         $data->created_by = auth()->id();
-        if( $data->save()){
+        $data->save();
 
-            foreach ($request->product_code as $index => $code) {
-              $assetType = new StockAssetType();
-              $assetType->stock_id = $data->id;
-              $assetType->asset_type_id = $request->asset_type_id;
-              $assetType->product_code = $code;
-              $assetType->asset_status = $request->asset_status[$index] ?? null;
-              $assetType->branch_id = $request->branch_id[$index] ?? null;
-              $assetType->location_id = $request->location_id[$index] ?? null;
-              $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
-              $assetType->floor_id = $request->floor_id[$index] ?? null;
-              $assetType->assigned_by = auth()->id();
-              $assetType->created_by = auth()->id();
-              $assetTypeCode = AssetType::where('id', $request->asset_type_id)->value('code');
-              $assetTypeCode = $assetTypeCode ?: '1';
-              $maxCode = StockAssetType::where('code', 'like', $assetTypeCode . '%')->max('code');
-              if ($maxCode) {
-                  $suffix = (int)substr($maxCode, strlen($assetTypeCode));
-                  $suffix++;
-              } else {
-                  $suffix = 1;
-              }
-              $assetType->code = $assetTypeCode . str_pad($suffix, 7, '0', STR_PAD_LEFT);
-              $assetType->save();
-            }
-          
+        foreach ($request->product_code as $index => $code) {
+            $assetType = new StockAssetType();
+            $assetType->stock_id = $data->id;
+            $assetType->asset_type_id = $assetTypeId;
+            $assetType->product_code = $code;
+            $assetType->asset_status = $request->asset_status[$index] ?? null;
+            $assetType->branch_id = $request->branch_id[$index] ?? null;
+            $assetType->location_id = $request->location_id[$index] ?? null;
+            $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
+            $assetType->floor_id = $request->floor_id[$index] ?? null;
+            $assetType->assigned_by = auth()->id();
+            $assetType->created_by = auth()->id();
+            $assetType->save();
         }
-        
 
         return response()->json(['status' => 200, 'message' => 'Data created successfully.']);
     }
@@ -108,9 +123,9 @@ class AssetStockController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'date' => 'required',
-            'asset_type_id' => 'required',
-            'quantity' => 'required',
-            'codeid' => 'required',
+            'asset_type_id' => 'required|numeric',
+            'quantity' => 'required|numeric|min:1',
+            'codeid' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -122,45 +137,61 @@ class AssetStockController extends Controller
             return response()->json(['status' => 404, 'message' => 'Stock not found']);
         }
 
+        $assetTypeId = $request->asset_type_id;
+        $codes = collect($request->product_code);
+        $uniqueCodes = $codes->unique();
+
+        if ($codes->count() !== $uniqueCodes->count()) {
+            return response()->json([
+                'status' => 422,
+                'message' => "Duplicate product codes found in the form."
+            ]);
+        }
+
+        foreach ($codes as $code) {
+            if (!str_starts_with($code, $assetTypeId . '-')) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "Invalid format: $code (must start with {$assetTypeId}-)"
+                ]);
+            }
+
+            $exists = StockAssetType::where('product_code', $code)
+                ->where('stock_id', '!=', $data->id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "Product code already exists: $code"
+                ]);
+            }
+        }
+
         $data->date = $request->date;
-        $data->asset_type_id = $request->asset_type_id;
+        $data->asset_type_id = $assetTypeId;
         $data->brand = $request->brand;
         $data->model = $request->model;
         $data->quantity = $request->quantity;
         $data->note = $request->note;
         $data->updated_by = auth()->id();
+        $data->save();
 
-        if ($data->save()) {
-            StockAssetType::where('stock_id', $data->id)->delete();
+        StockAssetType::where('stock_id', $data->id)->delete();
 
-            foreach ($request->product_code as $index => $code) {
-                $assetType = new StockAssetType();
-                $assetType->stock_id = $data->id;
-                $assetType->asset_type_id = $request->asset_type_id;
-                $assetType->product_code = $code;
-                $assetType->asset_status = $request->asset_status[$index] ?? null;
-                $assetType->branch_id = $request->branch_id[$index] ?? null;
-                $assetType->location_id = $request->location_id[$index] ?? null;
-                $assetType->maintenance_id = $request->maintenance_id[$index] ?? null;
-                $assetType->floor_id = $request->floor_id[$index] ?? null;
-                $assetType->assigned_by = auth()->id();
-                $assetType->updated_by = auth()->id();
-                $assetTypeCode = AssetType::where('id', $request->asset_type_id)->value('code');
-                $assetTypeCode = $assetTypeCode ?: '1';
-
-                $maxCode = StockAssetType::where('code', 'like', $assetTypeCode . '%')->max('code');
-
-                if ($maxCode) {
-                    $suffix = (int)substr($maxCode, strlen($assetTypeCode));
-                    $suffix++;
-                } else {
-                    $suffix = 1;
-                }
-
-                $assetType->code = $assetTypeCode . str_pad($suffix, 7, '0', STR_PAD_LEFT);
-
-                $assetType->save();
-            }
+        foreach ($request->product_code as $index => $code) {
+            StockAssetType::create([
+                'stock_id' => $data->id,
+                'asset_type_id' => $assetTypeId,
+                'product_code' => $code,
+                'asset_status' => $request->asset_status[$index] ?? null,
+                'branch_id' => $request->branch_id[$index] ?? null,
+                'location_id' => $request->location_id[$index] ?? null,
+                'maintenance_id' => $request->maintenance_id[$index] ?? null,
+                'floor_id' => $request->floor_id[$index] ?? null,
+                'assigned_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
         }
 
         return response()->json(['status' => 200, 'message' => 'Data updated successfully.']);
@@ -192,6 +223,26 @@ class AssetStockController extends Controller
             ->get();
 
         return view('admin.stock_asset.view_status', compact('stock', 'assets', 'status'));
+    }
+
+    public function getLatestCode($assetTypeId)
+    {
+        $lastCode = StockAssetType::where('asset_type_id', $assetTypeId)
+            ->where('product_code', 'like', $assetTypeId . '-%')
+            ->orderByRaw("CAST(SUBSTRING_INDEX(product_code, '-', -1) AS UNSIGNED) DESC")
+            ->first();
+
+        $lastNumber = 0;
+
+        if ($lastCode && $lastCode->product_code) {
+            $codeParts = explode('-', $lastCode->product_code);
+            $lastNumber = isset($codeParts[1]) ? (int) $codeParts[1] : 0;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'lastNumber' => $lastNumber
+        ]);
     }
 
 }

@@ -205,6 +205,8 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
 
     Route::get('/get-locations/{branchId}/{floorId}', [LocationController::class, 'getLocationsByBranchAndFloor']);
 
+    Route::get('/get-latest-code/{assetTypeId}', [AssetStockController::class, 'getLatestCode']);
+
   // Assets crud
   Route::get('/asset', [AssetController::class, 'index'])->name('assets');
   Route::post('/asset', [AssetController::class, 'store']);

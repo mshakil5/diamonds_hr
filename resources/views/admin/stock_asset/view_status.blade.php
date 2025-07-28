@@ -22,7 +22,7 @@
                 <tr>
                   <th>SL</th>
                   <th>Product Code</th>
-                  <th>Asset No.</th>
+                  {{-- <th>Asset No.</th> --}}
                   @if(in_array($status, [1, 2]))
                     <th>Branch</th>
                     <th>Floor</th>
@@ -37,8 +37,8 @@
                 @foreach($assets as $key => $item)
                   <tr>
                     <td>{{ $key + 1 }}</td>
-                    <td>{{ $item->product_code }}</td>
-                    <td>{{ $item->code ?? '' }}</td>
+                    <td>{{ $item->product_code ?? '' }}</td>
+                    {{-- <td>{{ $item->code ?? '' }}</td> --}}
                     @if(in_array($status, [1, 2]))
                       <td>{{ $item->branch->name ?? 'N/A' }}</td>
                       <td>{{ $item->location->flooor->name ?? 'N/A' }}</td>

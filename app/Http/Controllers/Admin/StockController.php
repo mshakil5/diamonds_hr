@@ -126,14 +126,14 @@ class StockController extends Controller
     public function faultyProducts(Request $request)
     {
         $results = collect();
-        if ($request->has('asset_no')) {
+        if ($request->has('product_code')) {
           
-            if ($request->asset_no) {
+            if ($request->product_code) {
                 $results = StockAssetType::with(['stock', 'assetType', 'branch', 'location.flooor', 'maintenance'])
                     ->whereHas('stock', function ($q) {
                         $q->whereNotNull('id');
                     })
-                    ->where('code', 'like', '%' . $request->asset_no . '%')
+                    ->where('product_code', 'like', '%' . $request->product_code . '%')
                     ->get();
             }
         }

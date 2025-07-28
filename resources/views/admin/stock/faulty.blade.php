@@ -7,8 +7,8 @@
         <form method="GET" action="{{ route('faultyProducts') }}">
             <div class="row">
                 <div class="col-sm-4">
-                    <label>Asset No.</label>
-                    <input type="text" name="asset_no" class="form-control" value="{{ $request->asset_no }}" autofocus>
+                    <label>Product Code <span class="text-danger">*</span></label>
+                    <input type="text" name="product_code" class="form-control" value="{{ $request->product_code }}" autofocus>
                 </div>
                 <div class="col-sm-2 mt-4">
                     <button type="submit" class="btn btn-secondary mt-2"><i class="fa fa-search"></i> Filter</button>
@@ -30,7 +30,7 @@
                             <th>Date</th>
                             <th>Asset Type</th>
                             <th>Product Code</th>
-                            <th>Asset No.</th>
+                            {{-- <th>Asset No.</th> --}}
                             <th>Status</th>
                             <th>Branch</th>
                             <th>Floor</th>
@@ -46,7 +46,7 @@
                                 <td>{{ \Carbon\Carbon::parse($row->stock->date)->format('d-m-Y') ?? '' }}</td>
                                 <td>{{ $row->assetType->name ?? '' }}</td>
                                 <td>{{ $row->product_code }}</td>
-                                <td>{{ $row->code ?? '' }}</td>
+                                {{-- <td>{{ $row->code ?? '' }}</td> --}}
                                 <td>{{ $statuses[$row->asset_status] ?? 'N/A' }}</td>
                                 <td>{{ $row->branch->name ?? '' }}</td>
                                 <td>{{ $row->location->flooor->name ?? '' }}</td>
@@ -66,7 +66,7 @@
                                     <input type="hidden" name="id" value="{{ $row->id }}">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="statusModalLabel{{ $row->id }}">Update Status - {{ $row->code }}</h5>
+                                            <h5 class="modal-title" id="statusModalLabel{{ $row->id }}">Update Status - {{ $row->product_code }}</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                               <span aria-hidden="true">&times;</span>
                                             </button>

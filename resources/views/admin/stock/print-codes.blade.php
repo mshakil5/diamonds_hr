@@ -22,7 +22,7 @@
 <body onload="window.print()">
     <div class="grid">
         @foreach($codes as $code)
-            <div class="code-box">{{ $code->code }}</div>
+            <div class="code-box">{{ $code->product_code }}</div>
         @endforeach
     </div>
 </body>
