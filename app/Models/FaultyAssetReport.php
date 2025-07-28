@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class StockAssetType extends Model
+class FaultyAssetReport extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
-    public function stock()
+    public function assetType()
     {
-        return $this->belongsTo(Stock::class);
+        return $this->belongsTo(AssetType::class);
     }
 
-    public function location()
+    public function stockAssetType()
     {
-        return $this->belongsTo(Location::class);
+        return $this->belongsTo(StockAssetType::class);
     }
 
     public function branch()
@@ -26,14 +26,19 @@ class StockAssetType extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
     public function maintenance()
     {
         return $this->belongsTo(Maintenance::class);
     }
 
-    public function assetType()
+    public function employee()
     {
-        return $this->belongsTo(AssetType::class);
+        return $this->belongsTo(Employee::class);
     }
 
 }

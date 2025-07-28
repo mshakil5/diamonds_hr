@@ -198,7 +198,7 @@
 
         $("#addBtn").click(function() {
             if ($(this).val() == 'Create') {
-                var requiredFields = ['#product_id','#cloth_type', '#quantity', '#marks', '#details'];
+                var requiredFields = ['#product_id','#cloth_type', '#quantity', '#details'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val () === '') {
                         showError('Please fill all required fields.');
@@ -236,7 +236,7 @@
             }
 
             if ($(this).val() == 'Update') {
-                var requiredFields = ['#product_id','#cloth_type', '#quantity', '#marks', '#details'];
+                var requiredFields = ['#product_id','#cloth_type', '#quantity', '#details'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val () === '') {
                         showError('Please fill all required fields.');

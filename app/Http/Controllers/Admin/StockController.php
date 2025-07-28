@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Stock;
+use App\Models\StockAssetType;
+use App\Models\Branch;
+use App\Models\Floor;
+use App\Models\Maintenance;
+use App\Models\FaultyAssetReport;
 
 class StockController extends Controller
 {
@@ -118,4 +123,94 @@ class StockController extends Controller
         return view('admin.stock.print-codes', compact('codes'));
     }
 
+    public function faultyProducts(Request $request)
+    {
+        $results = collect();
+        if ($request->has('asset_no')) {
+          
+            if ($request->asset_no) {
+                $results = StockAssetType::with(['stock', 'assetType', 'branch', 'location.flooor', 'maintenance'])
+                    ->whereHas('stock', function ($q) {
+                        $q->whereNotNull('id');
+                    })
+                    ->where('code', 'like', '%' . $request->asset_no . '%')
+                    ->get();
+            }
+        }
+
+        $statuses = [
+            1 => 'Assigned',
+            2 => 'In Storage',
+            3 => 'Under Repair',
+            4 => 'Damaged',
+        ];
+
+        $branches = Branch::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
+        $maintenances = Maintenance::where('status', 1)->get();
+
+        $reports = FaultyAssetReport::with([
+            'assetType',
+            'stockAssetType.stock',
+            'branch',
+            'location.flooor',
+            'maintenance',
+            'employee'
+        ])->latest()->get();
+
+        return view('admin.stock.faulty', compact('results', 'request', 'statuses', 'branches', 'floors', 'maintenances', 'reports'));
+    }
+
+    public function updateFaultyStatus(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:stock_asset_types,id',
+            'asset_status' => 'required|in:1,2,3,4',
+            'branch_id' => 'nullable|exists:branches,id',
+            'floor_id' => 'nullable|exists:floors,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'maintenance_id' => 'nullable|exists:maintenances,id',
+            'note' => 'nullable|string',
+        ]);
+
+        $asset = StockAssetType::findOrFail($request->id);
+
+        $updateData = [
+            'asset_status' => $request->asset_status
+        ];
+
+        if (in_array($request->asset_status, [1, 2])) {
+            $updateData['branch_id'] = $request->branch_id;
+            $updateData['floor_id'] = $request->floor_id;
+            $updateData['location_id'] = $request->location_id;
+            $updateData['maintenance_id'] = null;
+        } elseif ($request->asset_status == 3) {
+            $updateData['branch_id'] = null;
+            $updateData['floor_id'] = null;
+            $updateData['location_id'] = null;
+            $updateData['maintenance_id'] = $request->maintenance_id;
+        } else {
+            $updateData['branch_id'] = null;
+            $updateData['floor_id'] = null;
+            $updateData['location_id'] = null;
+            $updateData['maintenance_id'] = null;
+        }
+
+        $asset->update($updateData);
+
+        FaultyAssetReport::create([
+            'date' => now()->format('Y-m-d'),
+            'asset_type_id' => $asset->asset_type_id,
+            'stock_asset_type_id' => $asset->id,
+            'branch_id' => $updateData['branch_id'],
+            'location_id' => $updateData['location_id'],
+            'maintenance_id' => $updateData['maintenance_id'],
+            'employee_id' => null,
+            'status' => $request->asset_status,
+            'note' => $request->note,
+            'created_by' => auth()->id(),
+        ]);
+
+        return response()->json(['status' => 200, 'message' => 'Status updated successfully']);
+    }
 }

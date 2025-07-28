@@ -222,6 +222,8 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   Route::post('/floor/update-status', [FloorController::class, 'updateStatus'])->name('floors.updateStatus');
 
   Route::get('/stock/status/codes/{stock}/{status}', [StockController::class, 'printCodes'])->name('stock.codes.print');
-        
+
+  Route::get('/faulty-products', [StockController::class, 'faultyProducts'])->name('faultyProducts');
+  Route::post('/update-faulty-status', [StockController::class, 'updateFaultyStatus'])->name('admin.updateFaultyStatus');
 });
   
