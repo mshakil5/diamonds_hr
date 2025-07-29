@@ -10,8 +10,6 @@ use Spatie\Activitylog\LogOptions;
 class EmployeePreRota extends Model
 {
     use HasFactory;
-
-    use HasFactory;
     use LogsActivity;
     protected $table = 'employee_pre_rota';
     protected $fillable = ['employee_id', 'branch_id', 'pre_rota_id'];

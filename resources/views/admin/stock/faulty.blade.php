@@ -75,13 +75,15 @@
                                             <div class="form-group">
                                                 <label>Status <span class="text-danger">*</span></label>
                                                 <select class="form-control asset-status-select" name="asset_status" required>
-                                                    @foreach($statuses as $k => $v)
+                                                    {{-- @foreach($statuses as $k => $v)
                                                         <option value="{{ $k }}" {{ $row->asset_status == $k ? 'selected' : '' }}>{{ $v }}</option>
-                                                    @endforeach
+                                                    @endforeach --}}
+                                                      <option value="4" selected>Damaged</option>
+                                                      <option value="5" selected>Reported</option>
                                                 </select>
                                             </div>
                                             
-                                            <div class="branch-fields" style="display: {{ in_array($row->asset_status, [1,2]) ? 'block' : 'none' }};">
+                                            {{-- <div class="branch-fields" style="display: {{ in_array($row->asset_status, [1,2]) ? 'block' : 'none' }};">
                                                 <div class="form-group">
                                                     <label>Branch <span class="text-danger">*</span></label>
                                                     <select class="form-control branch-select" name="branch_id">
@@ -111,9 +113,9 @@
                                                         @endif
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             
-                                            <div class="maintenance-field" style="display: {{ $row->asset_status == 3 ? 'block' : 'none' }};">
+                                            {{-- <div class="maintenance-field" style="display: {{ $row->asset_status == 3 ? 'block' : 'none' }};">
                                                 <div class="form-group">
                                                     <label>Maintenance <span class="text-danger">*</span></label>
                                                     <select class="form-control" name="maintenance_id">
@@ -123,7 +125,7 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             
                                             <div class="form-group">
                                                 <label>Note</label>
@@ -176,7 +178,14 @@
                             <td>{{ $report->assetType->name ?? '' }}</td>
                             <td>{{ $report->stockAssetType->code ?? '' }}</td>
                             <td>
-                                @php $statuses = [1=>'Assigned', 2=>'In Storage', 3=>'Under Repair', 4=>'Damaged']; @endphp
+                                @php 
+                                  $statuses = [
+                                    1=>'Assigned', 
+                                    2=>'In Storage', 
+                                    3=>'Under Repair', 
+                                    4=>'Damaged', 
+                                    5=>'Reported']; 
+                                @endphp
                                 <span class="badge badge-info">{{ $statuses[$report->status] ?? 'N/A' }}</span>
                             </td>
                             <td>{{ $report->branch->name ?? '-' }}</td>

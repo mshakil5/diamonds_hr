@@ -143,6 +143,7 @@ class StockController extends Controller
             2 => 'In Storage',
             3 => 'Under Repair',
             4 => 'Damaged',
+            5 => 'Reported',
         ];
 
         $branches = Branch::where('status', 1)->get();
@@ -165,7 +166,7 @@ class StockController extends Controller
     {
         $request->validate([
             'id' => 'required|exists:stock_asset_types,id',
-            'asset_status' => 'required|in:1,2,3,4',
+            'asset_status' => 'required|in:1,2,3,4,5',
             'branch_id' => 'nullable|exists:branches,id',
             'floor_id' => 'nullable|exists:floors,id',
             'location_id' => 'nullable|exists:locations,id',
@@ -198,6 +199,7 @@ class StockController extends Controller
 
         $asset->update($updateData);
 
+        if ($request->asset_status == 4) {
         FaultyAssetReport::create([
             'date' => now()->format('Y-m-d'),
             'asset_type_id' => $asset->asset_type_id,
@@ -210,6 +212,7 @@ class StockController extends Controller
             'note' => $request->note,
             'created_by' => auth()->id(),
         ]);
+        }
 
         return response()->json(['status' => 200, 'message' => 'Status updated successfully']);
     }

@@ -35,6 +35,7 @@ class AssetStockController extends Controller
             $stock->storage_count = $stock->stockAssetTypes->where('asset_status', 2)->count();
             $stock->repair_count = $stock->stockAssetTypes->where('asset_status', 3)->count();
             $stock->damaged_count = $stock->stockAssetTypes->where('asset_status', 4)->count();
+            $stock->reported_count = $stock->stockAssetTypes->where('asset_status', 5)->count();
         }
 
         return view('admin.stock_asset.index', compact('data', 'assetTypes', 'locations', 'branches', 'maintainances', 'floors'));
@@ -222,7 +223,19 @@ class AssetStockController extends Controller
             ->where('asset_status', $status)
             ->get();
 
-        return view('admin.stock_asset.view_status', compact('stock', 'assets', 'status'));
+        $branches = Branch::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
+        $maintenances = Maintenance::where('status', 1)->get();
+
+        $statuses = [
+            1 => 'Assigned',
+            2 => 'In Storage',
+            3 => 'Under Repair',
+            4 => 'Damaged',
+            5 => 'Reported',
+        ];
+
+        return view('admin.stock_asset.view_status', compact('stock', 'assets', 'status', 'branches', 'floors', 'maintenances', 'statuses'));
     }
 
     public function getLatestCode($assetTypeId)

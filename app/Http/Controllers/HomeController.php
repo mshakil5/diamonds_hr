@@ -11,6 +11,10 @@ use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StockAssetType;
+use App\Models\Branch;
+use App\Models\Floor;
+use App\Models\Maintenance;
 
 class HomeController extends Controller
 {
@@ -67,8 +71,25 @@ class HomeController extends Controller
         $totalHours = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->count();
         $todayAttendance = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->get();
 
+        $assets = StockAssetType::with(['location.flooor', 'branch', 'maintenance', 'stock.assetType'])
+        ->where('asset_status', 5)
+        ->get();
 
-        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours'));
+        $branches = Branch::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
+        $maintenances = Maintenance::where('status', 1)->get();
+
+        $statuses = [
+            1 => 'Assigned',
+            2 => 'In Storage',
+            3 => 'Under Repair',
+            4 => 'Damaged',
+            5 => 'Reported',
+        ];
+
+        $status = 5;
+
+        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status'));
     }
   
     /**

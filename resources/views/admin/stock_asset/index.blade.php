@@ -116,6 +116,7 @@
                                   <th>In storage</th>
                                   <th>Under Repair</th>
                                   <th>Damaged</th>
+                                  <th>Reported</th>
                                   <th>Action</th>
                               </tr>
                           </thead>
@@ -170,6 +171,17 @@
                                          @endif
                                     <br>
                                       @foreach($item->stockAssetTypes->where('asset_status', 4) as $code)
+                                          <small>{{ $code->product_code }}</small>@if (!$loop->last),<br>@endif
+                                      @endforeach
+                                  </td>
+                                  <td><a href="{{ route('stock.view.status', [$item->id, 5]) }}"><span class="badge bg-success">{{ $item->reported_count }}</span></a>
+                                        @if ($item->reported_count > 0)
+                                        <a href="{{ route('stock.codes.print', [$item->id, 5]) }}" target="_blank" title="Print Codes">
+                                            <i class="fa fa-print text-secondary ml-2"></i>
+                                        </a>
+                                         @endif
+                                    <br>
+                                      @foreach($item->stockAssetTypes->where('asset_status', 5) as $code)
                                           <small>{{ $code->product_code }}</small>@if (!$loop->last),<br>@endif
                                       @endforeach
                                   </td>
