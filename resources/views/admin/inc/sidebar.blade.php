@@ -65,7 +65,7 @@
 
       @if (auth()->user()->canDo([14, 15, 16]))
       <li class="nav-item">
-        <a href="{{route('attendance.index')}}" class="nav-link {{ (request()->is('admin/attendance*')) ? 'active' : '' }}">
+        <a href="{{route('attendance.index')}}" class="nav-link bg-warning {{ (request()->is('admin/attendance*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
           <p>
             Attendance
@@ -83,7 +83,7 @@
 
       @if (auth()->user()->canDo([17, 18, 19]))
       <li class="nav-item">
-        <a href="{{route('products.index')}}" class="nav-link {{ (request()->is('admin/products*')) ? 'active' : '' }}">
+        <a href="{{route('products.index')}}" class="nav-link bg-info {{ (request()->is('admin/products*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
           <p>
             Product Laundry
@@ -104,7 +104,7 @@
       @endif
 
       <li class="nav-item dropdown {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') || request()->routeIs('maintenance.index') || request()->routeIs('floors') || request()->routeIs('faultyProducts') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') || request()->routeIs('maintenance.index') || request()->routeIs('floors') || request()->routeIs('faultyProducts') ? 'active' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle bg-success {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') || request()->routeIs('maintenance.index') || request()->routeIs('floors') || request()->routeIs('faultyProducts') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
               <p>
                   Asset<i class="fas fa-angle-left right"></i>

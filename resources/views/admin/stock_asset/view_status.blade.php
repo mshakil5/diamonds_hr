@@ -12,7 +12,7 @@
               $statusLabel = [1 => 'Assigned', 2 => 'In Storage', 3 => 'Under Repair', 4 => 'Damaged', 5 => 'Reported'];
             @endphp
             <h3 class="card-title">
-              {{ $stock->assetType->name ?? 'N/A' }} - Status: {{ $statusLabel[$status] ?? 'Unknown' }}
+              {{ $stock->assetType->name ?? 'All Stock' }} - Status: {{ $statusLabel[$status] ?? 'Unknown' }}
             </h3>
           </div>
 
@@ -22,6 +22,7 @@
                 <tr>
                   <th>SL</th>
                   <th>Product Code</th>
+                  <th>Status</th>
                   {{-- <th>Asset No.</th> --}}
                   @if(in_array($status, [1, 2]))
                     <th>Branch</th>
@@ -39,6 +40,7 @@
                   <tr>
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $item->product_code ?? '' }}</td>
+                    <td>{{ $statusLabel[$item->asset_status] ?? 'Unknown' }}</td>
                     {{-- <td>{{ $item->code ?? '' }}</td> --}}
                     @if(in_array($status, [1, 2]))
                       <td>{{ $item->branch->name ?? 'N/A' }}</td>

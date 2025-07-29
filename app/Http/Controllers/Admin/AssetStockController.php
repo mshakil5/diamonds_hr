@@ -214,14 +214,18 @@ class AssetStockController extends Controller
         return response()->json(['status' => 200, 'message' => 'Data deleted successfully.']);
     }
 
-    public function viewByStatus($stockId, $status)
+    public function viewByStatus($status, $stockId = null)
     {
-        $stock = Stock::with('assetType')->findOrFail($stockId);
+        $stock = null;
+        if ($stockId) {
+            $stock = Stock::with('assetType')->findOrFail($stockId);
+        }
 
-        $assets = StockAssetType::with(['location.flooor', 'branch', 'maintenance'])
-            ->where('stock_id', $stockId)
-            ->where('asset_status', $status)
-            ->get();
+        $query = StockAssetType::with(['location.flooor', 'branch', 'maintenance']);
+        if ($stockId) {
+            $query->where('stock_id', $stockId);
+        }
+        $assets = $query->where('asset_status', $status)->get();
 
         $branches = Branch::where('status', 1)->get();
         $floors = Floor::where('status', 1)->get();

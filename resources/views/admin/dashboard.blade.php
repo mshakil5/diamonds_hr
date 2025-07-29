@@ -69,6 +69,47 @@
               </div>
             </div>
           </div>
+
+          @php
+            $statusLabels = [
+                1 => 'Assigned',
+                2 => 'In Storage',
+                3 => 'Under Repair',
+                4 => 'Damaged',
+                5 => 'Reported',
+            ];
+
+            $statusColors = [
+                1 => 'bg-success',
+                2 => 'bg-primary',
+                3 => 'bg-warning',
+                4 => 'bg-danger',
+                5 => 'bg-secondary',
+            ];
+          @endphp
+
+          @foreach ($statusLabels as $key => $label)
+            <div class="col-lg-3 col-md-4 col-6 mb-3">
+              @php
+                $params = ['status' => $key];
+                if (!empty($stock?->id)) {
+                    $params['stock'] = $stock->id;
+                }
+              @endphp
+              <a href="{{ route('stock.view.status', $params) }}" class="text-decoration-none">
+                <div class="small-box {{ $statusColors[$key] }} rounded shadow-sm">
+                  <div class="inner">
+                    <h3 class="text-white font-weight-bold">{{ $statusCounts[$key] ?? 0 }}</h3>
+                    <p class="text-white m-0">{{ $label }}</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-box"></i>
+                  </div>
+                </div>
+              </a>
+            </div>
+          @endforeach
+
           <!-- ./col -->
           
         </div>

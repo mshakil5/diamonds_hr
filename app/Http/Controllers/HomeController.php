@@ -88,8 +88,11 @@ class HomeController extends Controller
         ];
 
         $status = 5;
+        $statusCounts = StockAssetType::selectRaw('asset_status, COUNT(*) as total')
+        ->groupBy('asset_status')
+        ->pluck('total', 'asset_status');
 
-        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status'));
+        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status', 'statusCounts'));
     }
   
     /**

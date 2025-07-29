@@ -81,7 +81,6 @@
                     </div>
                     <div class="card-footer">
                         <button type="submit" id="addBtn" class="btn btn-secondary" value="Create">Create</button>
-                        <button type="submit" id="FormCloseBtn" class="btn btn-default">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -128,7 +127,7 @@
                                         <a id="EditBtn" rid="{{ $data->id }}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
                                         @endif
                                         @if (auth()->user()->canDo(13))
-                                        {{-- <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a> --}}
+                                        <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
                                         @endif
                                     </td>
                                 </tr>
