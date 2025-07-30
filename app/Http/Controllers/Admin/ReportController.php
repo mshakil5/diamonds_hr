@@ -161,103 +161,189 @@ class ReportController extends Controller
 
 
 
+    // public function dirtyStockReport(Request $request)
+    // {
+    //     // Initialize variables
+    //     $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::today()->endOfDay();
+    //     $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : $endDate->copy()->subDays(9)->startOfDay();
+
+    //     // Validate date range
+    //     $request->validate([
+    //         'start_date' => 'nullable|date',
+    //         'end_date' => 'nullable|date|after_or_equal:start_date',
+    //     ]);
+
+    //     // Ensure the date range is exactly 10 days
+    //     if ($endDate->diffInDays($startDate) > 9) {
+    //         $startDate = $endDate->copy()->subDays(9)->startOfDay();
+    //     }
+
+    //     // Get branch name
+    //     $branch = Branch::find(Auth::user()->branch_id);
+    //     $branchName = $branch ? $branch->name : 'Unknown Branch';
+
+    //     // Get all products with names
+    //     $products = Stockmaintaince::with('product')
+    //         ->select('product_id')
+    //         ->distinct()
+    //         ->where('branch_id', Auth::user()->branch_id)
+    //         ->where('cloth_type', 'Dirty')
+    //         ->get()
+    //         ->pluck('product');
+
+    //     // Initialize report data
+    //     $reportData = [
+    //         'days' => [],
+    //         'total_sum' => 0,
+    //     ];
+
+    //     // Create a period for the last 10 days
+    //     $period = CarbonPeriod::create($startDate, '1 day', $endDate);
+
+    //     // Initialize days array
+    //     $days = [];
+    //     foreach ($period as $date) {
+    //         $dateStr = $date->format('Y-m-d');
+    //         $days[$dateStr] = [
+    //             'date' => $date->copy(),
+    //             'quantities' => [],
+    //             'total' => 0,
+    //         ];
+    //     }
+
+    //     // Get stock data for the date range
+    //     $stockData = Stockmaintaince::where('branch_id', Auth::user()->branch_id)
+    //         ->where('cloth_type', 'Dirty')
+    //         ->whereBetween('date', [$startDate, $endDate])
+    //         ->selectRaw('product_id, DATE(date) as stock_date, SUM(quantity) as total_quantity')
+    //         ->groupBy('product_id', 'stock_date')
+    //         ->get();
+
+    //     // Process stock data
+    //     $productTotals = [];
+    //     foreach ($stockData as $stock) {
+    //         $stockDate = Carbon::parse($stock->stock_date)->format('Y-m-d');
+    //         if (isset($days[$stockDate])) {
+    //             $quantity = (int) $stock->total_quantity; // Cast to integer to avoid type errors
+    //             $days[$stockDate]['quantities'][$stock->product_id] = $quantity;
+    //             $days[$stockDate]['total'] += $quantity;
+    //             $reportData['total_sum'] += $quantity;
+
+    //             // Track total per product
+    //             if (!isset($productTotals[$stock->product_id])) {
+    //                 $productTotals[$stock->product_id] = 0;
+    //             }
+    //             $productTotals[$stock->product_id] += $quantity;
+    //         }
+    //     }
+
+    //     $reportData['days'] = $days;
+    //     $reportData['product_totals'] = $productTotals;
+
+    //     // Handle PDF download
+    //     if ($request->has('download')) {
+    //         $pdf = PDF::loadView('admin.reports.dirtyStockReportPdf', compact(
+    //             'reportData',
+    //             'products',
+    //             'startDate',
+    //             'endDate',
+    //             'branchName'
+    //         ));
+    //         return $pdf->download('Dirty_Stock_Report_' . $branchName . '_' . $startDate->format('Y-m-d') . '_to_' . $endDate->format('Y-m-d') . '.pdf');
+    //     }
+
+    //     return view('admin.reports.dirtyStockReport', compact(
+    //         'reportData',
+    //         'products',
+    //         'startDate',
+    //         'endDate',
+    //         'branchName'
+    //     ));
+    // }
+
     public function dirtyStockReport(Request $request)
     {
-        // Initialize variables
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::today()->endOfDay();
         $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : $endDate->copy()->subDays(9)->startOfDay();
 
-        // Validate date range
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
 
-        // Ensure the date range is exactly 10 days
         if ($endDate->diffInDays($startDate) > 9) {
             $startDate = $endDate->copy()->subDays(9)->startOfDay();
         }
 
-        // Get branch name
         $branch = Branch::find(Auth::user()->branch_id);
         $branchName = $branch ? $branch->name : 'Unknown Branch';
 
-        // Get all products with names
-        $products = Stockmaintaince::with('product')
-            ->select('product_id')
-            ->distinct()
-            ->where('branch_id', Auth::user()->branch_id)
-            ->where('cloth_type', 'Dirty')
-            ->get()
-            ->pluck('product');
+        $types = ['Dirty', 'Rejected'];
+        $reports = [];
 
-        // Initialize report data
-        $reportData = [
-            'days' => [],
-            'total_sum' => 0,
-        ];
+        foreach ($types as $type) {
+            $products = Stockmaintaince::with('product')
+                ->select('product_id')
+                ->distinct()
+                ->where('branch_id', Auth::user()->branch_id)
+                ->where('cloth_type', $type)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->get()
+                ->pluck('product');
 
-        // Create a period for the last 10 days
-        $period = CarbonPeriod::create($startDate, '1 day', $endDate);
+            $period = CarbonPeriod::create($startDate, '1 day', $endDate);
+            $days = [];
+            foreach ($period as $date) {
+                $key = $date->format('Y-m-d');
+                $days[$key] = [
+                    'date' => $date->copy(),
+                    'quantities' => [],
+                    'total' => 0,
+                ];
+            }
 
-        // Initialize days array
-        $days = [];
-        foreach ($period as $date) {
-            $dateStr = $date->format('Y-m-d');
-            $days[$dateStr] = [
-                'date' => $date->copy(),
-                'quantities' => [],
-                'total' => 0,
+            $stockData = Stockmaintaince::where('branch_id', Auth::user()->branch_id)
+                ->where('cloth_type', $type)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->selectRaw('product_id, DATE(date) as stock_date, SUM(quantity) as total_quantity')
+                ->groupBy('product_id', 'stock_date')
+                ->get();
+
+            $productTotals = [];
+            $totalSum = 0;
+
+            foreach ($stockData as $stock) {
+                $dateKey = Carbon::parse($stock->stock_date)->format('Y-m-d');
+                if (isset($days[$dateKey])) {
+                    $qty = (int) $stock->total_quantity;
+                    $days[$dateKey]['quantities'][$stock->product_id] = $qty;
+                    $days[$dateKey]['total'] += $qty;
+                    $totalSum += $qty;
+
+                    if (!isset($productTotals[$stock->product_id])) {
+                        $productTotals[$stock->product_id] = 0;
+                    }
+                    $productTotals[$stock->product_id] += $qty;
+                }
+            }
+
+            $reports[$type] = [
+                'products' => $products,
+                'days' => $days,
+                'product_totals' => $productTotals,
+                'total_sum' => $totalSum,
             ];
         }
 
-        // Get stock data for the date range
-        $stockData = Stockmaintaince::where('branch_id', Auth::user()->branch_id)
-            ->where('cloth_type', 'Dirty')
-            ->whereBetween('date', [$startDate, $endDate])
-            ->selectRaw('product_id, DATE(date) as stock_date, SUM(quantity) as total_quantity')
-            ->groupBy('product_id', 'stock_date')
-            ->get();
-
-        // Process stock data
-        $productTotals = [];
-        foreach ($stockData as $stock) {
-            $stockDate = Carbon::parse($stock->stock_date)->format('Y-m-d');
-            if (isset($days[$stockDate])) {
-                $quantity = (int) $stock->total_quantity; // Cast to integer to avoid type errors
-                $days[$stockDate]['quantities'][$stock->product_id] = $quantity;
-                $days[$stockDate]['total'] += $quantity;
-                $reportData['total_sum'] += $quantity;
-
-                // Track total per product
-                if (!isset($productTotals[$stock->product_id])) {
-                    $productTotals[$stock->product_id] = 0;
-                }
-                $productTotals[$stock->product_id] += $quantity;
-            }
-        }
-
-        $reportData['days'] = $days;
-        $reportData['product_totals'] = $productTotals;
-
-        // Handle PDF download
         if ($request->has('download')) {
             $pdf = PDF::loadView('admin.reports.dirtyStockReportPdf', compact(
-                'reportData',
-                'products',
-                'startDate',
-                'endDate',
-                'branchName'
+                'reports', 'startDate', 'endDate', 'branchName'
             ));
-            return $pdf->download('Dirty_Stock_Report_' . $branchName . '_' . $startDate->format('Y-m-d') . '_to_' . $endDate->format('Y-m-d') . '.pdf');
+            return $pdf->download('Dirty_Rejected_Stock_Report_' . $branchName . '_' . $startDate->format('Y-m-d') . '_to_' . $endDate->format('Y-m-d') . '.pdf');
         }
 
         return view('admin.reports.dirtyStockReport', compact(
-            'reportData',
-            'products',
-            'startDate',
-            'endDate',
-            'branchName'
+            'reports', 'startDate', 'endDate', 'branchName'
         ));
     }
 

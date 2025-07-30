@@ -170,7 +170,7 @@
       
       @if (auth()->user()->canDo([23, 24, 25, 26]))
       <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') ? 'active' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle bg-primary {{ request()->is('admin/blogs*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
               <p>
                   Report <i class="fas fa-angle-left right"></i>

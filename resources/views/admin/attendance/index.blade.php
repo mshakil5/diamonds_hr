@@ -184,6 +184,7 @@
                                                         <th>Time In</th>
                                                         <th>Time Out</th>
                                                         <th>Late</th>
+                                                        <th>Early Leave</th>
                                                         <th>Total Time</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -202,7 +203,8 @@
                                                         <td>{{ $data->type }}</td>
                                                         <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('H:i:s') }}</td>
                                                         <td>{{ $data->clock_out ? \Carbon\Carbon::parse($data->clock_out)->format('H:i:s') : Null }}</td>
-                                                        <td></td>
+                                                        <td>{{ $data->late }}</td>
+                                                        <td>{{ $data->early_leave }}</td>
                                                         <td>{{ $diff ? $diff->format('%H:%I:%S') : '-' }} </td>
                                                         <td>
                                                             <a id="DetailsBtn"
