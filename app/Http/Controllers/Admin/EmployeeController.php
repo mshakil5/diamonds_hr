@@ -299,4 +299,101 @@ class EmployeeController extends Controller
     }
 
 
+    // check employee prorota data is available or not then show
+
+    public function checkProrota(Request $request)
+    {
+        // Validate inputs
+        $employeeId = $request->employee_id;
+        $fromDate = $request->from_date;
+        $toDate = $request->to_date;
+
+        if (!$employeeId || !$fromDate || !$toDate) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Employee ID, from date, and to date are required.'
+            ], 400);
+        }
+
+        // Ensure dates are valid
+        try {
+            $fromDate = Carbon::parse($fromDate)->startOfDay();
+            $toDate = Carbon::parse($toDate)->endOfDay();
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid date format for from_date or to_date.'
+            ], 400);
+        }
+
+        // Query employee_pre_rotas joined with pre_rotas for overlapping schedules
+        try {
+            $prorotaData = DB::table('employee_pre_rotas')
+                ->join('pre_rotas', 'employee_pre_rotas.pre_rota_id', '=', 'pre_rotas.id')
+                ->where('employee_pre_rotas.employee_id', $employeeId)
+                ->where(function ($query) use ($fromDate, $toDate) {
+                    $query->whereBetween('pre_rotas.start_date', [$fromDate, $toDate])
+                        ->orWhereBetween('pre_rotas.end_date', [$fromDate, $toDate])
+                        ->orWhere(function ($query) use ($fromDate, $toDate) {
+                            $query->where('pre_rotas.start_date', '<=', $fromDate)
+                                    ->where('pre_rotas.end_date', '>=', $toDate);
+                        });
+                })
+                ->select('pre_rotas.start_date', 'pre_rotas.end_date', 'pre_rotas.start_time', 'pre_rotas.end_time')
+                ->get();
+
+            // If no pre-rota data is found
+            if ($prorotaData->isEmpty()) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'No pre-rota schedules found for this employee in the specified date range.'
+                ], 404);
+            }
+
+            // Process affected dates and hours
+            $affectedData = $prorotaData->map(function ($rota) use ($fromDate, $toDate) {
+                $startDate = Carbon::parse($rota->start_date)->max($fromDate);
+                $endDate = Carbon::parse($rota->end_date)->min($toDate);
+                $days = $startDate->diffInDays($endDate) + 1;
+
+                // Calculate hours between start_time and end_time for each day
+                $startTime = Carbon::parse($rota->start_time);
+                $endTime = Carbon::parse($rota->end_time);
+
+                // Handle overnight shifts
+                if ($endTime->lt($startTime)) {
+                    $endTime->addDay();
+                }
+
+                $hoursPerDay = $startTime->diffInHours($endTime, true);
+                $totalHours = $hoursPerDay * $days;
+
+                return [
+                    'start_date' => $startDate->toDateString(),
+                    'end_date' => $endDate->toDateString(),
+                    'days' => $days,
+                    'hours' => round($totalHours, 2),
+                    'start_time' => $startTime->toTimeString(),
+                    'end_time' => $rota->end_time
+                ];
+            });
+
+            // Sum total hours
+            $totalHours = $affectedData->sum('hours');
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Pre-rota schedules found.',
+                'data' => $affectedData,
+                'total_hours' => round($totalHours, 2)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while fetching pre-rota data.'
+            ], 500);
+        }
+    }
+
+
 }

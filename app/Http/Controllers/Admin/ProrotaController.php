@@ -70,24 +70,16 @@ class ProrotaController extends Controller
                     ->whereDate('date', $request->start_date)
                     ->count();
 
-                \Log::info('Holiday Check for Employee ID:', [
-                    'employee_id' => $employeeId,
-                    'date' => $request->start_date,
-                    'holiday_count' => $holiday
-                ]);
+                
 
                 if (!$holiday) {
                     $employeeIds[] = $employeeId;
                 }
             }
 
-            // Log filtered employee IDs
-            \Log::info('Filtered Employee IDs:', $employeeIds);
-
             // Attach employees to the pivot table
             if (!empty($employeeIds)) {
                 $preRota->employees()->attach($employeeIds);
-                \Log::info('Employees Attached:', $employeeIds);
             } else {
                 \Log::warning('No employees attached after holiday filter.');
             }

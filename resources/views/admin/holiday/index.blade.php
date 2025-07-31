@@ -74,6 +74,9 @@
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
                                     </div>
                                 </div>
+                                <div class="col-sm-12 perrmsg">
+
+                                </div>
 
                             </div>
                             
@@ -186,13 +189,13 @@
                     data: form_data,
                     success: function(d) {
 
-                        console.log(d);
-                        // if (d.status == 422) {
-                        //     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                        // } else {
-                        //     showSuccess('Data created successfully.');
-                        //     reloadPage(2000);
-                        // }
+                        // console.log(d);
+                        if (d.status == 422) {
+                            $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                        } else {
+                            showSuccess('Data created successfully.');
+                            reloadPage(2000);
+                        }
                        
                     },
                     error: function(xhr, status, error) {
@@ -310,6 +313,68 @@
                 "responsive": true,
             });
         });
+
+
+        // onchange employee_id to check prorota
+
+        $("#employee_id").change(function() {
+            var employee_id = $(this).val();
+
+            $from_date = $("#from_date").val();
+            $to_date = $("#to_date").val();
+
+            if ($from_date === '' || $to_date === '') {
+                showError('Please select From Date and To Date first.');
+                return;
+            }
+
+            if (employee_id) {
+                $.ajax({
+                    url: "{{ route('admin.employee.prorota') }}",
+                    type: "GET",
+                    data: { employee_id: employee_id, from_date: $from_date, to_date: $to_date },
+                    // Treat 400 and 404 as success
+                    statusCode: {
+                        400: function(response) {
+                            handleResponse(response.responseJSON);
+                        },
+                        404: function(response) {
+                            handleResponse(response.responseJSON);
+                        }
+                    },
+                    success: function(data) {
+                        handleResponse(data);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', xhr.responseText);
+                        $(".perrmsg").html('<div class="alert alert-danger">An error occurred while fetching pre-rota data. Please try again.</div>');
+                    }
+                });
+
+                function handleResponse(data) {
+                    if (data.status === 400 || data.status === 404) {
+                        $(".perrmsg").html(`<div class="alert alert-danger">${data.message}</div>`);
+                    } else if (data.status === 200) {
+                        let html = '<div class="alert alert-success">';
+                        html += '<h4>Pre-rota Schedules Found</h4>';
+                        html += `<p><strong>Total Hours:</strong> ${data.total_hours}</p>`;
+                        html += '<ul>';
+                        data.data.forEach(function(rota) {
+                            html += `<li>From ${rota.start_date} to ${rota.end_date}: ${rota.days} day(s), `;
+                            html += `Hours: ${rota.hours}, Shift: ${rota.start_time} - ${rota.end_time}</li>`;
+                        });
+                        html += '</ul></div>';
+                        $(".perrmsg").html(html);
+                    } else {
+                        $(".perrmsg").html(`<div class="alert alert-danger">${data.message || 'Unexpected response from server.'}</div>`);
+                    }
+                }
+            }
+        });
+
+
+
+
     });
 </script>
 

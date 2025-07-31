@@ -72,7 +72,12 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::post('/change-status', [EmployeeController::class, 'updateStatus'])->name('employees.updateStatus');
 
         Route::post('/payslip', [EmployeeController::class, 'payslip'])->name('employees.payslip');
+
+        
+
     });
+
+    Route::get('/pre-rota', [EmployeeController::class, 'checkProrota'])->name('admin.employee.prorota');
 
     Route::prefix('branches')->group(function () {
         Route::get('/', [BranchController::class, 'index'])->name('branches.index');
