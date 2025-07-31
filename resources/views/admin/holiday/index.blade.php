@@ -185,12 +185,14 @@
                     processData: false,
                     data: form_data,
                     success: function(d) {
-                        if (d.status == 422) {
-                            $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                        } else {
-                            showSuccess('Data created successfully.');
-                            reloadPage(2000);
-                        }
+
+                        console.log(d);
+                        // if (d.status == 422) {
+                        //     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                        // } else {
+                        //     showSuccess('Data created successfully.');
+                        //     reloadPage(2000);
+                        // }
                        
                     },
                     error: function(xhr, status, error) {

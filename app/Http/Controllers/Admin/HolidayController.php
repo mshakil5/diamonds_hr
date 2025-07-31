@@ -35,12 +35,14 @@ class HolidayController extends Controller
 
         $employee = Employee::find($request->employee_id);
         if (!$employee) {
-            return response()->json(['status' => 404, 'message' => 'Employee not found.']);
+            return response()->json(['status' => 422, 'message' => 'Employee not found.']);
         }
 
         $from = Carbon::parse($request->from_date);
         $to = Carbon::parse($request->to_date);
         $duration = $from->diffInDays($to) + 1;
+
+        $holiday = $employee->holidays()->get();
 
         $counts = $employee->leave_status_counts;
         $used = ($counts['booked'] ?? 0) + ($counts['taken'] ?? 0);
@@ -64,7 +66,7 @@ class HolidayController extends Controller
         $data->created_by = auth()->id();
         $data->save();
 
-        return response()->json(['status' => 200, 'message' => 'Data created successfully.']);
+        return response()->json(['status' => 200, 'message' => 'Data created successfully.', 'counts' => $counts, 'holiday' => $holiday]);
     }
 
     public function edit($id)

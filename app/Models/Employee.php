@@ -69,7 +69,12 @@ class Employee extends Model
         return $this->hasMany(Holiday::class);
     }
 
-    public function getLeaveStatusCountsAttribute()
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function getLeaveStatusCountsAttribute_old()
     {
         $holidays = $this->holidays()->get();
 
@@ -85,6 +90,46 @@ class Employee extends Model
             'booked' => $durations['Booked'] ?? 0,
             'not_taken' => $durations['Not Taken'] ?? 0,
             'taken' => $durations['Taken'] ?? 0,
+        ];
+    }
+
+    public function getLeaveStatusCountsAttribute()
+    {
+        // Fetch holidays and related attendance data
+        $holidays = $this->holidays()->get();
+        $today = Carbon::today();
+
+        $durations = ['booked' => 0, 'not_taken' => 0, 'taken' => 0];
+
+        foreach ($holidays as $holiday) {
+            $start = Carbon::parse($holiday->from_date);
+            $end = Carbon::parse($holiday->to_date);
+            $days = $start->diffInDays($end) + 1;
+
+            $attendances = $this->attendances()
+                ->whereBetween('clock_in', [$holiday->from_date, $holiday->to_date])
+                ->get();
+
+            for ($date = $start; $date <= $end; $date->addDay()) {
+
+                $attendance = $attendances->firstWhere(function ($attendance) use ($date) {
+                    return Carbon::parse($attendance->clock_in)->toDateString() === $date->toDateString();
+                });
+
+                if ($date->isFuture()) {
+                    $durations['booked']++;
+                } elseif ($attendance) {
+                    $durations['not_taken']++;
+                } else {
+                    $durations['taken']++;
+                }
+            }
+        }
+
+        return [
+            'booked' => $durations['booked'],
+            'not_taken' => $durations['not_taken'],
+            'taken' => $durations['taken'],
         ];
     }
 
