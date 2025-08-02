@@ -83,6 +83,10 @@
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
                                     </div>
                                 </div>
+
+                                <div id="holiday_results" class="col-sm-12"></div>
+
+
                             </div>
                         </form>
                     </div>
@@ -481,6 +485,45 @@ $(document).ready(function() {
         $('#detailsModal').remove();
         $('body').append(modalHtml);
         $('#detailsModal').modal('show');
+    });
+});
+</script>
+
+<script>
+$(document).ready(function() {
+
+    // Trigger AJAX on employee selection change
+    $('#employee_id').on('change', function() {
+        let start_date = $('#start_date').val();
+        let end_date = $('#end_date').val();
+        let employee_ids = $(this).val() || []; // Get selected employee IDs
+
+        // Validate inputs
+        if (!start_date || employee_ids.length === 0) {
+            $('#holiday_results').html('<div class="alert alert-danger">Please select a start date and at least one employee.</div>');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('admin.holiday.check') }}", 
+            method: 'POST',
+            data: {
+                start_date: start_date,
+                end_date: end_date,
+                employee_ids: employee_ids,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#holiday_results').html(response.html);
+                } else {
+                    $('#holiday_results').html('<div class="alert alert-warning">No holidays found for the selected criteria.</div>');
+                }
+            },
+            error: function() {
+                $('#holiday_results').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+            }
+        });
     });
 });
 </script>

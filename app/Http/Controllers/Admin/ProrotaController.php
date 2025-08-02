@@ -38,8 +38,6 @@ class ProrotaController extends Controller
 
     public function store(Request $request)
     {
-        // Log incoming request data for debugging
-        \Log::info('Store Request Data:', $request->all());
 
         // Validate the request
         $validated = $request->validate([
@@ -60,9 +58,6 @@ class ProrotaController extends Controller
             // Create PreRota record
             $preRota = PreRota::create($request->except('employee_id'));
 
-            // Log created PreRota ID
-            \Log::info('Created PreRota ID:', ['id' => $preRota->id]);
-
             // Filter out employees who are on holiday for start_date
             $employeeIds = [];
             foreach ($request->employee_id as $employeeId) {
@@ -80,8 +75,6 @@ class ProrotaController extends Controller
             // Attach employees to the pivot table
             if (!empty($employeeIds)) {
                 $preRota->employees()->attach($employeeIds);
-            } else {
-                \Log::warning('No employees attached after holiday filter.');
             }
 
             return response()->json([
@@ -89,7 +82,7 @@ class ProrotaController extends Controller
                 'message' => 'Pre Rota Created successfully'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error creating PreRota:', ['error' => $e->getMessage()]);
+            
             return response()->json([
                 'status' => 422,
                 'message' => 'Error creating PreRota: ' . $e->getMessage()

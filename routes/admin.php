@@ -95,6 +95,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::post('/update', [HolidayController::class, 'update'])->name('holidays.update');
         Route::get('/{id}', [HolidayController::class, 'delete'])->name('holidays.delete');
     });
+    Route::post('/holidays/check', [HolidayController::class, 'checkHolidays'])->name('admin.holiday.check');
 
     Route::prefix('attendance')->group(function () {
         Route::get('/', [AttendanceController::class, 'index'])->name('attendance.index');
