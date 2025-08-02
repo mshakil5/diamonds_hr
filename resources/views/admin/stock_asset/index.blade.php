@@ -102,6 +102,22 @@
                         <h3 class="card-title">Stock</h3>
                     </div>
                     <div class="card-body">
+
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="AssetsFilter">Filter by Assets:</label>
+                                <select id="AssetsFilter" class="form-control">
+                                    <option value="">Select Assets</option>
+                                    @foreach ($assetTypes as $types)
+                                        <option value="{{ $types->name }}">{{ $types->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+
+
                       <table id="example1" class="table table-bordered table-striped">
                           <thead>
                               <tr>
@@ -649,22 +665,25 @@
             window.scrollTo(0, 0);
         }
 
-        $(function() {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
+        var table = $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "searching": true,
+            "pageLength": 20,
+            "buttons": ["copy", "csv", "excel", "pdf", "print"]
+        });
+
+        
+        $('#AssetsFilter').on('change', function() {
+            var assetType = $(this).val();
+            if ($.fn.DataTable.isDataTable('#example1')) {
+                if (assetType) {
+                    table.column(2).search(assetType).draw();
+                } else {
+                    table.column(2).search('').draw();
+                }
+            }
         });
     });
 </script>
