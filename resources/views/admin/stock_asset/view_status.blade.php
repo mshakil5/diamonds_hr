@@ -5,7 +5,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <a href="{{ url()->previous() }}" class="btn btn-secondary my-2">← Back</a>
+        <a href="{{ route('stock') }}" class="btn btn-secondary my-2">← Back</a>
         <div class="card card-secondary">
           <div class="card-header d-flex justify-content-between align-items-center">
             @php

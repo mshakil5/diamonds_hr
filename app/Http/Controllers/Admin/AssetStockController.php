@@ -214,7 +214,7 @@ class AssetStockController extends Controller
         return response()->json(['status' => 200, 'message' => 'Data deleted successfully.']);
     }
 
-    public function viewByStatus($status, $stockId = null)
+    public function viewByStatus($stockId = null, $status)
     {
         $stock = null;
         if ($stockId) {
