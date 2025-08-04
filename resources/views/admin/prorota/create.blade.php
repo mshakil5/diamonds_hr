@@ -1,9 +1,15 @@
 @extends('admin.layouts.admin')
 
 @section('content')
+<style>
+    select.time-select option {
+        max-height: 20px;
+        overflow-y: auto;
+    }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" /><!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.0/build/css/tempusdominus-bootstrap-4.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
 @if (auth()->user()->canDo(14))
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
@@ -37,12 +43,6 @@
                                         <input type="date" class="form-control" id="start_date" name="start_date" />
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label>To Date</label>
-                                        <input type="date" class="form-control" id="end_date" name="end_date" />
-                                    </div>
-                                </div>
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label for="type">Type <span class="text-danger">*</span></label>
@@ -54,7 +54,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id[]" multiple>
@@ -65,19 +65,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label>Start Time</label>
-                                        <input type="time" class="form-control" id="start_time" name="start_time" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label>End Time</label>
-                                        <input type="time" class="form-control" id="end_time" name="end_time" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Details</label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
@@ -86,6 +74,14 @@
 
                                 <div id="holiday_results" class="col-sm-12"></div>
 
+                                <div id="weekly-schedule" class="col-sm-12 mt-3"></div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>How many days this schedule will continue? <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="to_date" name="to_date" />
+                                    </div>
+                                </div>
 
                             </div>
                         </form>
@@ -117,8 +113,6 @@
                                     <th>From date</th>
                                     <th>To date</th>
                                     <th>Type</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
                                     <th>Employees</th>
                                     <th>Details</th>
                                     <th>Action</th>
@@ -132,16 +126,31 @@
                                         <td>{{$data->start_date}}</td>
                                         <td>{{$data->end_date}}</td>
                                         <td>{{$data->type}}</td>
-                                        <td>{{$data->start_time ?? '-'}}</td>
-                                        <td>{{$data->end_time ?? '-'}}</td>
                                         <td>
-                                            @foreach ($data->employees as $employee)
-                                                {{$employee->name}}{{ !$loop->last ? ', ' : ''}}
+                                            @foreach ($data->employees->unique('id') as $employee)
+                                                
+                                                <span class="btn btn-info btn-sm">{{ $employee->name }} </span>
                                             @endforeach
                                         </td>
                                         <td>{{$data->details}}</td>
                                         <td>
-                                            <button id="EditBtn" rid="{{$data->id}}" class="btn btn-sm btn-primary">Edit</button>
+
+                                            <button
+                                                class="btn btn-sm btn-info"
+                                                id="DetailsBtn"
+                                                data-id="{{ $data->id }}"
+                                                data-type="{{ $data->type }}"
+                                                data-start_date="{{ $data->start_date }}"
+                                                data-end_date="{{ $data->end_date }}"
+                                                data-details="{{ $data->details }}"
+                                                data-created_at="{{ $data->created_at }}"
+                                                data-employees='@json($data->employees)'
+                                            >
+                                                Details
+                                            </button>
+
+
+                                            {{-- <button id="EditBtn" rid="{{$data->id}}" class="btn btn-sm btn-primary">Edit</button> --}}
                                             <button id="deleteBtn" rid="{{$data->id}}" class="btn btn-sm btn-danger">Delete</button>
                                         </td>
                                     </tr>
@@ -159,14 +168,10 @@
 
 @section('script')
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
     // Initialize Select2 for employee_id with multiple selection
     $('#employee_id').select2({
-        placeholder: 'Select Employees',
         allowClear: true,
         width: '100%'
     });
@@ -195,15 +200,37 @@ $(document).ready(function() {
         });
     }
 
-    // Function to display error message
+    // Function to display error message with close button
     function showError(message, field = null) {
-        $('.errmsg').html(`<div class="alert alert-danger">${message}</div>`);
+        $('.errmsg').html(`
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        `);
+
         if (field) {
             $(field).css('border-color', 'red');
             $(field).addClass('is-invalid');
             $(field).focus();
         }
+
+        pagetop();
     }
+
+    // When user selects or types a time, remove error message and styles
+    $(document).on('input change', '.start-time, .end-time', function () {
+        $(this).removeClass('is-invalid').css('border-color', '');
+        
+        // Clear the main error message only if there are no other visible errors
+        if ($('.is-invalid').length === 0) {
+            $('.errmsg').html('');
+        }
+    });
+
+
 
     // Function to display success message
     function showSuccess(message) {
@@ -222,140 +249,137 @@ $(document).ready(function() {
         $('html, body').animate({ scrollTop: 0 }, 'slow');
     }
 
-    $("#addBtn").click(function() {
-        // Define required fields with user-friendly names
-        var requiredFields = [
-            {id: '#employee_id', name: 'Employee'},
-            {id: '#type', name: 'Type'},
-            {id: '#start_date', name: 'From Date'}
+    $("#addBtn").click(function (e) {
+        e.preventDefault();
+
+        const isCreate = $(this).val() === 'Create';
+        const isUpdate = $(this).val() === 'Update';
+
+        // Required fields
+        const requiredFields = [
+            { id: '#employee_id', name: 'Employee', type: 'multi' },
+            { id: '#type', name: 'Type', type: 'single' },
+            { id: '#start_date', name: 'From Date', type: 'date' },
+            { id: '#to_date', name: 'To Date', type: 'date' }
         ];
 
-        // Reset previous validation styles
         resetFieldStyles(requiredFields.map(field => field.id));
+        $('.errmsg').html('');
 
-        // Validate required fields
-        for (var i = 0; i < requiredFields.length; i++) {
-            if (requiredFields[i].id === '#employee_id') {
-                if ($('#employee_id').val().length === 0) {
-                    showError(`Please select at least one ${requiredFields[i].name}.`, requiredFields[i].id);
-                    return;
-                }
-            } else if ($(requiredFields[i].id).val() === '') {
-                showError(`Please fill the ${requiredFields[i].name} field.`, requiredFields[i].id);
+        // Validate basic fields
+        for (let field of requiredFields) {
+            const value = $(field.id).val();
+
+            if (field.type === 'multi' && (!value || value.length === 0)) {
+                showError(`Please select at least one ${field.name}.`, field.id);
+                return;
+            }
+
+            if ((field.type === 'single' || field.type === 'date') && (!value || value === '')) {
+                showError(`Please fill the ${field.name} field.`, field.id);
+                return;
+            }
+
+            if (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                showError(`Please enter a valid ${field.name} (YYYY-MM-DD).`, field.id);
                 return;
             }
         }
 
-        // Additional validation for date format (YYYY-MM-DD)
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!dateRegex.test($('#start_date').val())) {
-            showError('Please enter a valid From Date (YYYY-MM-DD).', '#start_date');
-            return;
-        }
+        // ✅ Validate time fields (start_time => end_time must exist)
+        const startTimes = $("input[name='start_times[]']");
+        const endTimes = $("input[name='end_times[]']");
+        
 
-        var form_data = new FormData();
-        // Debug: Log selected employee IDs
-        var employeeIds = $('#employee_id').val();
-        console.log('Selected Employee IDs:', employeeIds);
+        let timeError = false;
 
-        // Append each employee_id individually to FormData
-        employeeIds.forEach(function(employeeId) {
-            form_data.append('employee_id[]', employeeId);
+        $(".schedule-row").each(function (index) {
+            const row = $(this);
+            const startInput = row.find(".start-time");
+            const endInput = row.find(".end-time");
+
+            const start = startInput.val();
+            const end = endInput.val();
+            const isDayOff = startInput.prop('disabled') && endInput.prop('disabled');
+
+            if (!isDayOff) {
+                // Validate: start time must exist
+                if (!start) {
+                    showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
+                    timeError = true;
+                    return false; // breaks the .each loop
+                }
+
+                // Validate: end time must exist
+                if (!end) {
+                    showError(`End time is required for Row ${index + 1}.`, endInput[0]);
+                    timeError = true;
+                    return false;
+                }
+
+                // Optional: Validate end time comes after start time (if needed)
+                const startDate = new Date(`1970-01-01T${start}:00`);
+                const endDate = new Date(`1970-01-01T${end}:00`);
+                if (startDate >= endDate) {
+                    showError(`End time must be after Start time (Row ${index + 1}).`, endInput[0]);
+                    timeError = true;
+                    return false;
+                }
+            }
         });
+
+        if (timeError) return;
+
+
+
+        // ✅ Prepare FormData
+        const form_data = new FormData();
+
+        $('#employee_id').val().forEach(emp => form_data.append('employee_id[]', emp));
         form_data.append("start_date", $("#start_date").val());
-        form_data.append("end_date", $("#end_date").val());
+        form_data.append("to_date", $("#to_date").val());
         form_data.append("type", $("#type").val());
-        form_data.append("start_time", $("#start_time").val());
-        form_data.append("end_time", $("#end_time").val());
         form_data.append("details", $("#details").val());
 
-        // Debug: Log FormData contents
-        for (var pair of form_data.entries()) {
-            console.log('FormData:', pair[0] + ': ' + pair[1]);
-        }
+        $("input[name='dates[]']").each((i, el) => form_data.append("dates[]", el.value));
+        $("input[name='day_names[]']").each((i, el) => form_data.append("day_names[]", el.value));
+        $("input[name='start_times[]']").each((i, el) => form_data.append("start_times[]", el.value));
+        $("input[name='end_times[]']").each((i, el) => form_data.append("end_times[]", el.value));
 
-        if ($(this).val() == 'Create') {
-            $.ajax({
-                url: url,
-                method: "POST",
-                contentType: false,
-                processData: false,
-                data: form_data,
-                success: function(d) {
-                    console.log('Create Response:', d);
-                    if (d.status == 422) {
-                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                    } else {
-                        showSuccess('Data created successfully.');
-                        resetFieldStyles(requiredFields.map(field => field.id));
-                        reloadPage(2000);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Create Error:', xhr.responseText);
-                    showError('An error occurred. Please try again.');
-                }
-            });
-        }
-
-        if ($(this).val() == 'Update') {
-            var requiredFields = [
-                {id: '#employee_id', name: 'Employee'},
-                {id: '#type', name: 'Type'},
-                {id: '#start_date', name: 'From Date'}
-            ];
-
-            // Reset previous validation styles
-            resetFieldStyles(requiredFields.map(field => field.id));
-
-            // Validate required fields
-            for (var i = 0; i < requiredFields.length; i++) {
-                if (requiredFields[i].id === '#employee_id') {
-                    if ($('#employee_id').val().length === 0) {
-                        showError(`Please select at least one ${requiredFields[i].name}.`, requiredFields[i].id);
-                        return;
-                    }
-                } else if ($(requiredFields[i].id).val() === '') {
-                    showError(`Please fill the ${requiredFields[i].name} field.`, requiredFields[i].id);
-                    return;
-                }
-            }
-
-            if (!dateRegex.test($('#end_date').val()) && $('#end_date').val() !== '') {
-                showError('Please enter a valid To Date (YYYY-MM-DD).', '#end_date');
-                return;
-            }
-
-            // Debug: Log FormData for update
-            for (var pair of form_data.entries()) {
-                console.log('Update FormData:', pair[0] + ': ' + pair[1]);
-            }
-
+        if (isUpdate) {
             form_data.append("codeid", $("#codeid").val());
-            $.ajax({
-                url: upurl,
-                type: "POST",
-                dataType: 'json',
-                contentType: false,
-                processData: false,
-                data: form_data,
-                success: function(d) {
-                    console.log('Update Response:', d);
-                    if (d.status == 422) {
-                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                    } else {
-                        showSuccess('Data updated successfully.');
-                        resetFieldStyles(requiredFields.map(field => field.id));
-                        reloadPage(2000);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Update Error:', xhr.responseText);
-                    showError('An error occurred. Please try again.');
-                }
-            });
         }
+
+        // ✅ Debug: Show form values
+        for (let pair of form_data.entries()) {
+            console.log(pair[0] + ": " + pair[1]);
+        }
+
+        // ✅ AJAX Submit
+        $.ajax({
+            url: isCreate ? url : upurl,
+            type: "POST",
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            data: form_data,
+            success: function (d) {
+                if (d.status == 422) {
+                    $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                } else {
+                    showSuccess(isCreate ? 'Data created successfully.' : 'Data updated successfully.');
+                    resetFieldStyles(requiredFields.map(f => f.id));
+                    reloadPage(2000);
+                }
+            },
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
+                showError('An error occurred. Please try again.');
+            }
+        });
     });
+
+
 
     $("#contentContainer").on('click', '#EditBtn', function() {
         var codeid = $(this).attr('rid');
@@ -398,9 +422,7 @@ $(document).ready(function() {
         $("#type").val(data.type).trigger('change');
         $("#employee_id").val(data.employees.map(emp => emp.id)).trigger('change');
         $("#start_date").val(formatDate(data.start_date));
-        $("#start_time").val(data.start_time || '');
-        $("#end_date").val(formatDate(data.end_date));
-        $("#end_time").val(data.end_time || '');
+        $("#to_date").val(formatDate(data.end_date));
         $("#details").val(data.details);
         $("#codeid").val(data.id);
         $("#addBtn").val('Update');
@@ -418,6 +440,7 @@ $(document).ready(function() {
         $("#header-title").html('Add new PreRota');
     }
 
+    $("#addThisFormContainer").hide(300);
     $("#FormCloseBtn").click(function() {
         clearform();
         $("#addThisFormContainer").hide(300);
@@ -439,53 +462,99 @@ $(document).ready(function() {
             "columnDefs": [
                 { "targets": 0, "visible": false }
             ],
-            "buttons": ["copy", "csv", "excel", "pdf", "print"]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
 
-    $("#contentContainer").on('click', '#DetailsBtn', function() {
+    // dtls
+    $("#contentContainer").on('click', '#DetailsBtn', function () {
         var attrs = {};
-        $.each(this.attributes, function() {
-            if(this.specified && this.name.startsWith('data-')) {
+        $.each(this.attributes, function () {
+            if (this.specified && this.name.startsWith('data-')) {
                 var key = this.name.replace('data-', '');
-                attrs[key] = this.value;
+                if (key === 'employees') {
+                    try {
+                        attrs[key] = JSON.parse(this.value);
+                    } catch (e) {
+                        attrs[key] = [];
+                    }
+                } else {
+                    attrs[key] = this.value;
+                }
             }
         });
-        console.log('Details Attributes:', attrs);
+
+        // Build general info rows
+        let generalRows = Object.entries(attrs).filter(([k]) => k !== 'employees').map(([key, value]) => `
+            <tr>
+                <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
+                <td>${value}</td>
+            </tr>
+        `).join('');
+
+        // Build schedule rows if employees present
+        let scheduleRows = '';
+        if (Array.isArray(attrs.employees)) {
+            scheduleRows = attrs.employees.map(emp => {
+                return `
+                    <tr>
+                        <td>${emp.name}</td>
+                        <td>${emp.pivot?.date ?? '-'}</td>
+                        <td>${emp.pivot?.day_name ?? '-'}</td>
+                        <td>${emp.pivot?.start_time ?? '-'}</td>
+                        <td>${emp.pivot?.end_time ?? '-'}</td>
+                    </tr>`;
+            }).join('');
+        }
+
+        // Full modal HTML
         let modalHtml = `
-        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="detailsModalLabel">Employee Details</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered">
-                            <tbody>
-                                ${Object.entries(attrs).map(([key, value]) => `
+            <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="detailsModalLabel">Pre-Rota Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h5>General Info</h5>
+                            <table class="table table-sm table-bordered mb-4">
+                                <tbody>
+                                    ${generalRows}
+                                </tbody>
+                            </table>
+                            <h5>Employee Schedules</h5>
+                            <table class="table table-sm table-bordered">
+                                <thead>
                                     <tr>
-                                        <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
-                                        <td>${value}</td>
+                                        <th>Employee</th>
+                                        <th>Date</th>
+                                        <th>Day</th>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
                                     </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </thead>
+                                <tbody>
+                                    ${scheduleRows}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         `;
 
-        $('#detailsModal').remove();
-        $('body').append(modalHtml);
-        $('#detailsModal').modal('show');
+        $('#detailsModal').remove(); // Remove any existing modals
+        $('body').append(modalHtml); // Append new modal
+        $('#detailsModal').modal('show'); // Show modal
     });
+
+
+
 });
 </script>
 
@@ -527,5 +596,139 @@ $(document).ready(function() {
     });
 });
 </script>
+
+
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<!-- Tempus Dominus Bootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+
+
+<script>
+    document.getElementById('start_date').addEventListener('change', function () {
+        const startDate = new Date(this.value);
+        const scheduleContainer = document.getElementById('weekly-schedule');
+        scheduleContainer.innerHTML = ''; // Clear previous content
+
+        if (isNaN(startDate)) return; // Invalid date
+
+        for (let i = 0; i < 7; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + i);
+
+            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const formattedDate = currentDate.toISOString().split('T')[0];
+
+            const row = document.createElement('div');
+            row.className = 'row mb-3 align-items-center schedule-row';
+            row.dataset.index = i;
+
+            row.innerHTML = `
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="dates[]" value="${formattedDate}" readonly>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="day_names[]" value="${dayName}" readonly>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group date timepicker" id="start_time_${i}" data-target-input="nearest">
+                        <input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_${i}" />
+                        <div class="input-group-append" data-target="#start_time_${i}" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group date timepicker" id="end_time_${i}" data-target-input="nearest">
+                        <input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_${i}" />
+                        <div class="input-group-append" data-target="#end_time_${i}" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-warning btn-sm day-off-btn">Day Off</button>
+                </div>
+            `;
+
+            scheduleContainer.appendChild(row);
+        }
+
+        initTimepickers();
+        addEndTimeValidation();
+        addDayOffToggle();
+    });
+
+    function initTimepickers() {
+        $('.timepicker').datetimepicker({
+            format: 'HH:mm', // 24-hour format, e.g., 14:30
+            stepping: 30,
+            icons: {
+                time: 'fa fa-clock',
+                date: 'fa fa-calendar',
+                up: 'fa fa-chevron-up',
+                down: 'fa fa-chevron-down',
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-calendar-check',
+                clear: 'fa fa-trash',
+                close: 'fa fa-times'
+            }
+        });
+
+    }
+
+    function addEndTimeValidation() {
+        const startInputs = document.querySelectorAll('[name="start_times[]"]');
+        const endInputs = document.querySelectorAll('[name="end_times[]"]');
+
+        startInputs.forEach((startInput, index) => {
+            startInput.addEventListener('change', function () {
+                const endInput = endInputs[index];
+                if (this.value) {
+                    endInput.setAttribute('required', 'required');
+                } else {
+                    endInput.removeAttribute('required');
+                    endInput.value = '';
+                }
+            });
+        });
+    }
+
+    function addDayOffToggle() {
+        document.querySelectorAll('.day-off-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const row = this.closest('.schedule-row');
+                const startInput = row.querySelector('[name="start_times[]"]');
+                const endInput = row.querySelector('[name="end_times[]"]');
+
+                const isDisabled = startInput.disabled;
+
+                if (isDisabled) {
+                    startInput.disabled = false;
+                    endInput.disabled = false;
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-warning');
+                    this.textContent = 'Day Off';
+                } else {
+                    startInput.disabled = true;
+                    endInput.disabled = true;
+                    startInput.value = '';
+                    endInput.value = '';
+                    this.classList.remove('btn-warning');
+                    this.classList.add('btn-success');
+                    this.textContent = 'Working Day';
+                }
+            });
+        });
+    }
+</script>
+
+
+
+
+
 
 @endsection

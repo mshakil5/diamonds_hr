@@ -35,12 +35,18 @@ class PreRota extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "Pre Rota record has been {$eventName}");
     }
 
-    // public function employees(){
-    //     return $this->belongsToMany(Employee::class);
+
+    // public function employees()
+    // {
+    //     return $this->belongsToMany(Employee::class, 'employee_pre_rotas', 'pre_rota_id', 'employee_id');
     // }
 
     public function employees()
     {
-        return $this->belongsToMany(Employee::class, 'employee_pre_rotas', 'pre_rota_id', 'employee_id');
+        return $this->belongsToMany(Employee::class, 'employee_pre_rotas', 'pre_rota_id', 'employee_id')
+            ->withPivot(['date', 'day_name', 'start_time', 'end_time', 'created_by'])
+            ->withTimestamps()
+            ->distinct(); // 🔍 This line removes duplicate employee records
     }
+
 }

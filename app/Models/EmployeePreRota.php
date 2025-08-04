@@ -11,8 +11,8 @@ class EmployeePreRota extends Model
 {
     use HasFactory;
     use LogsActivity;
-    protected $table = 'employee_pre_rota';
-    protected $fillable = ['employee_id', 'branch_id', 'pre_rota_id'];
+    protected $table = 'employee_pre_rotas';
+    protected $fillable = ['employee_id', 'branch_id', 'pre_rota_id','date','day_name', 'start_time', 'end_time','created_by'];
     public $timestamps = true;
 
     protected static $logName = 'employee_pre_rota';
