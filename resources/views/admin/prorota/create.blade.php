@@ -46,9 +46,8 @@
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label for="type">Type <span class="text-danger">*</span></label>
-                                        <select class="form-control select2" id="type" name="type">
-                                            <option value="" disabled>Choose type</option>
-                                            <option value="Regular">Regular</option>
+                                        <select class="form-control" id="type" name="type">
+                                            <option value="Regular" selected>Regular</option>
                                             <option value="Authorized Holiday">Authorized Holiday</option>
                                             <option value="Unauthorized Holiday">Unauthorized Holiday</option>
                                         </select>
@@ -58,7 +57,6 @@
                                     <div class="form-group">
                                         <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id[]" multiple>
-                                            <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
                                                 <option value="{{$employee->id}}">{{$employee->name}}</option>
                                             @endforeach
@@ -176,12 +174,7 @@ $(document).ready(function() {
         width: '100%'
     });
 
-    // Initialize Select2 for type
-    $('#type').select2({
-        placeholder: 'Choose type',
-        allowClear: true,
-        width: '100%'
-    });
+
 
     $.ajaxSetup({
         headers: {
@@ -562,9 +555,9 @@ $(document).ready(function() {
 $(document).ready(function() {
 
     // Trigger AJAX on employee selection change
-    $('#employee_id').on('change', function() {
+    $('#to_date').on('change', function() {
         let start_date = $('#start_date').val();
-        let end_date = $('#end_date').val();
+        let end_date = $('#to_date').val();
         let employee_ids = $(this).val() || []; // Get selected employee IDs
 
         // Validate inputs
@@ -583,6 +576,7 @@ $(document).ready(function() {
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
+                console.log(response );
                 if (response.success) {
                     $('#holiday_results').html(response.html);
                 } else {
