@@ -96,7 +96,7 @@
                     $params['stock'] = $stock->id;
                 }
               @endphp
-              <a href="{{ route('stock.view.status', $params) }}" class="text-decoration-none">
+              <a href="{{ route('stocks.view.status', $params) }}" class="text-decoration-none">
                 <div class="small-box {{ $statusColors[$key] }} rounded shadow-sm">
                   <div class="inner">
                     <h3 class="text-white font-weight-bold">{{ $statusCounts[$key] ?? 0 }}</h3>

@@ -242,6 +242,31 @@ class AssetStockController extends Controller
         return view('admin.stock_asset.view_status', compact('stock', 'assets', 'status', 'branches', 'floors', 'maintenances', 'statuses'));
     }
 
+    public function viewByStockStatus($status)
+    {
+        
+
+        $query = StockAssetType::with(['location.flooor', 'branch', 'maintenance']);
+        
+        $assets = $query->where('asset_status', $status)->get();
+
+        $branches = Branch::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
+        $maintenances = Maintenance::where('status', 1)->get();
+
+        $statuses = [
+            1 => 'Assigned',
+            2 => 'In Storage',
+            3 => 'Under Repair',
+            4 => 'Damaged',
+            5 => 'Reported',
+        ];
+
+        $stock = null;
+
+        return view('admin.stock_asset.view_status', compact('stock', 'assets', 'status', 'branches', 'floors', 'maintenances', 'statuses'));
+    }
+
     public function getLatestCode($assetTypeId)
     {
         $lastCode = StockAssetType::where('asset_type_id', $assetTypeId)

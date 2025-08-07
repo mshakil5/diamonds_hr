@@ -208,6 +208,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/stock/{id}', [AssetStockController::class, 'delete']);
 
     Route::get('/stock-status/{stock?}/{status}', [AssetStockController::class, 'viewByStatus'])->name('stock.view.status');
+    Route::get('/stocks-status/{status}/{stock?}', [AssetStockController::class, 'viewByStockStatus'])->name('stocks.view.status');
 
     Route::get('/get-locations/{branchId}/{floorId}', [LocationController::class, 'getLocationsByBranchAndFloor']);
 
