@@ -387,124 +387,236 @@
         var url = "{{URL::to('/admin/stock')}}";
         var upurl = "{{URL::to('/admin/stock-update')}}";
 
-        $("#addBtn").click(function() {
-            if ($(this).val() == 'Create') {
-                var requiredFields = ['#date', '#asset_type_id', '#quantity'];
-                for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val() === '') {
-                        $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
-                        return;
-                    }
-                }
+        // $("#addBtn").click(function() {
+        //     if ($(this).val() == 'Create') {
+        //         var requiredFields = ['#date', '#asset_type_id', '#quantity'];
+        //         for (var i = 0; i < requiredFields.length; i++) {
+        //             if ($(requiredFields[i]).val() === '') {
+        //                 $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
+        //                 return;
+        //             }
+        //         }
 
-                var form_data = new FormData();
-                form_data.append("date", $("#date").val());
-                form_data.append("asset_type_id", $("#asset_type_id").val());
-                form_data.append("brand", $("#brand").val());
-                form_data.append("model", $("#model").val());
-                form_data.append("quantity", $("#quantity").val());
-                form_data.append("note", $("#note").val());
-
-                $('#dynamicRows .row').each(function () {
-                    form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
-                    form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
+        //         // Validate dynamic rows
+        //         var valid = true;
+        //         $('#dynamicRows .row').each(function () {
+        //             var productCode = $(this).find('input[name="product_code[]"]').val();
+        //             var assetStatus = $(this).find('select[name="asset_status[]"]').val();
                     
-                    const branchVal = $(this).find('select[name="branch_id[]"]').val();
-                    const locationVal = $(this).find('select[name="location_id[]"]').val();
-                    const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
-                    const floorVal = $(this).find('select[name="floor_id[]"]').val();
+        //             if (!productCode || productCode.trim() === '') {
+        //                 valid = false;
+        //                 $('.errmsg').html('<div class="alert alert-danger">Please fill all product codes.</div>');
+        //                 return false; // Break the each loop
+        //             }
+        //             if (!assetStatus || assetStatus.trim() === '') {
+        //                 valid = false;
+        //                 $('.errmsg').html('<div class="alert alert-danger">Please select all asset statuses.</div>');
+        //                 return false; // Break the each loop
+        //             }
+        //         });
+                
+        //         if (!valid) return;
 
-                    form_data.append('branch_id[]', branchVal ? branchVal : '');
-                    form_data.append('location_id[]', locationVal ? locationVal : '');
-                    form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
-                    form_data.append('floor_id[]', floorVal ? floorVal : '');
-                });
+        //         var form_data = new FormData();
+        //         form_data.append("date", $("#date").val());
+        //         form_data.append("asset_type_id", $("#asset_type_id").val());
+        //         form_data.append("brand", $("#brand").val());
+        //         form_data.append("model", $("#model").val());
+        //         form_data.append("quantity", $("#quantity").val());
+        //         form_data.append("note", $("#note").val());
 
-                $.ajax({
-                    url: url,
-                    method: "POST",
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(d) {
-                        if (d.status == 422) {
-                            $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                        } else {
-                            $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
-                            reloadPage(2000);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
-                    }
-                });
-            }
+        //         $('#dynamicRows .row').each(function () {
+        //             form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
+        //             form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
+                    
+        //             const branchVal = $(this).find('select[name="branch_id[]"]').val();
+        //             const locationVal = $(this).find('select[name="location_id[]"]').val();
+        //             const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
+        //             const floorVal = $(this).find('select[name="floor_id[]"]').val();
 
-            if ($(this).val() == 'Update') {
-                var requiredFields = ['#date', '#asset_type_id', '#quantity'];
-                for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val() === '') {
-                        $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
-                        return;
-                    }
-                }
+        //             form_data.append('branch_id[]', branchVal ? branchVal : '');
+        //             form_data.append('location_id[]', locationVal ? locationVal : '');
+        //             form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
+        //             form_data.append('floor_id[]', floorVal ? floorVal : '');
+        //         });
 
-                var qty = +$('#quantity').val();
-                var productCodes = $('input[name="product_code[]"]').filter(function() {
-                    return $(this).val().trim() === '';
-                }).length;
+        //         $.ajax({
+        //             url: url,
+        //             method: "POST",
+        //             contentType: false,
+        //             processData: false,
+        //             data: form_data,
+        //             success: function(d) {
+        //                 if (d.status == 422) {
+        //                     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+        //                 } else {
+        //                     $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
+        //                     reloadPage(2000);
+        //                 }
+        //             },
+        //             error: function(xhr, status, error) {
+        //                 console.error(xhr.responseText);
+        //                 $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+        //             }
+        //         });
+        //     }
 
-                if (productCodes > 0) {
-                    $('.errmsg').html('<div class="alert alert-danger">Please fill all product codes.</div>');
+        //     if ($(this).val() == 'Update') {
+        //         var requiredFields = ['#date', '#asset_type_id', '#quantity'];
+        //         for (var i = 0; i < requiredFields.length; i++) {
+        //             if ($(requiredFields[i]).val() === '') {
+        //                 $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
+        //                 return;
+        //             }
+        //         }
+
+        //         // Validate dynamic rows
+        //         var valid = true;
+        //         $('#dynamicRows .row').each(function () {
+        //             var productCode = $(this).find('input[name="product_code[]"]').val();
+        //             var assetStatus = $(this).find('select[name="asset_status[]"]').val();
+                    
+        //             if (!productCode || productCode.trim() === '') {
+        //                 valid = false;
+        //                 $('.errmsg').html('<div class="alert alert-danger">Please fill all product codes.</div>');
+        //                 return false; // Break the each loop
+        //             }
+        //             if (!assetStatus || assetStatus.trim() === '') {
+        //                 valid = false;
+        //                 $('.errmsg').html('<div class="alert alert-danger">Please select all asset statuses.</div>');
+        //                 return false; // Break the each loop
+        //             }
+        //         });
+                
+        //         if (!valid) return;
+
+        //         var form_data = new FormData();
+        //         form_data.append("date", $("#date").val());
+        //         form_data.append("asset_type_id", $("#asset_type_id").val());
+        //         form_data.append("brand", $("#brand").val());
+        //         form_data.append("model", $("#model").val());
+        //         form_data.append("quantity", $("#quantity").val());
+        //         form_data.append("note", $("#note").val());
+        //         form_data.append("codeid", $("#codeid").val());
+
+        //         $('#dynamicRows .row').each(function () {
+        //             form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
+        //             form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
+
+        //             const branchVal = $(this).find('select[name="branch_id[]"]').val();
+        //             const locationVal = $(this).find('select[name="location_id[]"]').val();
+        //             const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
+        //             const floorVal = $(this).find('select[name="floor_id[]"]').val();
+
+        //             form_data.append('branch_id[]', branchVal ? branchVal : '');
+        //             form_data.append('location_id[]', locationVal ? locationVal : '');
+        //             form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
+        //             form_data.append('floor_id[]', floorVal ? floorVal : '');
+        //         });
+
+        //         $.ajax({
+        //             url: upurl,
+        //             type: "POST",
+        //             dataType: 'json',
+        //             contentType: false,
+        //             processData: false,
+        //             data: form_data,
+        //             success: function(d) {
+        //                 if (d.status == 422) {
+        //                     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+        //                 } else {
+        //                     $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
+        //                     reloadPage(2000); 
+        //                 }
+        //             },
+        //             error: function(xhr, status, error) {
+        //                 console.error(xhr.responseText);
+        //                 $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+        //             }
+        //         });
+        //     }
+        // });
+
+        $("#addBtn").click(function() {
+            var isUpdate = $(this).val() == 'Update';
+            var requiredFields = ['#date', '#asset_type_id', '#quantity'];
+
+            // Validate required fields
+            for (var i = 0; i < requiredFields.length; i++) {
+                if ($(requiredFields[i]).val() === '') {
+                    $('.errmsg').html('<div class="alert alert-danger">Please fill all required fields.</div>');
                     return;
                 }
-
-                var form_data = new FormData();
-                form_data.append("date", $("#date").val());
-                form_data.append("asset_type_id", $("#asset_type_id").val());
-                form_data.append("brand", $("#brand").val());
-                form_data.append("model", $("#model").val());
-                form_data.append("quantity", $("#quantity").val());
-                form_data.append("note", $("#note").val());
-                form_data.append("codeid", $("#codeid").val());
-
-                $('#dynamicRows .row').each(function () {
-                    form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
-                    form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
-
-                    const branchVal = $(this).find('select[name="branch_id[]"]').val();
-                    const locationVal = $(this).find('select[name="location_id[]"]').val();
-                    const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
-                    const floorVal = $(this).find('select[name="floor_id[]"]').val();
-
-                    form_data.append('branch_id[]', branchVal ? branchVal : '');
-                    form_data.append('location_id[]', locationVal ? locationVal : '');
-                    form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
-                    form_data.append('floor_id[]', floorVal ? floorVal : '');
-                });
-
-                $.ajax({
-                    url: upurl,
-                    type: "POST",
-                    dataType: 'json',
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(d) {
-                        if (d.status == 422) {
-                            $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                        } else {
-                            $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
-                            reloadPage(2000); 
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
-                    }
-                });
             }
+
+            // Validate dynamic rows
+            var valid = true;
+            $('#dynamicRows .row').each(function () {
+                var productCode = $(this).find('input[name="product_code[]"]').val();
+                var assetStatus = $(this).find('select[name="asset_status[]"]').val();
+                
+                if (!productCode || productCode.trim() === '') {
+                    valid = false;
+                    $('.errmsg').html('<div class="alert alert-danger">Please fill all product codes.</div>');
+                    return false; // Break the each loop
+                }
+                if (!assetStatus || assetStatus.trim() === '') {
+                    valid = false;
+                    $('.errmsg').html('<div class="alert alert-danger">Please select all asset statuses.</div>');
+                    return false; // Break the each loop
+                }
+            });
+            
+            if (!valid) return;
+
+            var form_data = new FormData();
+            form_data.append("date", $("#date").val());
+            form_data.append("asset_type_id", $("#asset_type_id").val());
+            form_data.append("brand", $("#brand").val());
+            form_data.append("model", $("#model").val());
+            form_data.append("quantity", $("#quantity").val());
+            form_data.append("note", $("#note").val());
+            
+            // Append codeid only for Update
+            if (isUpdate) {
+                form_data.append("codeid", $("#codeid").val());
+            }
+
+            $('#dynamicRows .row').each(function () {
+                form_data.append('product_code[]', $(this).find('input[name="product_code[]"]').val());
+                form_data.append('asset_status[]', $(this).find('select[name="asset_status[]"]').val());
+                
+                const branchVal = $(this).find('select[name="branch_id[]"]').val();
+                const locationVal = $(this).find('select[name="location_id[]"]').val();
+                const maintenanceVal = $(this).find('select[name="maintenance_id[]"]').val();
+                const floorVal = $(this).find('select[name="floor_id[]"]').val();
+
+                form_data.append('branch_id[]', branchVal ? branchVal : '');
+                form_data.append('location_id[]', locationVal ? locationVal : '');
+                form_data.append('maintenance_id[]', maintenanceVal ? maintenanceVal : '');
+                form_data.append('floor_id[]', floorVal ? floorVal : '');
+            });
+
+            $.ajax({
+                url: isUpdate ? upurl : url,
+                method: "POST",
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                data: form_data,
+                success: function(d) {
+                    if (d.status == 422) {
+                        $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                    } else {
+                        $('.errmsg').html('<div class="alert alert-success">' + d.message + '</div>');
+                        reloadPage(2000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    $('.errmsg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+                }
+            });
         });
 
         $("#contentContainer").on('click', '#EditBtn', function() {
