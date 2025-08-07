@@ -322,14 +322,9 @@ class EmployeeController extends Controller
                 ->join('pre_rotas', 'employee_pre_rotas.pre_rota_id', '=', 'pre_rotas.id')
                 ->where('employee_pre_rotas.employee_id', $employeeId)
                 ->where(function ($query) use ($fromDate, $toDate) {
-                    $query->whereBetween('pre_rotas.start_date', [$fromDate, $toDate])
-                        ->orWhereBetween('pre_rotas.end_date', [$fromDate, $toDate])
-                        ->orWhere(function ($query) use ($fromDate, $toDate) {
-                            $query->where('pre_rotas.start_date', '<=', $fromDate)
-                                    ->where('pre_rotas.end_date', '>=', $toDate);
-                        });
+                    $query->whereBetween('employee_pre_rotas.date', [$fromDate, $toDate]);
                 })
-                ->select('pre_rotas.start_date', 'pre_rotas.end_date', 'pre_rotas.start_time', 'pre_rotas.end_time')
+                ->select('employee_pre_rotas.date', 'employee_pre_rotas.day_name', 'employee_pre_rotas.start_time', 'employee_pre_rotas.end_time')
                 ->get();
 
             // If no pre-rota data is found
@@ -342,8 +337,8 @@ class EmployeeController extends Controller
 
             // Process affected dates and hours
             $affectedData = $prorotaData->map(function ($rota) use ($fromDate, $toDate) {
-                $startDate = Carbon::parse($rota->start_date)->max($fromDate);
-                $endDate = Carbon::parse($rota->end_date)->min($toDate);
+                $startDate = Carbon::parse($rota->date)->max($fromDate);
+                $endDate = Carbon::parse($rota->date)->min($toDate);
                 $days = $startDate->diffInDays($endDate) + 1;
 
                 // Calculate hours between start_time and end_time for each day

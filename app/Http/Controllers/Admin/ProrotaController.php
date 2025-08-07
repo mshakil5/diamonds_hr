@@ -103,15 +103,20 @@ class ProrotaController extends Controller
                     $pattern = collect($scheduleTemplate)->firstWhere('day_name', $dayName);
                     $employeBranchId = Employee::find($employeeId)->branch_id ?? $branchId;
 
+                    $startTime = $pattern['start_time'] ?? null;
+                    $endTime = $pattern['end_time'] ?? null;
+                    $status = $startTime ? 1 : 2;
+
+
                     EmployeePreRota::create([
                         'employee_id' => $employeeId,
                         'pre_rota_id' => $preRota->id,
                         'branch_id'   => $employeBranchId,
                         'date'        => $date,
                         'day_name'    => $dayName,
-                        'start_time'  => $pattern['start_time'] ?? null,
-                        'end_time'    => $pattern['end_time'] ?? null,
-                        'status'    => $pattern['start_time'] ? 1 : 2, // 1 = working day, 2 = holiday
+                        'start_time'  => $startTime,
+                        'end_time'    => $endTime,
+                        'status'      => $status,
                         'created_by'  => $createdBy,
                     ]);
                 }

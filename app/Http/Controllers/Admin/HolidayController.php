@@ -15,7 +15,7 @@ class HolidayController extends Controller
     public function index()
     {
         $data = Holiday::where('branch_id', Auth::user()->branch_id)->with('branch')->orderby('id','DESC')->get();
-        $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
+        $employees = Employee::where('is_active', 1)->get();
         return view('admin.holiday.index', compact('data','employees'));
     }
 

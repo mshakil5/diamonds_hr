@@ -74,9 +74,11 @@
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
                                     </div>
                                 </div>
+                                <input type="hidden" id="available_prerota">
                                 <div class="col-sm-12 perrmsg">
 
                                 </div>
+                                
 
                             </div>
                             
@@ -174,6 +176,14 @@
                         return;
                     }
                 }
+
+                $available_prerota = $('#available_prerota').val();
+                if ($available_prerota == 1 && !$('#is_prorota').is(':checked')) {
+                    showError('Please check the prerota checkbox if you want to continue.');
+                    return;
+                }
+
+
                 var form_data = new FormData();
                 form_data.append("from_date", $("#from_date").val());
                 form_data.append("to_date", $("#to_date").val());
@@ -320,10 +330,10 @@
         $("#employee_id").change(function() {
             var employee_id = $(this).val();
 
-            $from_date = $("#from_date").val();
-            $to_date = $("#to_date").val();
+            var from_date = $("#from_date").val();
+            var to_date = $("#to_date").val();
 
-            if ($from_date === '' || $to_date === '') {
+            if (from_date === '' || to_date === '') {
                 showError('Please select From Date and To Date first.');
                 return;
             }
@@ -332,7 +342,7 @@
                 $.ajax({
                     url: "{{ route('admin.employee.prorota') }}",
                     type: "GET",
-                    data: { employee_id: employee_id, from_date: $from_date, to_date: $to_date },
+                    data: { employee_id: employee_id, from_date: from_date, to_date: to_date },
                     // Treat 400 and 404 as success
                     statusCode: {
                         400: function(response) {
@@ -355,6 +365,7 @@
                     if (data.status === 400 || data.status === 404) {
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message}</div>`);
                     } else if (data.status === 200) {
+                        $("#available_prerota").val(1);
                         let html = '<div class="alert alert-success">';
                         html += '<h4>Pre-rota Schedules Found</h4>';
                         html += `<p><strong>Total Hours:</strong> ${data.total_hours}</p>`;
@@ -363,7 +374,7 @@
                             html += `<li>From ${rota.start_date} to ${rota.end_date}: ${rota.days} day(s), `;
                             html += `Hours: ${rota.hours}, Shift: ${rota.start_time} - ${rota.end_time}</li>`;
                         });
-                        html += '</ul></div>';
+                        html += '</ul></div><div class="col-sm-12"><input type="checkbox" id="is_prorota" name="is_prorota" value="1"><label for="is_prorota"> There are prerota available. if you want to continue, please checked this.</label></div>';
                         $(".perrmsg").html(html);
                     } else {
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message || 'Unexpected response from server.'}</div>`);

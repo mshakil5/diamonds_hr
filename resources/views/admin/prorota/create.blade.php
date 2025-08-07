@@ -68,7 +68,6 @@
                                     </div>
                                 </div>
 
-                                <div id="holiday_results" class="col-sm-12"></div>
 
                                 <div id="weekly-schedule" class="col-sm-12 mt-3"></div>
 
@@ -78,6 +77,8 @@
                                         <input type="date" class="form-control" id="to_date" name="to_date" />
                                     </div>
                                 </div>
+                                
+                                <div id="holiday_results" class="col-sm-12"></div>
 
                             </div>
                         </form>
@@ -556,13 +557,16 @@ $(document).ready(function() {
     $('#to_date').on('change', function() {
         let start_date = $('#start_date').val();
         let end_date = $('#to_date').val();
-        let employee_ids = $(this).val() || []; // Get selected employee IDs
+        let employee_ids = $('#employee_id').val() || []; // Get selected employee IDs
 
         // Validate inputs
         if (!start_date || employee_ids.length === 0) {
             $('#holiday_results').html('<div class="alert alert-danger">Please select a start date and at least one employee.</div>');
+            $('#to_date').val('');
             return;
         }
+
+        console.log(start_date, end_date, employee_ids);
 
         $.ajax({
             url: "{{ route('admin.holiday.check') }}", 
