@@ -212,6 +212,7 @@
                                 </div>
                                 <!-- /.card-body -->
                                 <div class="card-body">
+                                    <div class="errmsg"></div>
                                     <input type="hidden" id="codeid">
                                     <div class="row">
                                         <div class="col-sm-3">
@@ -375,6 +376,18 @@
                                         <div class="col-sm-3">
                                             <!-- text input -->
                                             <div class="form-group">
+                                                <label>Branch <span class="text-danger">*</span></label>
+                                                <select name="branch_id" id="branch_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    @foreach ($branches as $branch)
+                                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <!-- text input -->
+                                            <div class="form-group">
                                                 <label>Username <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="username" name="username">
                                             </div>
@@ -491,6 +504,7 @@
                                             data-address="{{ $data->address }}"
                                             data-employee_type="{{ $data->employee_type }}"
                                             data-pay_rate="{{ $data->pay_rate }}"
+                                            data-branch_id="{{ $data->branch_id }}"
                                         >
                                             <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
                                         </a>
@@ -756,6 +770,7 @@ $(document).ready(function() {
                 '#pay_rate',
                 '#tax_code',
                 '#entitled_holiday',
+                '#branch_id',
                 '#username',
                 '#password'
             ];
@@ -800,6 +815,7 @@ $(document).ready(function() {
                 '#pay_rate',
                 '#tax_code',
                 '#entitled_holiday',
+                '#branch_id',
                 '#username'
             ];
             for (var i = 0; i < requiredFields.length; i++) {
@@ -839,6 +855,23 @@ $(document).ready(function() {
             });
         }
     });
+
+function showSuccess(message) {
+    pagetop();
+    $('.errmsg').html(`<div class="alert alert-success">${message}</div>`);
+}
+
+function showError(message) {
+    pagetop();
+    $('.errmsg').html(`
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    `);
+}
 
     // Edit
     $("#contentContainer").on('click', '#EditBtn', function() {
@@ -981,6 +1014,7 @@ $(document).ready(function() {
         $("#address").val(data.address);
         $("#pay_rate").val(data.pay_rate);
         $("#tax_code").val(data.tax_code);
+        $("#branch_id").val(data.branch_id);
         $("#entitled_holiday").val(data.entitled_holiday);
         $("#bank_details").val(data.bank_details);
         var image = document.getElementById('preview-image');
@@ -1078,13 +1112,6 @@ $(document).ready(function() {
         $('#detailsModal').modal('show');
     });
 
-    function showSuccess(message) {
-        alert(message);
-    }
-
-    function showError(message) {
-        alert(message);
-    }
 
     function reloadPage(timeout) {
         setTimeout(() => location.reload(), timeout);

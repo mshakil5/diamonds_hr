@@ -19,17 +19,7 @@ use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
-    public function index2(Request $request)
-    {
-        if (Auth::user()->is_type == '1') {
-          $query = Employee::with('user.branch')->orderby('id','DESC')->get();
-        } else{
-          $query = Employee::with('user.branch')->where('branch_id', Auth::user()->branch_id)->orderby('id','DESC')->get();
-        }
-        $roles = Role::latest()->get();
-        $branches = Branch::where('status', 1)->get();
-        return view('admin.employees.index', compact('query','roles','branches'));
-    }
+
 
     public function index(Request $request)
     {
@@ -121,7 +111,7 @@ class EmployeeController extends Controller
             'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
         ]);
         $request->merge(['user_id'=>$user->id]);
-        $request->merge(['branch_id' => Auth::user()->branch_id]);
+        $request->merge(['branch_id' =>$request->branch_id ?? Auth::user()->branch_id]);
         
         Employee::create($request->all());
 
@@ -171,7 +161,7 @@ class EmployeeController extends Controller
 
         if($request->password){
             $request->merge(['password'=>Hash::make($request->password)]);
-            $request->merge(['branch_id' => Auth::user()->branch_id]);
+            $request->merge(['branch_id' =>$request->branch_id ?? Auth::user()->branch_id]);
             
             $user = User::whereId($employee->user_id)->first()->update([
                 'name'=>$request->name,
@@ -184,7 +174,7 @@ class EmployeeController extends Controller
             ]);
 
         }else {
-            $request->merge(['branch_id' => Auth::user()->branch_id]);
+            $request->merge(['branch_id' =>$request->branch_id ?? Auth::user()->branch_id]);
             $user = User::whereId($employee->user_id)->first()->update([
                 'name'=>$request->name,
                 'email'=>$request->email,
