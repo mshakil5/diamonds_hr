@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
+use App\Models\EmployeePreRota;
 use Illuminate\Http\Request;
 use App\Models\Holiday;
 use Illuminate\Support\Facades\Validator;
@@ -65,6 +66,15 @@ class HolidayController extends Controller
         $data->branch_id = Auth::user()->branch_id;
         $data->created_by = auth()->id();
         $data->save();
+
+        if ($request->available_prerota == 1) {
+            $updatePrerota = EmployeePreRota::where('employee_id', $request->employee_id)
+                ->whereBetween('date', [$from, $to])
+                ->update([
+                    'status' => 3, // authorised holiday
+                    'updated_by' => auth()->id(),
+                ]);
+        }
 
         return response()->json(['status' => 200, 'message' => 'Data created successfully.', 'counts' => $counts, 'holiday' => $holiday]);
     }
@@ -136,7 +146,6 @@ class HolidayController extends Controller
 
     public function checkHolidays(Request $request)
     {
-        // Validate input
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -145,10 +154,9 @@ class HolidayController extends Controller
         ]);
 
         $start_date = $request->start_date;
-        $end_date = $request->end_date ?? $start_date; // Use start_date if end_date is not provided
+        $end_date = $request->end_date ?? $start_date; 
         $employee_ids = $request->employee_ids;
 
-        // Query holidays with overlapping date ranges
         $holidays = Holiday::whereIn('employee_id', $employee_ids)
             ->where(function ($query) use ($start_date, $end_date) {
                 $query->whereBetween('from_date', [$start_date, $end_date])
@@ -162,15 +170,13 @@ class HolidayController extends Controller
                             ->where('to_date', '<=', $end_date);
                     });
             })
-            ->with('employee') // Assuming a relationship with Employee model
+            ->with('employee') 
             ->get();
 
-        // If no holidays found
         if ($holidays->isEmpty()) {
             return response()->json(['success' => false]);
         }
 
-        // Build HTML output
         $html = '<h4>Holiday List</h4><table class="table table-bordered"><thead><tr><th>Employee</th><th>From Date</th><th>To Date</th><th>Type</th><th>Details</th></tr></thead><tbody>';
         foreach ($holidays as $holiday) {
             $html .= "<tr><td>{$holiday->employee->name}</td><td>{$holiday->from_date}</td><td>{$holiday->to_date}</td><td>{$holiday->type}</td><td>{$holiday->details}</td></tr>";

@@ -170,7 +170,6 @@ class ProrotaController extends Controller
             $branchId = Auth::user()->branch_id;
             $createdBy = Auth::id();
 
-            // Validate array lengths
             $datesCount = count($request->input('dates', []));
             if ($datesCount > 0 && (
                 $datesCount !== count($request->input('employee_ids', [])) ||
@@ -181,7 +180,6 @@ class ProrotaController extends Controller
                 throw new \Exception('Mismatch in array lengths for dates, employee_ids, day_names, start_times, or end_times.');
             }
 
-            // Step 1: Find and update the PreRota entry
             $preRota = PreRota::findOrFail($request->codeid);
             $preRota->update([
                 'branch_id'   => $branchId,
@@ -214,10 +212,8 @@ class ProrotaController extends Controller
                 $allDates[] = $date->copy();
             }
 
-            // Step 4: Delete existing EmployeePreRota records for this PreRota
             EmployeePreRota::where('pre_rota_id', $preRota->id)->delete();
 
-            // Step 5: Loop through employees and dates to insert new schedule rows
             foreach ($request->employee_id as $employeeId) {
                 foreach ($allDates as $dateObj) {
                     $date = $dateObj->format('Y-m-d');

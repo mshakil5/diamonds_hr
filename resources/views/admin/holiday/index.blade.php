@@ -190,6 +190,7 @@
                 form_data.append("employee_type", $("#employee_type").val());
                 form_data.append("employee_id", $("#employee_id").val());
                 form_data.append("details", $("#details").val());
+                form_data.append("available_prerota", $("#available_prerota").val());
 
                 $.ajax({
                     url: url,
