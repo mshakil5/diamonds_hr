@@ -162,15 +162,14 @@
                                                               $out = \Carbon\Carbon::parse($data->clock_out);
                                                               $diff = $in->diff($out);
                                                           }
-                                                          $lateTime = null; // Initialize lateTime as null
+                                                          $lateTime = null; 
                                                           if ($checkPrerota && $data->clock_in) {
-                                                              $scheduledStart = \Carbon\Carbon::parse($checkPrerota->start_time); // Adjust 'start_time' to the actual field name in your EmployeePreRota model
+                                                              $scheduledStart = \Carbon\Carbon::parse($checkPrerota->start_time); 
                                                               $actualClockIn = \Carbon\Carbon::parse($data->clock_in);
-                                                              // Check if clock-in is after the scheduled start time
                                                               if ($actualClockIn->gt($scheduledStart)) {
                                                                   $lateTime = $scheduledStart->diff($actualClockIn);
                                                               } else {
-                                                                  $lateTime = null; // Not late if clocked in on time or early
+                                                                  $lateTime = null;
                                                               }
                                                           }
                                                           @endphp

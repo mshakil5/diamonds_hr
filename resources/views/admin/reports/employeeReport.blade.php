@@ -101,6 +101,7 @@
                                     <th>Date</th>
                                     <th>Name</th>
                                     <th>Type</th>
+                                    <th>Late</th>
                                     <th>Details</th>
                                     <th>Total Time</th>
                                 </tr>
@@ -108,11 +109,35 @@
                             <tbody>
                                 @php $totalSeconds = 0; @endphp
                                 @foreach ($data as $key => $data)
+
+                                @php
+                                    $date = \Carbon\Carbon::parse($data->created_at)->format('Y-m-d');
+                                    $checkPrerota = \App\Models\EmployeePreRota::where('employee_id', $data->employee_id)->where('date', $date)->first();
+                                    $lateTime = null; 
+                                    if ($checkPrerota && $data->clock_in) {
+                                        $scheduledStart = \Carbon\Carbon::parse($checkPrerota->start_time); 
+                                        $actualClockIn = \Carbon\Carbon::parse($data->clock_in);
+                                        if ($actualClockIn->gt($scheduledStart)) {
+                                            $lateTime = $scheduledStart->diff($actualClockIn);
+                                        } else {
+                                            $lateTime = null;
+                                        }
+                                    }
+                                @endphp
+
+
                                 <tr>
                                     <td>{{$key + 1}}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('d/m/Y') }}</td>
                                     <td>{{ $data->employee_name }}</td>
                                     <td>{{ $data->type }}</td>
+                                    <td>
+                                        @if($lateTime)
+                                            {{ $lateTime->format('%H:%I:%S') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>{{ $data->details }}</td>
                                     <td>
                                         @if($data->clock_in && $data->clock_out)
