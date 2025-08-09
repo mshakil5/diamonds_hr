@@ -793,6 +793,7 @@ $(document).ready(function() {
                 processData: false,
                 data: form_data,
                 success: function(d) {
+                    pagetop();
                     showSuccess('Data created successfully.');
                     reloadPage(2000);
                 },
@@ -840,6 +841,7 @@ $(document).ready(function() {
                 processData: false,
                 data: form_data,
                 success: function(d) {
+                    pagetop();
                     showSuccess('Data updated successfully.');
                     reloadPage(2000);
                 },

@@ -244,6 +244,9 @@ $(document).ready(function() {
     $("#addBtn").click(function (e) {
         e.preventDefault();
 
+        // add a loader when clicked and disable the button
+        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+
         const isCreate = $(this).val() === 'Create';
         const isUpdate = $(this).val() === 'Update';
 
@@ -359,6 +362,7 @@ $(document).ready(function() {
                 if (d.status == 422) {
                     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
                 } else {
+                    pagetop();
                     showSuccess(isCreate ? 'Data created successfully.' : 'Data updated successfully.');
                     resetFieldStyles(requiredFields.map(f => f.id));
                     reloadPage(2000);

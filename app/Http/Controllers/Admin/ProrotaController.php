@@ -107,6 +107,8 @@ class ProrotaController extends Controller
                     $endTime = $pattern['end_time'] ?? null;
                     $status = $startTime ? 1 : 2;
 
+                    // 1 = In Rota, 2 = Day off, 3 = Holiday
+
 
                     EmployeePreRota::create([
                         'employee_id' => $employeeId,
@@ -233,6 +235,7 @@ class ProrotaController extends Controller
                     $endTime = $pattern['end_time'] ?? null;
                     $status = $startTime ? 1 : 2;
 
+                    // 1 = In Rota, 2 = Day off, 3 = Holiday
 
                     EmployeePreRota::create([
                         'employee_id' => $employeeId,

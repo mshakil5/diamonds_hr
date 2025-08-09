@@ -1,17 +1,7 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-@if (auth()->user()->canDo(11))
-<section class="content" id="newBtnSection">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-2">
-                {{-- <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button> --}}
-            </div>
-        </div>
-    </div>
-</section>
-@endif
+
 
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
@@ -51,7 +41,7 @@
                                         <select class="form-control select2" id="employee_id" name="employee_id">
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
-                                            <option value="{{$employee->id}}">{{$employee->name}}</option>
+                                            <option value="{{$employee->id}}">{{$employee->name}} - {{$employee->id}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -70,14 +60,14 @@
                                 <div class="col-sm-12">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Details <span class="text-danger">*</span></label>
+                                        <label>Details</label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
                                     </div>
                                 </div>
                                 <input type="hidden" id="available_prerota">
-                                <div class="col-sm-12 perrmsg">
+                                <div class="col-sm-12 perrmsg"></div>
 
-                                </div>
+                                <div id="prerotaContainer"  class="col-sm-12" ></div>
                                 
 
                             </div>
@@ -149,6 +139,12 @@
 @endsection
 
 @section('script')
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<!-- Tempus Dominus Bootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
 
 <script>
     // Function to show error messages in .errmsg div
@@ -157,7 +153,9 @@
     // }
 
     $(document).ready(function() {
-        
+
+        initTimepickers();
+        addDayOffToggle();
         
         $.ajaxSetup({
             headers: {
@@ -217,7 +215,7 @@
             }
 
             if ($(this).val() == 'Update') {
-                var requiredFields = ['#from_date', '#to_date',  '#employee_id', '#employee_type', '#details'];
+                var requiredFields = ['#from_date', '#to_date',  '#employee_id', '#employee_type'];
                 for (var i = 0; i < requiredFields.length; i++) {
                     if ($(requiredFields[i]).val() === '') {
                         showError('Please fill all required fields.');
@@ -330,9 +328,9 @@
 
         $("#employee_id").change(function() {
             var employee_id = $(this).val();
-
             var from_date = $("#from_date").val();
             var to_date = $("#to_date").val();
+            $("#prerotaContainer").html('');
 
             if (from_date === '' || to_date === '') {
                 showError('Please select From Date and To Date first.');
@@ -354,6 +352,7 @@
                         }
                     },
                     success: function(data) {
+                        console.log(data);
                         handleResponse(data);
                     },
                     error: function(xhr, status, error) {
@@ -367,22 +366,90 @@
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message}</div>`);
                     } else if (data.status === 200) {
                         $("#available_prerota").val(1);
-                        let html = '<div class="alert alert-success">';
-                        html += '<h4>Pre-rota Schedules Found</h4>';
-                        html += `<p><strong>Total Hours:</strong> ${data.total_hours}</p>`;
-                        html += '<ul>';
-                        data.data.forEach(function(rota) {
-                            html += `<li>From ${rota.start_date} to ${rota.end_date}: ${rota.days} day(s), `;
-                            html += `Hours: ${rota.hours}, Shift: ${rota.start_time} - ${rota.end_time}</li>`;
-                        });
-                        html += '</ul></div><div class="col-sm-12"><input type="checkbox" id="is_prorota" name="is_prorota" value="1"><label for="is_prorota"> There are prerota available. if you want to continue, please checked this.</label></div>';
-                        $(".perrmsg").html(html);
+                        $("#prerotaContainer").html(data.prerota);
+                        
+                        // Move these here: Initialize pickers and toggles AFTER HTML is inserted
+                        initTimepickers();
+                        addDayOffToggle();
+                        
                     } else {
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message || 'Unexpected response from server.'}</div>`);
                     }
                 }
             }
         });
+
+        function initTimepickers() {
+            $('.timepicker').datetimepicker({
+                format: 'HH:mm',
+                stepping: 30,
+                useCurrent: false,
+                icons: {
+                    time: 'fa fa-clock',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-calendar-check',
+                    clear: 'fa fa-trash',
+                    close: 'fa fa-times'
+                }
+            });
+        }
+
+
+        function addDayOffToggle() {
+            document.querySelectorAll('.day-off-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const row = this.closest('.row');
+                    const startInput = row.querySelector('[name="start_times[]"]');
+                    const endInput = row.querySelector('[name="end_times[]"]');
+                    const makeHolidayBtn = row.querySelector('.make-holiday-btn');
+
+                    const isDisabled = startInput.disabled;
+
+                    if (isDisabled) {
+                        startInput.disabled = false;
+                        endInput.disabled = false;
+                        makeHolidayBtn.style.display = 'inline-block'; // Show Make Holiday button
+                        this.classList.remove('btn-warning');
+                        this.classList.add('btn-success');
+                        this.textContent = 'Working Day';
+                    } else {
+                        startInput.disabled = true;
+                        endInput.disabled = true;
+                        startInput.value = '';
+                        endInput.value = '';
+                        makeHolidayBtn.style.display = 'none'; // Hide Make Holiday button
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-warning');
+                        this.textContent = 'Day Off';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.make-holiday-btn input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const row = this.closest('.row');
+                    const startInput = row.querySelector('[name="start_times[]"]');
+                    const endInput = row.querySelector('[name="end_times[]"]');
+                    const otherButton = row.querySelector('.day-off-btn'); // Targets In Rota, No Rota Found, or Set Day Off button
+
+                    if (this.checked) {
+                        startInput.disabled = true;
+                        endInput.disabled = true;
+                        startInput.value = '';
+                        endInput.value = '';
+                        otherButton.style.display = 'none'; // Hide other button
+                    } else {
+                        startInput.disabled = false;
+                        endInput.disabled = false;
+                        otherButton.style.display = 'inline-block'; // Show other button
+                    }
+                });
+            });
+        }
 
 
 

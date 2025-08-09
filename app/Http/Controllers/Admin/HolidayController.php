@@ -27,7 +27,6 @@ class HolidayController extends Controller
             'to_date' => 'required|date|after_or_equal:from_date',
             'employee_id' => 'required|string|max:255',
             'employee_type' => 'required|string|max:255',
-            'details' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -92,7 +91,6 @@ class HolidayController extends Controller
             'to_date' => 'required|date|after_or_equal:from_date',
             'employee_id' => 'required|string|max:255',
             'employee_type' => 'required|string|max:255',
-            'details' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
