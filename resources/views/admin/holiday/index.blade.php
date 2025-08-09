@@ -159,6 +159,10 @@
             setTimeout(function() { location.reload(); }, timeout);
         }
 
+        function pagetop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         $("#addBtn").click(function() {
             pagetop();
             var isUpdate = $(this).val() === 'Update';
@@ -173,7 +177,6 @@
             const startTimes = $("input[name='start_times[]']");
             const endTimes = $("input[name='end_times[]']");
             
-
             let timeError = false;
 
             $(".schedule-row").each(function (index) {
@@ -189,7 +192,7 @@
                     if (!start) {
                         showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
                         timeError = true;
-                        return false; // breaks the .each loop
+                        return false;
                     }
 
                     if (!end) {
@@ -210,8 +213,6 @@
 
             if (timeError) return;
 
-            
-
             var form_data = new FormData();
             form_data.append("from_date", $("#from_date").val());
             form_data.append("to_date", $("#to_date").val());
@@ -222,14 +223,12 @@
                 form_data.append("codeid", $("#codeid").val());
             }
 
-            // Collect checked holiday dates
             var holidayDates = [];
             $('input[name="make_holiday[]"]:checked').each(function() {
                 holidayDates.push($(this).val());
             });
             form_data.append("holiday_dates", JSON.stringify(holidayDates));
 
-            // ✅ Debug: Show form values
             for (let pair of form_data.entries()) {
                 console.log(pair[0] + ": " + pair[1]);
             }
@@ -239,8 +238,6 @@
                 showError('Please check the prerota checkbox if you want to continue.');
                 return;
             }
-
-            
 
             $.ajax({
                 url: isUpdate ? upurl : url,
@@ -292,17 +289,24 @@
         });
 
         function populateForm(data) {
-            $("#from_date").val(data.from_date);
-            $("#to_date").val(data.to_date);
-            $("#employee_id").val(data.employee_id).trigger('change');
-            $("#employee_type").val(data.type);
-            $("#details").val(data.details);
-            $("#codeid").val(data.id);
+            console.log(data);
+            $("#from_date").val(data.holiday.from_date);
+            $("#to_date").val(data.holiday.to_date);
+            $("#employee_id").val(data.holiday.employee_id).trigger('change');
+            $("#employee_type").val(data.holiday.type);
+            $("#details").val(data.holiday.details);
+            $("#codeid").val(data.holiday.id);
+            $("#prerotaContainer").html('');
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');
             $("#header-title").html('Update data');
             $("#addThisFormContainer").show(300);
             $("#newBtn").hide(100);
+            
+            initTimepickers();
+            addDayOffToggle();
+            addEndTimeValidation();
+            
         }
 
         function clearform() {
@@ -339,6 +343,7 @@
                 showError('Please select From Date and To Date first.');
                 return;
             }
+            console.log(employee_id);
 
             if (employee_id) {
                 $.ajax({

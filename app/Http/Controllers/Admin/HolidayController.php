@@ -21,6 +21,8 @@ class HolidayController extends Controller
         return view('admin.holiday.index', compact('data','employees'));
     }
 
+
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -104,6 +106,95 @@ class HolidayController extends Controller
         }
     }
 
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'codeid' => 'required|exists:holidays,id',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
+            'employee_id' => 'required|string|max:255',
+            'employee_type' => 'required|string|max:255',
+            'holiday_dates' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
+        }
+
+        $data = Holiday::findOrFail($request->codeid);
+
+        $employee = Employee::find($request->employee_id);
+        if (!$employee) {
+            return response()->json(['status' => 422, 'message' => 'Employee not found.']);
+        }
+
+        $from = Carbon::parse($request->from_date);
+        $to = Carbon::parse($request->to_date);
+        $duration = $from->diffInDays($to) + 1;
+
+        $holidayDates = $request->holiday_dates ? json_decode($request->holiday_dates, true) : [];
+        $holidayCount = !empty($holidayDates) ? count($holidayDates) : $duration;
+
+        $counts = $employee->leave_status_counts;
+        $currentDuration = Carbon::parse($data->from_date)->diffInDays(Carbon::parse($data->to_date)) + 1;
+        $used = ($counts['booked'] ?? 0) + ($counts['taken'] ?? 0) - $currentDuration;
+        $available = $employee->entitled_holiday - $used;
+
+        if ($holidayCount > $available) {
+            return response()->json([
+                'status' => 422,
+                'message' => "Only $available holiday(s) available, but $holidayCount requested."
+            ]);
+        }
+
+        if (!empty($holidayDates)) {
+            foreach ($holidayDates as $date) {
+                $holidayDate = Carbon::parse($date);
+                if ($holidayDate->lt($from) || $holidayDate->gt($to)) {
+                    return response()->json([
+                        'status' => 422,
+                        'message' => 'Selected holiday dates must be within the specified date range.'
+                    ]);
+                }
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $data->from_date = $request->from_date;
+            $data->to_date = $request->to_date;
+            $data->employee_id = $request->employee_id;
+            $data->type = $request->employee_type;
+            $data->details = $request->details;
+            $data->updated_by = auth()->id();
+            $data->save();
+
+            // Delete existing holiday_details for this holiday
+            DB::table('holiday_details')->where('holiday_id', $data->id)->delete();
+
+            
+
+            $this->preRota($holidayDates, $from, $to, $request, $data);
+
+            DB::commit();
+
+            $holiday = $employee->holidays()->get();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data updated successfully.',
+                'counts' => $counts,
+                'holiday' => $holiday
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while updating the holiday: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function preRota($holidayDates, $from, $to, $request, $data)
     {
         if (!empty($holidayDates)) {
@@ -129,7 +220,7 @@ class HolidayController extends Controller
                 $newPrerota = new EmployeePreRota();
                 $newPrerota->employee_id = $request->employee_id;
                 $newPrerota->date = $date;
-                $newPrerota->day_name = $holidayDate->format('l'); 
+                $newPrerota->day_name = $holidayDate->format('l');
                 $newPrerota->status = 3; // authorised holiday
                 $newPrerota->start_time = null;
                 $newPrerota->end_time = null;
@@ -164,7 +255,7 @@ class HolidayController extends Controller
                     $newPrerota = new EmployeePreRota();
                     $newPrerota->employee_id = $request->employee_id;
                     $newPrerota->date = $dateStr;
-                    $newPrerota->day_name = $currentDate->format('l'); 
+                    $newPrerota->day_name = $currentDate->format('l');
                     $newPrerota->status = 3;
                     $newPrerota->start_time = null;
                     $newPrerota->end_time = null;
@@ -185,60 +276,70 @@ class HolidayController extends Controller
         }
     }
 
+    // public function edit($id)
+    // {
+    //     $data = Holiday::with('holidayDetail')->findOrFail($id);
+    //     return response()->json($data);
+    // }
+
     public function edit($id)
     {
-        $data = Holiday::findOrFail($id);
-        return response()->json($data);
-    }
+        $holiday = Holiday::with('holidayDetail')->findOrFail($id);
+        $preRota = EmployeePreRota::where('employee_id', $holiday->employee_id)
+            ->whereBetween('date', [$holiday->from_date, $holiday->to_date])
+            ->get();
 
-    public function update(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'from_date' => 'required|date',
-            'to_date' => 'required|date|after_or_equal:from_date',
-            'employee_id' => 'required|string|max:255',
-            'employee_type' => 'required|string|max:255',
+
+
+            $prop = '';
+            foreach ($preRota as $key => $prorota) {
+                $prop .= '<div class="row schedule-row"><div class="col-md-2">
+                            <input type="text" class="form-control" name="dates[]" value="' . $prorota->date . '" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control" name="day_names[]" value="' . $prorota->day_name . '" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date timepicker" id="start_time_' . $key . '" data-target-input="nearest" >
+                                <input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_' . $key . '" value="' . $prorota->start_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
+                                <div class="input-group-append" data-target="#start_time_' . $key . '" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date timepicker" id="end_time_' . $key . '" data-target-input="nearest">
+                                <input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_' . $key . '"  value="' . $prorota->end_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
+                                <div class="input-group-append" data-target="#end_time_' . $key . '" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">';
+
+                if ($prorota->status == '1') {
+                    $prop .= '<button type="button" class="btn btn-success btn-sm day-off-btn">In Rota</button><button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
+                            <input type="checkbox" name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
+                        </button>';
+                } elseif ($prorota->status == '3') {
+                    $prop .= '<button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
+                            <input type="checkbox" checked name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
+                        </button>';
+                } else {
+                    $prop .= '<button type="button" class="btn btn-warning btn-sm day-off-btn">Day Off</button>';
+                }
+
+                $prop .= '</div></div>';
+            }
+
+        return response()->json([
+            'holiday' => $holiday,
+            'prerota' => $prop,
+            'preRotaDetails' => $preRota,
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
-        }
-
-        $data = Holiday::findOrFail($request->codeid);
-
-        $employee = Employee::find($request->employee_id);
-        if (!$employee) {
-            return response()->json(['status' => 404, 'message' => 'Employee not found.']);
-        }
-
-        $from = Carbon::parse($request->from_date);
-        $to = Carbon::parse($request->to_date);
-        $newDuration = $from->diffInDays($to) + 1;
-
-        $counts = $employee->leave_status_counts;
-        $currentDuration = Carbon::parse($data->from_date)->diffInDays(Carbon::parse($data->to_date)) + 1;
-
-        $used = ($counts['booked'] ?? 0) + ($counts['taken'] ?? 0) - $currentDuration;
-
-        $available = $employee->entitled_holiday - $used;
-
-        if ($newDuration > $available) {
-            return response()->json([
-                'status' => 422,
-                'message' => "Only $available holiday(s) available, but $newDuration requested."
-            ]);
-        }
-
-        $data->from_date = $request->from_date;
-        $data->to_date = $request->to_date;
-        $data->employee_id = $request->employee_id;
-        $data->type = $request->employee_type;
-        $data->details = $request->details;
-        $data->updated_by = auth()->id();
-        $data->save();
-
-        return response()->json(['status' => 200, 'message' => 'Data updated successfully.']);
     }
+
+
 
     public function delete($id)
     {

@@ -374,7 +374,7 @@ class EmployeeController extends Controller
                         </div>
                         <div class="col-md-2">
                             <div class="input-group date timepicker" id="start_time_' . $key . '" data-target-input="nearest" >
-                                <input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_' . $key . '" value="' . $prorota->start_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
+                                <input type="text" name="start_times[]" readonly class="form-control datetimepicker-input start-time" data-target="#start_time_' . $key . '" value="' . $prorota->start_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
                                 <div class="input-group-append" data-target="#start_time_' . $key . '" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
                                 </div>
@@ -382,7 +382,7 @@ class EmployeeController extends Controller
                         </div>
                         <div class="col-md-2">
                             <div class="input-group date timepicker" id="end_time_' . $key . '" data-target-input="nearest">
-                                <input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_' . $key . '"  value="' . $prorota->end_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
+                                <input type="text" name="end_times[]" readonly class="form-control datetimepicker-input end-time" data-target="#end_time_' . $key . '"  value="' . $prorota->end_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
                                 <div class="input-group-append" data-target="#end_time_' . $key . '" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
                                 </div>
@@ -394,10 +394,10 @@ class EmployeeController extends Controller
                     $prop .= '<button type="button" class="btn btn-success btn-sm day-off-btn">In Rota</button><button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
                             <input type="checkbox" name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
                         </button>';
-                } elseif ($prorota->status == '4') {
-                    $prop .= '<button type="button" class="btn btn-danger btn-sm">No Rota found</button><button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
-                            <input type="checkbox" name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
-                        </button><button type="button" class="btn btn-secondary btn-sm day-off-btn ml-1">Set Day Off</button>';
+                } elseif ($prorota->status == '3') {
+                    $prop .= '<button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
+                            <input type="checkbox" checked name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
+                        </button>';
                 } else {
                     $prop .= '<button type="button" class="btn btn-warning btn-sm day-off-btn">Day Off</button>';
                 }
