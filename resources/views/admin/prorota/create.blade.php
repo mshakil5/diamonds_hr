@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label>Details</label>
+                                        <label>Note</label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
                                     </div>
                                 </div>

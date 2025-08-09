@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label>Details</label>
+                                        <label>Note</label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
                                     </div>
                                 </div>
@@ -289,7 +289,6 @@
         });
 
         function populateForm(data) {
-            console.log(data);
             $("#from_date").val(data.holiday.from_date);
             $("#to_date").val(data.holiday.to_date);
             $("#employee_id").val(data.holiday.employee_id).trigger('change');
