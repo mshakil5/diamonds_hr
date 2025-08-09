@@ -296,7 +296,7 @@
             $("#employee_type").val(data.holiday.type);
             $("#details").val(data.holiday.details);
             $("#codeid").val(data.holiday.id);
-            $("#prerotaContainer").html('');
+            $("#prerotaContainer").html(data.prerota);
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');
             $("#header-title").html('Update data');

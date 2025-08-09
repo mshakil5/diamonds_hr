@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\EmployeePreRota;
 use Illuminate\Http\Request;
 use App\Models\Holiday;
+use App\Models\HolidayDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -363,19 +364,8 @@ class HolidayController extends Controller
         $end_date = $request->end_date ?? $start_date; 
         $employee_ids = $request->employee_ids;
 
-        $holidays = Holiday::whereIn('employee_id', $employee_ids)
-            ->where(function ($query) use ($start_date, $end_date) {
-                $query->whereBetween('from_date', [$start_date, $end_date])
-                    ->orWhereBetween('to_date', [$start_date, $end_date])
-                    ->orWhere(function ($query) use ($start_date, $end_date) {
-                        $query->where('from_date', '<=', $start_date)
-                            ->where('to_date', '>=', $end_date);
-                    })
-                    ->orWhere(function ($query) use ($start_date, $end_date) {
-                        $query->where('from_date', '>=', $start_date)
-                            ->where('to_date', '<=', $end_date);
-                    });
-            })
+        $holidays = HolidayDetail::whereIn('employee_id', $employee_ids)
+            ->whereBetween('date', [$start_date, $end_date])
             ->with('employee') 
             ->get();
 
@@ -383,13 +373,13 @@ class HolidayController extends Controller
             return response()->json(['success' => false]);
         }
 
-        $html = '<h4>Holiday List</h4><table class="table table-bordered"><thead><tr><th>Employee</th><th>From Date</th><th>To Date</th><th>Type</th><th>Details</th></tr></thead><tbody>';
+        $html = '<h4>Holiday List</h4><table class="table table-bordered"><thead><tr><th>Employee</th><th>From Date</th><th>Type</th><th>Details</th></tr></thead><tbody>';
         foreach ($holidays as $holiday) {
-            $html .= "<tr><td>{$holiday->employee->name}</td><td>{$holiday->from_date}</td><td>{$holiday->to_date}</td><td>{$holiday->type}</td><td>{$holiday->details}</td></tr>";
+            $html .= "<tr><td>{$holiday->employee->name}</td><td>{$holiday->date}</td><td>{$holiday->holiday->type}</td><td>{$holiday->holiday->details}</td></tr>";
         }
         $html .= '</tbody></table>';
 
-        return response()->json(['success' => true, 'html' => $html]);
+        return response()->json(['success' => true, 'html' => $html, 'holidays' => $holidays]);
     }
 
 
