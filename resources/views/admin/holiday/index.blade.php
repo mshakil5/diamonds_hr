@@ -100,7 +100,7 @@
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->from_date)->format('d-m-Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->to_date)->format('d-m-Y') }}</td>
-                                    <td>{{ $data->holidayDetail->count() }}</td>
+                                    <td><span class="btn btn-warning btn-sm">{{ $data->holidayDetail->count() }}</span></td>
                                     <td>{{ $data->employee->name }}</td>
                                     <td>{{ $data->type }}</td>
                                     <td>{{ $data->branch->name ?? '' }}</td>
