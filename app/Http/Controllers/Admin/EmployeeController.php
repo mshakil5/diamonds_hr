@@ -289,132 +289,6 @@ class EmployeeController extends Controller
     }
 
 
-    // check employee prorota data is available or not then show
-
-    public function checkProrota_old(Request $request)
-    {
-        // Validate inputs
-        $employeeId = $request->employee_id;
-        $fromDate = $request->from_date;
-        $toDate = $request->to_date;
-
-        if (!$employeeId || !$fromDate || !$toDate) {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Employee ID, from date, and to date are required.'
-            ], 400);
-        }
-
-        try {
-            $fromDate = Carbon::parse($fromDate)->startOfDay();
-            $toDate = Carbon::parse($toDate)->endOfDay();
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid date format for from_date or to_date.'
-            ], 400);
-        }
-
-        try {
-            $prorotaData = DB::table('employee_pre_rotas')
-                ->where('employee_id', $employeeId)
-                ->whereBetween('date', [$fromDate, $toDate])
-                ->get();
-
-            if ($prorotaData->isEmpty()) {
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'No pre-rota schedules found for this employee in the specified date range.'
-                ], 404);
-            }
-
-            if ($prorotaData) {
-                $prop = '';
-                foreach ($prorotaData as $key => $prorota) {
-
-                    $prop.= '<div class="row"><div class="col-md-2">
-                                <input type="text" class="form-control" name="dates[]" value="'.$prorota->date.'" readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <input type="text" class="form-control" name="day_names[]" value="'.$prorota->day_name.'" readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="input-group date timepicker" id="start_time_'.$key.'" data-target-input="nearest" >
-                                    <input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_'.$key.'" value="'.$prorota->start_time.'"/>
-                                    <div class="input-group-append" data-target="#start_time_'.$key.'" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="input-group date timepicker" id="end_time_'.$key.'" data-target-input="nearest">
-                                    <input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_'.$key.'"  value="'.$prorota->end_time.'"/>
-                                    <div class="input-group-append" data-target="#end_time_'.$key.'" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2">';
-
-                            if ($prorota->status == '1') {
-                                $prop.= '<button type="button" class="btn btn-success btn-sm day-off-btn">Working Day</button>';
-                            } else {
-                                $prop.= '<button type="button" class="btn btn-warning btn-sm day-off-btn"> Day Off</button>';
-                            }
-                            
-                            $prop.= '</div></div>';
-                    
-                }
-            }
-
-
-
-            // Process affected dates and hours
-            $affectedData = $prorotaData->map(function ($rota) use ($fromDate, $toDate) {
-                $startDate = Carbon::parse($rota->date)->max($fromDate);
-                $endDate = Carbon::parse($rota->date)->min($toDate);
-                $days = $startDate->diffInDays($endDate) + 1;
-
-                // Calculate hours between start_time and end_time for each day
-                $startTime = Carbon::parse($rota->start_time);
-                $endTime = Carbon::parse($rota->end_time);
-
-                // Handle overnight shifts
-                if ($endTime->lt($startTime)) {
-                    $endTime->addDay();
-                }
-
-                $hoursPerDay = $startTime->diffInHours($endTime, true);
-                $totalHours = $hoursPerDay * $days;
-
-                return [
-                    'start_date' => $startDate->toDateString(),
-                    'end_date' => $endDate->toDateString(),
-                    'days' => $days,
-                    'hours' => round($totalHours, 2),
-                    'start_time' => $startTime->toTimeString(),
-                    'end_time' => $rota->end_time
-                ];
-            });
-
-            // Sum total hours
-            $totalHours = $affectedData->sum('hours');
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'Pre-rota schedules found.',
-                'prerota' => $prop,
-                'data' => $affectedData,
-                'total_hours' => round($totalHours, 2)
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'An error occurred while fetching pre-rota data.'
-            ], 500);
-        }
-    }
-
     public function checkProrota(Request $request)
     {
         // Validate inputs
@@ -492,7 +366,7 @@ class EmployeeController extends Controller
 
             $prop = '';
             foreach ($scheduleData as $key => $prorota) {
-                $prop .= '<div class="row"><div class="col-md-2">
+                $prop .= '<div class="row schedule-row"><div class="col-md-2">
                             <input type="text" class="form-control" name="dates[]" value="' . $prorota->date . '" readonly>
                         </div>
                         <div class="col-md-2">

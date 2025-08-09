@@ -1,11 +1,9 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-
-
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
-         <div class="row justify-content-md-center">
+        <div class="row justify-content-md-center">
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
@@ -18,24 +16,19 @@
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
                             
                             <div class="row">
-
                                 <div class="col-sm-3">
-                                <!-- text input -->
                                     <div class="form-group">
                                         <label>From Date <span class="text-danger">*</span></label>
-                                            <input type="date" class="form-control" id="from_date" name="from_date" />
+                                        <input type="date" class="form-control" id="from_date" name="from_date" />
                                     </div>
                                 </div>
-
                                 <div class="col-sm-3">
-                                <!-- text input -->
                                     <div class="form-group">
                                         <label>To Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="to_date" name="to_date"/>
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
-                                <!-- text input -->
                                     <div class="form-group">
                                         <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id">
@@ -47,7 +40,6 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
-                                <!-- text input -->
                                     <div class="form-group">
                                         <label>Type <span class="text-danger">*</span></label>
                                         <select class="form-control" id="employee_type" name="employee_type">
@@ -58,20 +50,14 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
-                                <!-- text input -->
                                     <div class="form-group">
                                         <label>Details</label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="1"></textarea>
                                     </div>
                                 </div>
-                                <input type="hidden" id="available_prerota">
                                 <div class="col-sm-12 perrmsg"></div>
-
-                                <div id="prerotaContainer"  class="col-sm-12" ></div>
-                                
-
+                                <div id="prerotaContainer" class="col-sm-12"></div>
                             </div>
-                            
                         </form>
                     </div>
                     <div class="card-footer">
@@ -135,7 +121,6 @@
         </div>
     </div>
 </section>
-
 @endsection
 
 @section('script')
@@ -147,15 +132,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
 
 <script>
-    // Function to show error messages in .errmsg div
-    // function showError(message) {
-    //     $('.errmsg').html('<div class="alert alert-danger">' + message + '</div>');
-    // }
-
     $(document).ready(function() {
-
         initTimepickers();
         addDayOffToggle();
+        addEndTimeValidation();
         
         $.ajaxSetup({
             headers: {
@@ -165,94 +145,120 @@
         var url = "{{URL::to('/admin/holidays')}}";
         var upurl = "{{URL::to('/admin/holidays/update')}}";
 
-        $("#addBtn").click(function() {
-            if ($(this).val() == 'Create') {
-                var requiredFields = ['#from_date', '#to_date', '#employee_id', '#employee_type', '#details'];
-                for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val () === '') {
-                        showError('Please fill all required fields.');
-                        return;
-                    }
-                }
+        function showError(message) {
+            $('.errmsg').html('<div class="alert alert-danger">' + message + '</div>');
+        }
 
-                $available_prerota = $('#available_prerota').val();
-                if ($available_prerota == 1 && !$('#is_prorota').is(':checked')) {
-                    showError('Please check the prerota checkbox if you want to continue.');
+        function showSuccess(message) {
+            $('.errmsg').html('<div class="alert alert-success">' + message + '</div>');
+        }
+
+        function reloadPage(timeout) {
+            setTimeout(function() { location.reload(); }, timeout);
+        }
+
+        $("#addBtn").click(function() {
+            pagetop();
+            var isUpdate = $(this).val() === 'Update';
+            var requiredFields = ['#from_date', '#to_date', '#employee_id', '#employee_type'];
+            for (var i = 0; i < requiredFields.length; i++) {
+                if ($(requiredFields[i]).val() === '') {
+                    showError('Please fill all required fields.');
                     return;
                 }
-
-
-                var form_data = new FormData();
-                form_data.append("from_date", $("#from_date").val());
-                form_data.append("to_date", $("#to_date").val());
-                form_data.append("employee_type", $("#employee_type").val());
-                form_data.append("employee_id", $("#employee_id").val());
-                form_data.append("details", $("#details").val());
-                form_data.append("available_prerota", $("#available_prerota").val());
-
-                $.ajax({
-                    url: url,
-                    method: "POST",
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(d) {
-
-                        // console.log(d);
-                        if (d.status == 422) {
-                            $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                        } else {
-                            showSuccess('Data created successfully.');
-                            reloadPage(2000);
-                        }
-                       
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        showError('An error occurred. Please try again.');
-                    }
-                });
             }
 
-            if ($(this).val() == 'Update') {
-                var requiredFields = ['#from_date', '#to_date',  '#employee_id', '#employee_type'];
-                for (var i = 0; i < requiredFields.length; i++) {
-                    if ($(requiredFields[i]).val() === '') {
-                        showError('Please fill all required fields.');
-                        return;
+            const startTimes = $("input[name='start_times[]']");
+            const endTimes = $("input[name='end_times[]']");
+            
+
+            let timeError = false;
+
+            $(".schedule-row").each(function (index) {
+                const row = $(this);
+                const startInput = row.find(".start-time");
+                const endInput = row.find(".end-time");
+
+                const start = startInput.val();
+                const end = endInput.val();
+                const isDayOff = startInput.prop('disabled') && endInput.prop('disabled');
+
+                if (!isDayOff) {
+                    if (!start) {
+                        showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
+                        timeError = true;
+                        return false; // breaks the .each loop
+                    }
+
+                    if (!end) {
+                        showError(`End time is required for Row ${index + 1}.`, endInput[0]);
+                        timeError = true;
+                        return false;
+                    }
+
+                    const startDate = new Date(`1970-01-01T${start}:00`);
+                    const endDate = new Date(`1970-01-01T${end}:00`);
+                    if (startDate >= endDate) {
+                        showError(`End time must be after Start time (Row ${index + 1}).`, endInput[0]);
+                        timeError = true;
+                        return false;
                     }
                 }
+            });
 
-                var form_data = new FormData();
-                form_data.append("from_date", $("#from_date").val());
-                form_data.append("to_date", $("#to_date").val());
-                form_data.append("employee_type", $("#employee_type").val());
-                form_data.append("employee_id", $("#employee_id").val());
-                form_data.append("details", $("#details").val());
+            if (timeError) return;
+
+            
+
+            var form_data = new FormData();
+            form_data.append("from_date", $("#from_date").val());
+            form_data.append("to_date", $("#to_date").val());
+            form_data.append("employee_type", $("#employee_type").val());
+            form_data.append("employee_id", $("#employee_id").val());
+            form_data.append("details", $("#details").val());
+            if (isUpdate) {
                 form_data.append("codeid", $("#codeid").val());
-
-                $.ajax({
-                    url: upurl,
-                    type: "POST",
-                    dataType: 'json',
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(d) {
-                        if (d.status == 422) {
-                            $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                        } else {
-                            showSuccess('Data updated successfully.');
-                            reloadPage(2000); 
-                        }
-                        
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        showError('An error occurred. Please try again.');
-                    }
-                });
             }
+
+            // Collect checked holiday dates
+            var holidayDates = [];
+            $('input[name="make_holiday[]"]:checked').each(function() {
+                holidayDates.push($(this).val());
+            });
+            form_data.append("holiday_dates", JSON.stringify(holidayDates));
+
+            // ✅ Debug: Show form values
+            for (let pair of form_data.entries()) {
+                console.log(pair[0] + ": " + pair[1]);
+            }
+
+            var available_prerota = $('#available_prerota').val();
+            if (available_prerota == 1 && !$('#is_prorota').is(':checked')) {
+                showError('Please check the prerota checkbox if you want to continue.');
+                return;
+            }
+
+            
+
+            $.ajax({
+                url: isUpdate ? upurl : url,
+                method: "POST",
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function(d) {
+                    if (d.status == 422) {
+                        showError(d.message);
+                    } else {
+                        showSuccess(isUpdate ? 'Data updated successfully.' : 'Data created successfully.');
+                        reloadPage(2000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    showError('An error occurred. Please try again.');
+                }
+            });
         });
 
         $("#contentContainer").on('click', '#EditBtn', function() {
@@ -303,8 +309,6 @@
             $("#header-title").html('Add new data');
         }
 
-
-
         $(function() {
             $("#example1").DataTable({
                 "responsive": true,
@@ -323,9 +327,6 @@
             });
         });
 
-
-        // onchange employee_id to check prorota
-
         $("#employee_id").change(function() {
             var employee_id = $(this).val();
             var from_date = $("#from_date").val();
@@ -342,7 +343,6 @@
                     url: "{{ route('admin.employee.prorota') }}",
                     type: "GET",
                     data: { employee_id: employee_id, from_date: from_date, to_date: to_date },
-                    // Treat 400 and 404 as success
                     statusCode: {
                         400: function(response) {
                             handleResponse(response.responseJSON);
@@ -365,19 +365,33 @@
                     if (data.status === 400 || data.status === 404) {
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message}</div>`);
                     } else if (data.status === 200) {
-                        $("#available_prerota").val(1);
                         $("#prerotaContainer").html(data.prerota);
-                        
-                        // Move these here: Initialize pickers and toggles AFTER HTML is inserted
                         initTimepickers();
                         addDayOffToggle();
-                        
+                        addEndTimeValidation();
                     } else {
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message || 'Unexpected response from server.'}</div>`);
                     }
                 }
             }
         });
+
+        function addEndTimeValidation() {
+            const startInputs = document.querySelectorAll('[name="start_times[]"]');
+            const endInputs = document.querySelectorAll('[name="end_times[]"]');
+
+            startInputs.forEach((startInput, index) => {
+                startInput.addEventListener('change', function () {
+                    const endInput = endInputs[index];
+                    if (this.value) {
+                        endInput.setAttribute('required', 'required');
+                    } else {
+                        endInput.removeAttribute('required');
+                        endInput.value = '';
+                    }
+                });
+            });
+        }
 
         function initTimepickers() {
             $('.timepicker').datetimepicker({
@@ -398,7 +412,6 @@
             });
         }
 
-
         function addDayOffToggle() {
             document.querySelectorAll('.day-off-btn').forEach(button => {
                 button.addEventListener('click', function () {
@@ -412,7 +425,7 @@
                     if (isDisabled) {
                         startInput.disabled = false;
                         endInput.disabled = false;
-                        makeHolidayBtn.style.display = 'inline-block'; // Show Make Holiday button
+                        makeHolidayBtn.style.display = 'inline-block';
                         this.classList.remove('btn-warning');
                         this.classList.add('btn-success');
                         this.textContent = 'Working Day';
@@ -421,7 +434,7 @@
                         endInput.disabled = true;
                         startInput.value = '';
                         endInput.value = '';
-                        makeHolidayBtn.style.display = 'none'; // Hide Make Holiday button
+                        makeHolidayBtn.style.display = 'none';
                         this.classList.remove('btn-success');
                         this.classList.add('btn-warning');
                         this.textContent = 'Day Off';
@@ -434,29 +447,22 @@
                     const row = this.closest('.row');
                     const startInput = row.querySelector('[name="start_times[]"]');
                     const endInput = row.querySelector('[name="end_times[]"]');
-                    const otherButton = row.querySelector('.day-off-btn'); // Targets In Rota, No Rota Found, or Set Day Off button
+                    const otherButton = row.querySelector('.day-off-btn');
 
                     if (this.checked) {
                         startInput.disabled = true;
                         endInput.disabled = true;
                         startInput.value = '';
                         endInput.value = '';
-                        otherButton.style.display = 'none'; // Hide other button
+                        otherButton.style.display = 'none';
                     } else {
                         startInput.disabled = false;
                         endInput.disabled = false;
-                        otherButton.style.display = 'inline-block'; // Show other button
+                        otherButton.style.display = 'inline-block';
                     }
                 });
             });
         }
-
-
-
-
     });
 </script>
-
-
-
 @endsection

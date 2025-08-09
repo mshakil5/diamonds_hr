@@ -281,7 +281,6 @@ $(document).ready(function() {
             }
         }
 
-        // ✅ Validate time fields (start_time => end_time must exist)
         const startTimes = $("input[name='start_times[]']");
         const endTimes = $("input[name='end_times[]']");
         
@@ -298,23 +297,20 @@ $(document).ready(function() {
             const isDayOff = startInput.prop('disabled') && endInput.prop('disabled');
 
             if (!isDayOff) {
-                // Validate: start time must exist
                 if (!start) {
                     showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
                     timeError = true;
                     return false; // breaks the .each loop
                 }
 
-                // Validate: end time must exist
                 if (!end) {
                     showError(`End time is required for Row ${index + 1}.`, endInput[0]);
                     timeError = true;
                     return false;
                 }
 
-                // Optional: Validate end time comes after start time (if needed)
-                const startDate = new Date(`1970-01-01T${start}:00`);
-                const endDate = new Date(`1970-01-01T${end}:00`);
+                const startDate = new Date(`2025-01-01T${start}:00`);
+                const endDate = new Date(`2025-01-01T${end}:00`);
                 if (startDate >= endDate) {
                     showError(`End time must be after Start time (Row ${index + 1}).`, endInput[0]);
                     timeError = true;
@@ -327,7 +323,6 @@ $(document).ready(function() {
 
 
 
-        // ✅ Prepare FormData
         const form_data = new FormData();
 
         $('#employee_id').val().forEach(emp => form_data.append('employee_id[]', emp));
@@ -345,12 +340,10 @@ $(document).ready(function() {
             form_data.append("codeid", $("#codeid").val());
         }
 
-        // ✅ Debug: Show form values
         for (let pair of form_data.entries()) {
             console.log(pair[0] + ": " + pair[1]);
         }
 
-        // ✅ AJAX Submit
         $.ajax({
             url: isCreate ? url : upurl,
             type: "POST",
