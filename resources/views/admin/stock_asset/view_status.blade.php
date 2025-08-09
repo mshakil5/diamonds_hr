@@ -21,6 +21,7 @@
               <thead>
                 <tr>
                   <th>SL</th>
+                  <th>Product Name</th>
                   <th>Product Code</th>
                   <th>Status</th>
                   {{-- <th>Asset No.</th> --}}
@@ -40,6 +41,7 @@
                   <tr>
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $item->product_code ?? '' }}</td>
+                    <td>{{ $item->assetType->name ?? '' }}</td>
                     <td>{{ $statusLabel[$item->asset_status] ?? 'Unknown' }}</td>
                     {{-- <td>{{ $item->code ?? '' }}</td> --}}
                     @if(in_array($status, [1, 2]))

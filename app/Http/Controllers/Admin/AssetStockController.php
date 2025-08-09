@@ -249,7 +249,6 @@ class AssetStockController extends Controller
         $query = StockAssetType::with(['location.flooor', 'branch', 'maintenance']);
         
         $assets = $query->where('asset_status', $status)->get();
-
         $branches = Branch::where('status', 1)->get();
         $floors = Floor::where('status', 1)->get();
         $maintenances = Maintenance::where('status', 1)->get();
