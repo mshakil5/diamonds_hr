@@ -154,28 +154,45 @@
                                                     </thead>
                                                     <tbody>
                                                         @php
-                                                            if ($data->clock_in && $data->clock_out) {
-                                                                $in = \Carbon\Carbon::parse($data->clock_in);
-                                                                $out = \Carbon\Carbon::parse($data->clock_out);
-                                                                $diff = $in->diff($out);
-                                                                
-                                                            } else {
-                                                                
-                                                            }
-                                                        @endphp
-                                                        <tr>
-                                                            <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
-                                                            <td>{{ $data->type }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('h:m') }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($data->clock_out)->format('h:m') }}</td>
-                                                            <td></td>
-                                                            @if(isset($diff))
-                                                              <td>{{ $diff->format('%H:%I:%S') }}</td>
-                                                            @else
-                                                              <td>-</td>
-                                                            @endif
-                                                            <td class="d-none">
-                                                                <a id="DetailsBtn"
+                                                          $date = \Carbon\Carbon::parse($data->created_at)->format('Y-m-d');
+
+                                                          $checkPrerota = \App\Models\EmployeePreRota::where('employee_id', $data->employee_id)->where('date', $date)->first();
+                                                          if ($data->clock_in && $data->clock_out) {
+                                                              $in = \Carbon\Carbon::parse($data->clock_in);
+                                                              $out = \Carbon\Carbon::parse($data->clock_out);
+                                                              $diff = $in->diff($out);
+                                                          }
+                                                          $lateTime = null; // Initialize lateTime as null
+                                                          if ($checkPrerota && $data->clock_in) {
+                                                              $scheduledStart = \Carbon\Carbon::parse($checkPrerota->start_time); // Adjust 'start_time' to the actual field name in your EmployeePreRota model
+                                                              $actualClockIn = \Carbon\Carbon::parse($data->clock_in);
+                                                              // Check if clock-in is after the scheduled start time
+                                                              if ($actualClockIn->gt($scheduledStart)) {
+                                                                  $lateTime = $scheduledStart->diff($actualClockIn);
+                                                              } else {
+                                                                  $lateTime = null; // Not late if clocked in on time or early
+                                                              }
+                                                          }
+                                                          @endphp
+                                                          <tr>
+                                                              <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
+                                                              <td>{{ $data->type }}</td>
+                                                              <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('h:i') }}</td>
+                                                              <td>{{ \Carbon\Carbon::parse($data->clock_out)->format('h:i') }}</td>
+                                                              <td>
+                                                                  @if($lateTime)
+                                                                      {{ $lateTime->format('%H:%I:%S') }}
+                                                                  @else
+                                                                      -
+                                                                  @endif
+                                                              </td>
+                                                              @if(isset($diff))
+                                                                  <td>{{ $diff->format('%H:%I:%S') }}</td>
+                                                              @else
+                                                                  <td>-</td>
+                                                              @endif
+                                                              <td class="d-none">
+                                                                  <a id="DetailsBtn"
                                                                     rid="{{$data->id}}"
                                                                     title="Details"
                                                                     data-id="{{ $data->id }}"
@@ -186,13 +203,13 @@
                                                                     data-details="{{ $data->details }}"
                                                                     data-date="{{ \Carbon\Carbon::parse($data->created_at)->format('Y-m-d') }}"
                                                                     data-total_time="{{ isset($diff) ? $diff->format('%H:%I:%S') : '-' }}"
-                                                                >
-                                                                    <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
-                                                                </a>
-                                                                <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
-                                                                <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
-                                                            </td>
-                                                        </tr>
+                                                                  >
+                                                                      <i class="fa fa-info-circle" style="color: #17a2b8; font-size:16px; margin-right:8px;"></i>
+                                                                  </a>
+                                                                  <a id="EditBtn" rid="{{$data->id}}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
+                                                                  <a id="deleteBtn" rid="{{$data->id}}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
+                                                              </td>
+                                                          </tr>
                                                     </tbody>
                                                 </table>
                                             </td>
