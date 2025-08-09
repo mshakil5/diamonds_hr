@@ -66,4 +66,9 @@ class Holiday extends Model
             return 'Taken';
         }
     }
+
+    public function holidayDetail()
+    {
+        return $this->hasMany(HolidayDetail::class);
+    }
 }

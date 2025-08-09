@@ -85,6 +85,7 @@
                                     <th>Created Date</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
+                                    <th>Total Holiday</th>
                                     <th>Employee</th>
                                     <th>Type</th>
                                     <th>Branch</th>
@@ -99,6 +100,7 @@
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->from_date)->format('d-m-Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->to_date)->format('d-m-Y') }}</td>
+                                    <td>{{ $data->holidayDetail->count() }}</td>
                                     <td>{{ $data->employee->name }}</td>
                                     <td>{{ $data->type }}</td>
                                     <td>{{ $data->branch->name ?? '' }}</td>
