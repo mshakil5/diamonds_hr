@@ -167,7 +167,7 @@
                                                             <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                                             <td>{{ $data->type }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('h:m') }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($data->clock_out)->format('h:m') }}{{ $data->clock_out }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($data->clock_out)->format('h:m') }}</td>
                                                             <td></td>
                                                             @if(isset($diff))
                                                               <td>{{ $diff->format('%H:%I:%S') }}</td>
