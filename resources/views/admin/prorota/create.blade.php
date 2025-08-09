@@ -244,8 +244,6 @@ $(document).ready(function() {
     $("#addBtn").click(function (e) {
         e.preventDefault();
 
-        // add a loader when clicked and disable the button
-        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
 
         const isCreate = $(this).val() === 'Create';
         const isUpdate = $(this).val() === 'Update';
@@ -343,6 +341,8 @@ $(document).ready(function() {
         for (let pair of form_data.entries()) {
             console.log(pair[0] + ": " + pair[1]);
         }
+        
+        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
 
         $.ajax({
             url: isCreate ? url : upurl,
@@ -352,6 +352,8 @@ $(document).ready(function() {
             processData: false,
             data: form_data,
             success: function (d) {
+                
+                $(this).prop('disabled', false).html('');
                 if (d.status == 422) {
                     $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
                 } else {
