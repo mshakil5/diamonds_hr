@@ -90,10 +90,13 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-2">
-                                                @if ($schedule->pivot->start_time)
+                                                @if ($schedule->pivot->status == 1)
                                                     <button type="button" class="btn btn-success btn-sm day-off-btn">Working Day</button>
-                                                @else
+
+                                                @elseif ($schedule->pivot->status == 2)
                                                     <button type="button" class="btn btn-warning btn-sm day-off-btn">Day Off</button>
+                                                @else
+                                                    <button type="button" class="btn btn-primary btn-sm ">Holiday</button>
                                                 @endif
                                             </div>
                                         </div>
