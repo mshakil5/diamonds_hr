@@ -102,6 +102,8 @@
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>Late</th>
+                                    <th>Clock In</th>
+                                    <th>Clock Out</th>
                                     <th>Details</th>
                                     <th>Total Time</th>
                                 </tr>
@@ -138,6 +140,8 @@
                                             -
                                         @endif
                                     </td>
+                                    <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('h:i') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->clock_out)->format('h:i') }}</td>
                                     <td>{{ $data->details }}</td>
                                     <td>
                                         @if($data->clock_in && $data->clock_out)
