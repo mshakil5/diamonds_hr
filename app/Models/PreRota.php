@@ -44,7 +44,7 @@ class PreRota extends Model
     public function employees()
     {
         return $this->belongsToMany(Employee::class, 'employee_pre_rotas', 'pre_rota_id', 'employee_id')
-            ->withPivot(['date', 'day_name', 'start_time', 'end_time', 'created_by'])
+            ->withPivot(['date', 'day_name', 'start_time', 'end_time','status', 'created_by'])
             ->withTimestamps()
             ->distinct(); // 🔍 This line removes duplicate employee records
     }

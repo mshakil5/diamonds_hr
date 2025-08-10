@@ -141,6 +141,7 @@
                                                 data-end_date="{{ $data->end_date }}"
                                                 data-details="{{ $data->details }}"
                                                 data-created_at="{{ $data->created_at }}"
+                                                data-status="{{ $data->status }}"
                                                 data-employees='@json($data->employees)'
                                             >
                                                 Details
@@ -212,11 +213,9 @@ $(document).ready(function() {
         pagetop();
     }
 
-    // When user selects or types a time, remove error message and styles
     $(document).on('input change', '.start-time, .end-time', function () {
         $(this).removeClass('is-invalid').css('border-color', '');
         
-        // Clear the main error message only if there are no other visible errors
         if ($('.is-invalid').length === 0) {
             $('.errmsg').html('');
         }
@@ -457,92 +456,188 @@ $(document).ready(function() {
     });
 
     // dtls
+    // $("#contentContainer").on('click', '#DetailsBtn', function () {
+    //     var attrs = {};
+    //     $.each(this.attributes, function () {
+    //         if (this.specified && this.name.startsWith('data-')) {
+    //             var key = this.name.replace('data-', '');
+    //             if (key === 'employees') {
+    //                 try {
+    //                     attrs[key] = JSON.parse(this.value);
+    //                 } catch (e) {
+    //                     attrs[key] = [];
+    //                 }
+    //             } else {
+    //                 attrs[key] = this.value;
+    //             }
+    //         }
+    //     });
+
+    //     // Build general info rows
+    //     let generalRows = Object.entries(attrs).filter(([k]) => k !== 'employees').map(([key, value]) => `
+    //         <tr>
+    //             <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
+    //             <td>${value}</td>
+    //         </tr>
+    //     `).join('');
+
+    //     // Build schedule rows if employees present
+    //     let scheduleRows = '';
+    //     if (Array.isArray(attrs.employees)) {
+    //         scheduleRows = attrs.employees.map(emp => {
+    //             return `
+    //                 <tr>
+    //                     <td>${emp.name}</td>
+    //                     <td>${emp.pivot?.date ?? '-'}</td>
+    //                     <td>${emp.pivot?.day_name ?? '-'}</td>
+    //                     <td>${emp.pivot?.start_time ?? '-'}</td>
+    //                     <td>${emp.pivot?.end_time ?? '-'}</td>
+    //                 </tr>`;
+    //         }).join('');
+    //     }
+
+    //     // Full modal HTML
+    //     let modalHtml = `
+    //         <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    //             <div class="modal-dialog modal-xl" role="document">
+    //                 <div class="modal-content">
+    //                     <div class="modal-header">
+    //                         <h5 class="modal-title" id="detailsModalLabel">Pre-Rota Details</h5>
+    //                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    //                             <span aria-hidden="true">×</span>
+    //                         </button>
+    //                     </div>
+    //                     <div class="modal-body">
+    //                         <h5>General Info</h5>
+    //                         <table class="table table-sm table-bordered mb-4">
+    //                             <tbody>
+    //                                 ${generalRows}
+    //                             </tbody>
+    //                         </table>
+    //                         <h5>Employee Schedules</h5>
+    //                         <table class="table table-sm table-bordered">
+    //                             <thead>
+    //                                 <tr>
+    //                                     <th>Employee</th>
+    //                                     <th>Date</th>
+    //                                     <th>Day</th>
+    //                                     <th>Start Time</th>
+    //                                     <th>End Time</th>
+    //                                 </tr>
+    //                             </thead>
+    //                             <tbody>
+    //                                 ${scheduleRows}
+    //                             </tbody>
+    //                         </table>
+    //                     </div>
+    //                     <div class="modal-footer">
+    //                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     `;
+
+    //     $('#detailsModal').remove(); // Remove any existing modals
+    //     $('body').append(modalHtml); // Append new modal
+    //     $('#detailsModal').modal('show'); // Show modal
+    // });
+
     $("#contentContainer").on('click', '#DetailsBtn', function () {
-        var attrs = {};
-        $.each(this.attributes, function () {
-            if (this.specified && this.name.startsWith('data-')) {
-                var key = this.name.replace('data-', '');
-                if (key === 'employees') {
-                    try {
-                        attrs[key] = JSON.parse(this.value);
-                    } catch (e) {
-                        attrs[key] = [];
-                    }
-                } else {
-                    attrs[key] = this.value;
+    var attrs = {};
+    $.each(this.attributes, function () {
+        if (this.specified && this.name.startsWith('data-')) {
+            var key = this.name.replace('data-', '');
+            if (key === 'employees') {
+                try {
+                    attrs[key] = JSON.parse(this.value);
+                } catch (e) {
+                    attrs[key] = [];
                 }
+            } else {
+                attrs[key] = this.value;
             }
-        });
-
-        // Build general info rows
-        let generalRows = Object.entries(attrs).filter(([k]) => k !== 'employees').map(([key, value]) => `
-            <tr>
-                <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
-                <td>${value}</td>
-            </tr>
-        `).join('');
-
-        // Build schedule rows if employees present
-        let scheduleRows = '';
-        if (Array.isArray(attrs.employees)) {
-            scheduleRows = attrs.employees.map(emp => {
-                return `
-                    <tr>
-                        <td>${emp.name}</td>
-                        <td>${emp.pivot?.date ?? '-'}</td>
-                        <td>${emp.pivot?.day_name ?? '-'}</td>
-                        <td>${emp.pivot?.start_time ?? '-'}</td>
-                        <td>${emp.pivot?.end_time ?? '-'}</td>
-                    </tr>`;
-            }).join('');
         }
+    });
 
-        // Full modal HTML
-        let modalHtml = `
-            <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="detailsModalLabel">Pre-Rota Details</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <h5>General Info</h5>
-                            <table class="table table-sm table-bordered mb-4">
-                                <tbody>
-                                    ${generalRows}
-                                </tbody>
-                            </table>
-                            <h5>Employee Schedules</h5>
-                            <table class="table table-sm table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Employee</th>
-                                        <th>Date</th>
-                                        <th>Day</th>
-                                        <th>Start Time</th>
-                                        <th>End Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${scheduleRows}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
+    // Build general info rows
+    let generalRows = Object.entries(attrs).filter(([k]) => k !== 'employees').map(([key, value]) => `
+        <tr>
+            <th>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>
+            <td>${value}</td>
+        </tr>
+    `).join('');
+
+    // Map status values to human-readable text
+    const statusMap = {
+        '1': 'In Rota',
+        '2': 'Day Off',
+        '3': 'Authorised Holiday'
+    };
+
+    // Build schedule rows if employees present
+    let scheduleRows = '';
+    if (Array.isArray(attrs.employees)) {
+        scheduleRows = attrs.employees.map(emp => {
+            return `
+                <tr>
+                    <td>${emp.name}</td>
+                    <td>${emp.pivot?.date ?? '-'}</td>
+                    <td>${emp.pivot?.day_name ?? '-'}</td>
+                    <td>${emp.pivot?.start_time ?? '-'}</td>
+                    <td>${emp.pivot?.end_time ?? '-'}</td>
+                    <td>${emp.pivot?.status ? statusMap[emp.pivot.status] || emp.pivot.status : '-'}</td>
+                </tr>`;
+        }).join('');
+    }
+
+    // Full modal HTML
+    let modalHtml = `
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel">Pre-Rota Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>General Info</h5>
+                        <table class="table table-sm table-bordered mb-4">
+                            <tbody>
+                                ${generalRows}
+                            </tbody>
+                        </table>
+                        <h5>Employee Schedules</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Day</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${scheduleRows}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
 
-        $('#detailsModal').remove(); // Remove any existing modals
-        $('body').append(modalHtml); // Append new modal
-        $('#detailsModal').modal('show'); // Show modal
-    });
+    $('#detailsModal').remove(); // Remove any existing modals
+    $('body').append(modalHtml); // Append new modal
+    $('#detailsModal').modal('show'); // Show modal
+});
 
 
 
