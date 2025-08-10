@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PDF;
 use App\Models\AssetType;
+use App\Models\EmployeePreRota;
 use App\Models\StockAssetType;
 
 class ReportController extends Controller
@@ -389,6 +390,46 @@ class ReportController extends Controller
         // dd($results);
 
         return view('admin.reports.asset_stock_report', compact('results', 'assetTypes', 'branches', 'statuses', 'request'));
+    }
+
+    public function weeklyPrerotaReport(Request $request)
+    {
+        
+        $currentDate = Carbon::today();
+        $currentWeekStart = $currentDate->copy()->startOfWeek(Carbon::MONDAY); 
+        $currentWeekEnd = $currentDate->copy()->endOfWeek(Carbon::SUNDAY);
+
+        $nextWeekStart = $currentWeekStart->copy()->addWeek(); 
+        $nextWeekEnd = $currentWeekEnd->copy()->addWeek();
+
+        $currentWeekPreRota = EmployeePreRota::whereBetween('date', [$currentWeekStart->format('Y-m-d'), $currentWeekEnd->format('Y-m-d')])
+            ->get();
+
+        $nextWeekPreRota = EmployeePreRota::whereBetween('date', [$nextWeekStart->format('Y-m-d'), $nextWeekEnd->format('Y-m-d')])
+            ->get();
+        return view('admin.reports.weeklyPrerotaReport', compact('currentWeekPreRota'));
+       
+        
+    }
+
+    public function nextweekPrerotaReport(Request $request)
+    {
+        
+        $currentDate = Carbon::today();
+        $currentWeekStart = $currentDate->copy()->startOfWeek(Carbon::MONDAY); 
+        $currentWeekEnd = $currentDate->copy()->endOfWeek(Carbon::SUNDAY);
+
+        $nextWeekStart = $currentWeekStart->copy()->addWeek(); 
+        $nextWeekEnd = $currentWeekEnd->copy()->addWeek();
+
+        $currentWeekPreRota = EmployeePreRota::whereBetween('date', [$currentWeekStart->format('Y-m-d'), $currentWeekEnd->format('Y-m-d')])
+            ->get();
+
+        $nextWeekPreRota = EmployeePreRota::whereBetween('date', [$nextWeekStart->format('Y-m-d'), $nextWeekEnd->format('Y-m-d')])
+            ->get();
+        return view('admin.reports.weeklyPrerotaReport', compact('nextWeekPreRota'));
+       
+        
     }
 
 }

@@ -27,5 +27,9 @@ class EmployeePreRota extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "Employee Pre-Rota record has been {$eventName}");
     }
 
+    public function employee(){
+        return $this->belongsTo(Employee::class);
+    }
+
 
 }

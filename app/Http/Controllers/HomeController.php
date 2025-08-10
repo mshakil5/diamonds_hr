@@ -13,6 +13,7 @@ use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StockAssetType;
 use App\Models\Branch;
+use App\Models\EmployeePreRota;
 use App\Models\Floor;
 use App\Models\Maintenance;
 
@@ -92,7 +93,24 @@ class HomeController extends Controller
         ->groupBy('asset_status')
         ->pluck('total', 'asset_status');
 
-        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status', 'statusCounts'));
+
+        $currentDate = Carbon::today();
+        $currentWeekStart = $currentDate->copy()->startOfWeek(Carbon::MONDAY); 
+        $currentWeekEnd = $currentDate->copy()->endOfWeek(Carbon::SUNDAY);
+
+        $nextWeekStart = $currentWeekStart->copy()->addWeek(); 
+        $nextWeekEnd = $currentWeekEnd->copy()->addWeek();
+
+
+        $currentWeekPreRota = \App\Models\EmployeePreRota::whereBetween('date', [$currentWeekStart->format('Y-m-d'), $currentWeekEnd->format('Y-m-d')])
+        ->distinct('employee_id')
+        ->count('employee_id');
+
+        $nextWeekPreRota = \App\Models\EmployeePreRota::whereBetween('date', [$nextWeekStart->format('Y-m-d'), $nextWeekEnd->format('Y-m-d')])
+            ->distinct('employee_id')
+            ->count('employee_id');
+
+        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status', 'statusCounts','currentWeekPreRota','nextWeekPreRota'));
     }
   
     /**

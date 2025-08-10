@@ -148,6 +148,10 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport');
     Route::post('/report/employee', [ReportController::class, 'employeeReport'])->name('employeeReport.search');
 
+    // weekly prerota
+    Route::get('/report/weekly-prerota', [ReportController::class, 'weeklyPrerotaReport'])->name('weeklyprerota');
+    Route::get('/report/next-prerota', [ReportController::class, 'nextweekPrerotaReport'])->name('nextweeklyprerota');
+
     // holiday report
     Route::get('/report/holiday', [ReportController::class, 'holidayReport'])->name('holidayReport');
     Route::post('/report/holiday', [ReportController::class, 'holidayReport'])->name('holidayReport.search');

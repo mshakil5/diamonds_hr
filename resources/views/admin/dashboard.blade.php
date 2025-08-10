@@ -111,6 +111,34 @@
           @endforeach
 
           <!-- ./col -->
+
+          <div class="col-lg-3 col-md-4 col-6 mb-3">
+              <a href="{{ route('weeklyprerota') }}" class="text-decoration-none">
+                <div class="small-box bg-primary rounded shadow-sm">
+                  <div class="inner">
+                    <h3 class="text-white font-weight-bold">{{ $currentWeekPreRota }} Employee</h3>
+                    <p class="text-white m-0">This week</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                </div>
+              </a>
+          </div>
+
+          <div class="col-lg-3 col-md-4 col-6 mb-3">
+              <a href="{{ route('nextweeklyprerota') }}" class="text-decoration-none">
+            <div class="small-box bg-primary rounded shadow-sm">
+              <div class="inner">
+                <h3 class="text-white font-weight-bold">{{ $nextWeekPreRota }} Employee</h3>
+                <p class="text-white m-0">Next week</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+              </a>
+          </div>
           
         </div>
         <!-- /.row (main row) -->
