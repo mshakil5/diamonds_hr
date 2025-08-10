@@ -360,21 +360,54 @@ $(document).ready(function() {
             processData: false,
             data: form_data,
             success: function (d) {
-                $(this).prop('disabled', false).html('Update');
-                console.log(d);
-                if (d.status == 422) {
-                    $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+                $('#addBtn').prop('disabled', false).html('Update');
+                console.log('Response:', d);
+                
+                if (d.status === 422) {
+                    $('.errmsg').html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            ${d.message}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    `);
+                    pagetop();
                 } else {
                     pagetop();
                     showSuccess('Data updated successfully.');
-                    setTimeout(() => window.location.href = "{{ route('prorota') }}", 2000);
+                    resetFieldStyles(requiredFields.map(f => f.id));
+                    reloadPage(2000);
                 }
             },
             error: function (xhr) {
-                $(this).prop('disabled', false).html('Update');
-                console.error('Error:', xhr.responseText);
-                showError('An error occurred. Please try again.');
+                $('#addBtn').prop('disabled', false).html('Update');
+                console.error('AJAX Error:', xhr.responseText);
+                
+                let errorMessage = 'An error occurred. Please try again.';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.status === 422 && response.message) {
+                        errorMessage = response.message;
+                    }
+                } catch (e) {
+                    // If response is not JSON, use default error message
+                }
+                
+                $('.errmsg').html(`
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${errorMessage}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `);
+                pagetop();
             }
+
+
+
+            
         });
     });
 });
