@@ -25,7 +25,7 @@
                             </thead>
                             <tbody>
 
-                                @foreach ($nextWeekPreRota as $key => $data)
+                                @foreach ($currentWeekPreRota as $key => $data)
                                 <tr>
                                     <td>{{$key + 1}}</td>
                                     <td>{{$data->date ?? ""}}</td>

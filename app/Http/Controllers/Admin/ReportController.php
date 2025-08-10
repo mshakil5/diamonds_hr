@@ -422,12 +422,9 @@ class ReportController extends Controller
         $nextWeekStart = $currentWeekStart->copy()->addWeek(); 
         $nextWeekEnd = $currentWeekEnd->copy()->addWeek();
 
-        $currentWeekPreRota = EmployeePreRota::whereBetween('date', [$currentWeekStart->format('Y-m-d'), $currentWeekEnd->format('Y-m-d')])
+        $currentWeekPreRota = EmployeePreRota::whereBetween('date', [$nextWeekStart->format('Y-m-d'), $nextWeekEnd->format('Y-m-d')])
             ->get();
-
-        $nextWeekPreRota = EmployeePreRota::whereBetween('date', [$nextWeekStart->format('Y-m-d'), $nextWeekEnd->format('Y-m-d')])
-            ->get();
-        return view('admin.reports.weeklyPrerotaReport', compact('nextWeekPreRota'));
+        return view('admin.reports.weeklyPrerotaReport', compact('currentWeekPreRota'));
        
         
     }
