@@ -396,10 +396,16 @@ class EmployeeController extends Controller
                         </button>';
                 } elseif ($prorota->status == '3') {
                     $prop .= '<button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
-                            <input type="checkbox" checked name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
+                            <input type="checkbox" name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
                         </button>';
-                } else {
+                } elseif ($prorota->status == '2') {
                     $prop .= '<button type="button" class="btn btn-warning btn-sm day-off-btn">Day Off</button>';
+
+                    
+                } else {
+                    $prop .= '<button type="button" class="btn btn-warning btn-sm day-off-btn">Day Off</button><button type="button" class="btn btn-primary btn-sm make-holiday-btn ml-1">
+                            <input type="checkbox" name="make_holiday[]" value="' . $prorota->date . '" class="mr-1">Make Holiday
+                        </button>';
                 }
 
                 $prop .= '</div></div>';
