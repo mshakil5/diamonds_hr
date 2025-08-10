@@ -28,10 +28,10 @@
                                 @foreach ($nextWeekPreRota as $key => $data)
                                 <tr>
                                     <td>{{$key + 1}}</td>
-                                    <td>{{$data->date}}</td>
-                                    <td>{{$data->employee->name}}</td>
-                                    <td>{{$data->start_time}}</td>
-                                    <td>{{$data->end_time}}</td>
+                                    <td>{{$data->date ?? ""}}</td>
+                                    <td>{{$data->employee->name ?? ""}}</td>
+                                    <td>{{$data->start_time ?? ""}}</td>
+                                    <td>{{$data->end_time ?? ""}}</td>
                                 </tr>
                                 @endforeach
 
