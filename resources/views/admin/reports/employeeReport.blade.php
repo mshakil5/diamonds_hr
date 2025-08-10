@@ -37,7 +37,7 @@
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
                                             <option value="{{ $employee->id }}" {{ request('employee_id') == $employee->id ? 'selected' : '' }}>
-                                                {{ $employee->name }}
+                                                {{ $employee->name }} - {{$employee->branch->name}}
                                             </option>
                                             @endforeach
                                         </select>

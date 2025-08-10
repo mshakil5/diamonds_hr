@@ -56,7 +56,7 @@
                                         <label>Employee <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="employee_id" name="employee_id[]" multiple>
                                             @foreach ($employees as $employee)
-                                                <option value="{{$employee->id}}">{{$employee->name}}</option>
+                                                <option value="{{$employee->id}}">{{$employee->name}} - {{$employee->branch->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
