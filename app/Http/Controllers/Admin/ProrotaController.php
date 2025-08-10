@@ -40,12 +40,9 @@ class ProrotaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id' => 'required|array',
-            'employee_id.*' => 'exists:employees,id',
-
+            'employee_id' => 'required',
             'start_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:start_date',
-
             'type' => 'required|in:Regular,Authorized Holiday,Unauthorized Holiday',
 
             'details' => 'nullable|string',
@@ -84,44 +81,47 @@ class ProrotaController extends Controller
                     'day_name'   => $request->day_names[$i] ?? null,
                     'start_time' => $request->start_times[$i] ?? null,
                     'end_time'   => $request->end_times[$i] ?? null,
+                    'status'   => $request->status[$i] ?? null,
                 ];
             }
 
             $start = Carbon::parse($request->start_date);
-            $end   = Carbon::parse($request->to_date);
+            $end = Carbon::parse($request->to_date);
 
             $allDates = [];
             for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
                 $allDates[] = $date->copy();
             }
 
-            foreach ($request->employee_id as $employeeId) {
-                foreach ($allDates as $dateObj) {
-                    $date     = $dateObj->format('Y-m-d');
-                    $dayName  = $dateObj->format('l');
+            foreach ($allDates as $dateObj) {
+                $date = $dateObj->format('Y-m-d');
+                $dayName = $dateObj->format('l');
 
-                    $pattern = collect($scheduleTemplate)->firstWhere('day_name', $dayName);
-                    $employeBranchId = Employee::find($employeeId)->branch_id ?? $branchId;
+                $pattern = collect($scheduleTemplate)->firstWhere('day_name', $dayName);
+                $employeBranchId = Employee::find($request->employee_id)->branch_id ?? $branchId;
 
-                    $startTime = $pattern['start_time'] ?? null;
-                    $endTime = $pattern['end_time'] ?? null;
-                    $status = $startTime ? 1 : 2;
+                $startTime = $pattern['start_time'] ?? null;
+                $endTime = $pattern['end_time'] ?? null;
+                $status = $pattern['status'] ?? null;
 
-                    // 1 = In Rota, 2 = Day off, 3 = Holiday
+                // 1 = In Rota, 2 = Day off, 3 = Holiday
 
+                EmployeePreRota::where('employee_id', $request->employee_id)
+                    ->where('date', $date)
+                    ->delete();
 
-                    EmployeePreRota::create([
-                        'employee_id' => $employeeId,
-                        'pre_rota_id' => $preRota->id,
-                        'branch_id'   => $employeBranchId,
-                        'date'        => $date,
-                        'day_name'    => $dayName,
-                        'start_time'  => $startTime,
-                        'end_time'    => $endTime,
-                        'status'      => $status,
-                        'created_by'  => $createdBy,
-                    ]);
-                }
+                // Create new record
+                EmployeePreRota::create([
+                    'employee_id' => $request->employee_id,
+                    'pre_rota_id' => $preRota->id,
+                    'branch_id' => $employeBranchId,
+                    'date' => $date,
+                    'day_name' => $dayName,
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'status' => $status,
+                    'created_by' => $createdBy,
+                ]);
             }
 
             return response()->json([
@@ -233,7 +233,7 @@ class ProrotaController extends Controller
 
                     $startTime = $pattern['start_time'] ?? null;
                     $endTime = $pattern['end_time'] ?? null;
-                    $status = $startTime ? 1 : 2;
+                    $status = $pattern['status'] ?? null;
 
                     // 1 = In Rota, 2 = Day off, 3 = Holiday
 

@@ -41,7 +41,7 @@
                                         <input type="date" class="form-control" id="start_date" name="start_date" />
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-3 d-none">
                                     <div class="form-group">
                                         <label for="type">Type <span class="text-danger">*</span></label>
                                         <select class="form-control" id="etype" name="type">
@@ -51,34 +51,34 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-4">
                                     <div class="form-group">
                                         <label>Employee <span class="text-danger">*</span></label>
-                                        <select class="form-control select2" id="employee_id" name="employee_id[]" multiple>
+                                        <select class="form-control select2" id="employee_id" name="employee_id[]">
+                                            <option value="">Please Select</option>
                                             @foreach ($employees as $employee)
                                                 <option value="{{$employee->id}}">{{$employee->name}} - {{$employee->branch->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label>Note</label>
-                                        <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
-                                    </div>
-                                </div>
-
-
-                                <div id="weekly-schedule" class="col-sm-12 mt-3"></div>
-
-                                <div class="col-sm-12">
+                                <div class="col-sm-5">
                                     <div class="form-group">
                                         <label>How many days this schedule will continue? <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="to_date" name="to_date" />
                                     </div>
                                 </div>
                                 
+
+                                <div id="weekly-schedule" class="col-sm-12 mt-3"></div>
                                 <div id="holiday_results" class="col-sm-12"></div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Note</label>
+                                        <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
+                                    </div>
+                                </div>
 
                             </div>
                         </form>
@@ -241,133 +241,147 @@ $(document).ready(function() {
     }
 
     $("#addBtn").click(function (e) {
-        e.preventDefault();
+    e.preventDefault();
 
+    const isCreate = $(this).val() === 'Create';
+    const isUpdate = $(this).val() === 'Update';
 
-        const isCreate = $(this).val() === 'Create';
-        const isUpdate = $(this).val() === 'Update';
+    // Required fields
+    const requiredFields = [
+        { id: '#employee_id', name: 'Employee', type: 'multi' },
+        { id: '#etype', name: 'Type', type: 'single' },
+        { id: '#start_date', name: 'From Date', type: 'date' },
+        { id: '#to_date', name: 'To Date', type: 'date' }
+    ];
 
-        // Required fields
-        const requiredFields = [
-            { id: '#employee_id', name: 'Employee', type: 'multi' },
-            { id: '#etype', name: 'Type', type: 'single' },
-            { id: '#start_date', name: 'From Date', type: 'date' },
-            { id: '#to_date', name: 'To Date', type: 'date' }
-        ];
+    resetFieldStyles(requiredFields.map(field => field.id));
+    $('.errmsg').html('');
 
-        resetFieldStyles(requiredFields.map(field => field.id));
-        $('.errmsg').html('');
+    // Validate basic fields
+    for (let field of requiredFields) {
+        const value = $(field.id).val();
 
-        // Validate basic fields
-        for (let field of requiredFields) {
-            const value = $(field.id).val();
-
-            if (field.type === 'multi' && (!value || value.length === 0)) {
-                showError(`Please select at least one ${field.name}.`, field.id);
-                return;
-            }
-
-            if ((field.type === 'single' || field.type === 'date') && (!value || value === '')) {
-                showError(`Please fill the ${field.name} field.`, field.id);
-                return;
-            }
-
-            if (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-                showError(`Please enter a valid ${field.name} (YYYY-MM-DD).`, field.id);
-                return;
-            }
+        if (field.type === 'multi' && (!value || value.length === 0)) {
+            showError(`Please select at least one ${field.name}.`, field.id);
+            return;
         }
 
-        const startTimes = $("input[name='start_times[]']");
-        const endTimes = $("input[name='end_times[]']");
-        
+        if ((field.type === 'single' || field.type === 'date') && (!value || value === '')) {
+            showError(`Please fill the ${field.name} field.`, field.id);
+            return;
+        }
 
-        let timeError = false;
+        if (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            showError(`Please enter a valid ${field.name} (YYYY-MM-DD).`, field.id);
+            return;
+        }
+    }
 
-        $(".schedule-row").each(function (index) {
-            const row = $(this);
-            const startInput = row.find(".start-time");
-            const endInput = row.find(".end-time");
+    let timeError = false;
+    let hasHoliday = false;
 
+    // Check if any row has Holiday status
+    $(".schedule-row").each(function () {
+        const statusSelect = $(this).find(".status-select");
+        if (statusSelect.val() === '3') {
+            hasHoliday = true;
+        }
+    });
+
+    // Show single alert for Holiday status if present
+    if (hasHoliday && !confirm('One or more rows are marked as Holiday. Continue?')) {
+        return;
+    }
+
+    // Validate schedule rows
+    $(".schedule-row").each(function (index) {
+        const row = $(this);
+        const startInput = row.find(".start-time");
+        const endInput = row.find(".end-time");
+        const statusSelect = row.find(".status-select");
+        const status = statusSelect.val();
+
+        // Handle In Rota (status 1) and empty status (Please Select)
+        if (status === '1' || status === '') {
             const start = startInput.val();
             const end = endInput.val();
-            const isDayOff = startInput.prop('disabled') && endInput.prop('disabled');
 
-            if (!isDayOff) {
-                if (!start) {
-                    showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
-                    timeError = true;
-                    return false; // breaks the .each loop
-                }
-
-                if (!end) {
-                    showError(`End time is required for Row ${index + 1}.`, endInput[0]);
-                    timeError = true;
-                    return false;
-                }
-
-                const startDate = new Date(`2025-01-01T${start}:00`);
-                const endDate = new Date(`2025-01-01T${end}:00`);
-                if (startDate >= endDate) {
-                    showError(`End time must be after Start time (Row ${index + 1}).`, endInput[0]);
-                    timeError = true;
-                    return false;
-                }
+            if (!start) {
+                showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
+                timeError = true;
+                return false;
             }
-        });
 
-        if (timeError) return;
+            if (!end) {
+                showError(`End time is required for Row ${index + 1}.`, endInput[0]);
+                timeError = true;
+                return false;
+            }
 
-
-
-        const form_data = new FormData();
-
-        $('#employee_id').val().forEach(emp => form_data.append('employee_id[]', emp));
-        form_data.append("start_date", $("#start_date").val());
-        form_data.append("to_date", $("#to_date").val());
-        form_data.append("type", $("#etype").val());
-        form_data.append("details", $("#details").val());
-
-        $("input[name='dates[]']").each((i, el) => form_data.append("dates[]", el.value));
-        $("input[name='day_names[]']").each((i, el) => form_data.append("day_names[]", el.value));
-        $("input[name='start_times[]']").each((i, el) => form_data.append("start_times[]", el.value));
-        $("input[name='end_times[]']").each((i, el) => form_data.append("end_times[]", el.value));
-
-        if (isUpdate) {
-            form_data.append("codeid", $("#codeid").val());
+            const startDate = new Date(`2025-01-01T${start}:00`);
+            const endDate = new Date(`2025-01-01T${end}:00`);
+            if (startDate >= endDate) {
+                showError(`End time must be after Start time (Row ${index + 1}).`, endInput[0]);
+                timeError = true;
+                return false;
+            }
         }
 
-        for (let pair of form_data.entries()) {
-            console.log(pair[0] + ": " + pair[1]);
-        }
-        
-        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-
-        $.ajax({
-            url: isCreate ? url : upurl,
-            type: "POST",
-            dataType: 'json',
-            contentType: false,
-            processData: false,
-            data: form_data,
-            success: function (d) {
-                
-                $(this).prop('disabled', false).html('');
-                if (d.status == 422) {
-                    $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
-                } else {
-                    pagetop();
-                    showSuccess(isCreate ? 'Data created successfully.' : 'Data updated successfully.');
-                    resetFieldStyles(requiredFields.map(f => f.id));
-                    reloadPage(2000);
-                }
-            },
-            error: function (xhr) {
-                console.error('Error:', xhr.responseText);
-                showError('An error occurred. Please try again.');
-            }
-        });
+        // No validation needed for Day Off (status 2) or Holiday (status 3)
     });
+
+    if (timeError) return;
+
+    const form_data = new FormData();
+
+    form_data.append("employee_id", $("#employee_id").val());
+    form_data.append("start_date", $("#start_date").val());
+    form_data.append("to_date", $("#to_date").val());
+    form_data.append("type", $("#etype").val());
+    form_data.append("details", $("#details").val());
+
+    $("input[name='dates[]']").each((i, el) => form_data.append("dates[]", el.value));
+    $("input[name='day_names[]']").each((i, el) => form_data.append("day_names[]", el.value));
+    $("input[name='start_times[]']").each((i, el) => form_data.append("start_times[]", el.value));
+    $("input[name='end_times[]']").each((i, el) => form_data.append("end_times[]", el.value));
+    $("select[name='status[]']").each((i, el) => form_data.append("status[]", el.value));
+
+    if (isUpdate) {
+        form_data.append("codeid", $("#codeid").val());
+    }
+
+    for (let pair of form_data.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+    }
+
+    $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+
+    $.ajax({
+        url: isCreate ? url : upurl,
+        type: "POST",
+        dataType: 'json',
+        contentType: false,
+        processData: false,
+        data: form_data,
+        success: function (d) {
+            $(this).prop('disabled', false).html(isCreate ? 'Create' : 'Update');
+            console.log(d);
+            if (d.status == 422) {
+                $('.errmsg').html('<div class="alert alert-danger">' + d.message + '</div>');
+            } else {
+                pagetop();
+                showSuccess(isCreate ? 'Data created successfully.' : 'Data updated successfully.');
+                resetFieldStyles(requiredFields.map(f => f.id));
+                reloadPage(2000);
+            }
+        },
+        error: function (xhr) {
+            $(this).prop('disabled', false).html(isCreate ? 'Create' : 'Update');
+            console.error('Error:', xhr.responseText);
+            showError('An error occurred. Please try again.');
+        }
+    });
+});
 
 
 
@@ -430,7 +444,7 @@ $(document).ready(function() {
         $("#header-title").html('Add new PreRota');
     }
 
-    $("#addThisFormContainer").hide(300);
+    // $("#addThisFormContainer").hide(300);
     $("#FormCloseBtn").click(function() {
         clearform();
         $("#addThisFormContainer").hide(300);
@@ -644,10 +658,19 @@ $(document).ready(function() {
 });
 </script>
 
-<script>
-$(document).ready(function() {
 
-    // Trigger AJAX on employee selection change
+
+
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<!-- Tempus Dominus Bootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+
+
+<script>
+
     $('#to_date').on('change', function() {
         let start_date = $('#start_date').val();
         let end_date = $('#to_date').val();
@@ -660,7 +683,6 @@ $(document).ready(function() {
             return;
         }
 
-        console.log(start_date, end_date, employee_ids);
 
         $.ajax({
             url: "{{ route('admin.holiday.check') }}", 
@@ -672,9 +694,13 @@ $(document).ready(function() {
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
-                console.log(response );
+                // console.log(response );
                 if (response.success) {
-                    $('#holiday_results').html(response.html);
+                    $('#holiday_results').html('');
+                    $('#weekly-schedule').html(response.html);
+                    initTimepickers();
+                    addEndTimeValidation();
+                    addDayOffToggle();
                 } else {
                     $('#holiday_results').html('<div class="alert alert-warning">No holidays found for the selected criteria.</div>');
                 }
@@ -684,72 +710,7 @@ $(document).ready(function() {
             }
         });
     });
-});
-</script>
 
-
-<!-- Moment.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-
-<!-- Tempus Dominus Bootstrap 4 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
-
-
-<script>
-    document.getElementById('start_date').addEventListener('change', function () {
-        const startDate = new Date(this.value);
-        const scheduleContainer = document.getElementById('weekly-schedule');
-        scheduleContainer.innerHTML = ''; // Clear previous content
-
-        if (isNaN(startDate)) return; // Invalid date
-
-        for (let i = 0; i < 7; i++) {
-            const currentDate = new Date(startDate);
-            currentDate.setDate(startDate.getDate() + i);
-
-            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
-            const formattedDate = currentDate.toISOString().split('T')[0];
-
-            const row = document.createElement('div');
-            row.className = 'row mb-3 align-items-center schedule-row';
-            row.dataset.index = i;
-
-            row.innerHTML = `
-                <div class="col-md-2">
-                    <input type="text" class="form-control" name="dates[]" value="${formattedDate}" readonly>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" class="form-control" name="day_names[]" value="${dayName}" readonly>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group date timepicker" id="start_time_${i}" data-target-input="nearest">
-                        <input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_${i}" />
-                        <div class="input-group-append" data-target="#start_time_${i}" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group date timepicker" id="end_time_${i}" data-target-input="nearest">
-                        <input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_${i}" />
-                        <div class="input-group-append" data-target="#end_time_${i}" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-success btn-sm day-off-btn">Working Day</button>
-                </div>
-            `;
-
-            scheduleContainer.appendChild(row);
-        }
-
-        initTimepickers();
-        addEndTimeValidation();
-        addDayOffToggle();
-    });
 
     function initTimepickers() {
         $('.timepicker').datetimepicker({
@@ -788,32 +749,26 @@ $(document).ready(function() {
     }
 
     function addDayOffToggle() {
-        document.querySelectorAll('.day-off-btn').forEach(button => {
-            button.addEventListener('click', function () {
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', function () {
                 const row = this.closest('.schedule-row');
                 const startInput = row.querySelector('[name="start_times[]"]');
                 const endInput = row.querySelector('[name="end_times[]"]');
 
-                const isDisabled = startInput.disabled;
-
-                if (isDisabled) {
-                    startInput.disabled = false;
-                    endInput.disabled = false;
-                    this.classList.remove('btn-warning');
-                    this.classList.add('btn-success');
-                    this.textContent = 'Working Day';
-                } else {
+                if (this.value === '2') {
                     startInput.disabled = true;
                     endInput.disabled = true;
                     startInput.value = '';
                     endInput.value = '';
-                    this.classList.remove('btn-success');
-                    this.classList.add('btn-warning');
-                    this.textContent = 'Day Off';
+                } else {
+                    startInput.disabled = false;
+                    endInput.disabled = false;
                 }
             });
         });
     }
+
+
 </script>
 
 

@@ -12,7 +12,7 @@ class EmployeePreRota extends Model
     use HasFactory;
     use LogsActivity;
     protected $table = 'employee_pre_rota';
-    protected $fillable = ['employee_id', 'branch_id', 'pre_rota_id'];
+    protected $fillable = ['employee_id', 'branch_id', 'pre_rota_id', 'status'];
     public $timestamps = true;
 
     protected static $logName = 'employee_pre_rota';

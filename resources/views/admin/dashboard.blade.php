@@ -273,6 +273,7 @@
                     <tr>
                       <th>SL</th>
                       <th>Product Code</th>
+                  <th>Product Name</th>
                       {{-- <th>Asset No.</th> --}}
                       @if(in_array($status, [1, 2]))
                         <th>Branch</th>
@@ -290,6 +291,7 @@
                       <tr>
                         <td>{{ $key + 1 }}</td>
                         <td>{{ $item->product_code ?? '' }}</td>
+                      <td>{{ $item->assetType->name ?? '' }}</td>
                         {{-- <td>{{ $item->code ?? '' }}</td> --}}
                         @if(in_array($status, [1, 2]))
                           <td>{{ $item->branch->name ?? 'N/A' }}</td>

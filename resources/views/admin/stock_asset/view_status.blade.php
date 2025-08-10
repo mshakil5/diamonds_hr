@@ -21,8 +21,8 @@
               <thead>
                 <tr>
                   <th>SL</th>
-                  <th>Product Name</th>
                   <th>Product Code</th>
+                  <th>Product Name</th>
                   <th>Status</th>
                   {{-- <th>Asset No.</th> --}}
                   @if(in_array($status, [1, 2]))

@@ -10,7 +10,7 @@ use App\Models\Holiday;
 use App\Models\HolidayDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class HolidayController extends Controller
@@ -351,20 +351,18 @@ class HolidayController extends Controller
     }
 
 
-    public function checkHolidays(Request $request)
+    public function checkHolidays2(Request $request)
     {
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'employee_ids' => 'required|array',
-            'employee_ids.*' => 'exists:employees,id',
         ]);
 
         $start_date = $request->start_date;
         $end_date = $request->end_date ?? $start_date; 
         $employee_ids = $request->employee_ids;
 
-        $holidays = HolidayDetail::whereIn('employee_id', $employee_ids)
+        $holidays = HolidayDetail::where('employee_id', $employee_ids)
             ->whereBetween('date', [$start_date, $end_date])
             ->with('employee') 
             ->get();
@@ -373,14 +371,93 @@ class HolidayController extends Controller
             return response()->json(['success' => false]);
         }
 
-        $html = '<h4>Holiday List</h4><table class="table table-bordered"><thead><tr><th>Employee</th><th>From Date</th><th>Type</th><th>Details</th></tr></thead><tbody>';
-        foreach ($holidays as $holiday) {
-            $html .= "<tr><td>{$holiday->employee->name}</td><td>{$holiday->date}</td><td>{$holiday->holiday->type}</td><td>{$holiday->holiday->details}</td></tr>";
-        }
-        $html .= '</tbody></table>';
+        $chkPrerota = EmployeePreRota::where('employee_id', $employee_ids)
+            ->whereBetween('date', [$start_date, $end_date])
+            ->get();
 
-        return response()->json(['success' => true, 'html' => $html, 'holidays' => $holidays]);
+
+        return response()->json(['success' => true, 'html' => $chkPrerota, 'holidays' => $holidays]);
     }
+
+public function checkHolidays(Request $request)
+{
+    $request->validate([
+        'start_date' => 'required|date',
+        'end_date' => 'nullable|date|after_or_equal:start_date',
+    ]);
+
+    $start_date = Carbon::parse($request->start_date);
+    $end_date = $request->end_date ? Carbon::parse($request->end_date) : $start_date;
+    $employee_ids = $request->employee_ids;
+
+    $holidays = HolidayDetail::where('employee_id', $employee_ids)
+        ->whereBetween('date', [$start_date, $end_date])
+        ->with('employee')
+        ->get();
+
+    $chkPrerota = EmployeePreRota::where('employee_id', $employee_ids)
+        ->whereBetween('date', [$start_date, $end_date])
+        ->get();
+
+    // Generate HTML for each date in the range
+    $prop = '';
+    $current_date = $start_date->copy();
+    $index = 0;
+
+    while ($current_date <= $end_date) {
+        $date_str = $current_date->toDateString();
+        $day_name = $current_date->format('l');
+
+        // Find matching pre-rota entry for the current date
+        $prorota = $chkPrerota->firstWhere('date', $date_str);
+
+        // If no pre-rota entry exists, create a default one with empty fields
+        $prorota = $prorota ?: (object)[
+            'date' => $date_str,
+            'day_name' => $day_name,
+            'start_time' => '',
+            'end_time' => '',
+            'status' => '', // Default to empty for "Please Select"
+        ];
+
+        $prop .= '<div class="row schedule-row"><div class="col-md-2">
+                    <input type="text" class="form-control" name="dates[]" value="' . $prorota->date . '" readonly>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="day_names[]" value="' . $prorota->day_name . '" readonly>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group date timepicker" id="start_time_' . $index . '" data-target-input="nearest" >
+                        <input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_' . $index . '" value="' . $prorota->start_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
+                        <div class="input-group-append" data-target="#start_time_' . $index . '" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group date timepicker" id="end_time_' . $index . '" data-target-input="nearest">
+                        <input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_' . $index . '" value="' . $prorota->end_time . '"' . ($prorota->status == '2' ? ' disabled="disabled"' : '') . '/>
+                        <div class="input-group-append" data-target="#end_time_' . $index . '" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="status[]" class="form-control status-select  ' . ($prorota->status == '1' ? 'bg-success' : '').($prorota->status == '2' ? 'bg-warning' : '').($prorota->status == '3' ? 'bg-primary' : '') . '">
+                        <option value="" ' . ($prorota->status == '' ? 'selected' : '') . '>Please Select</option>
+                        <option class="bg-success" value="1" ' . ($prorota->status == '1' ? 'selected' : '') . '> Rota</option>
+                        <option class="bg-warning" value="2" ' . ($prorota->status == '2' ? 'selected' : '') . '>Day Off</option>
+                        <option class="bg-primary" value="3" ' . ($prorota->status == '3' ? 'selected' : '') . '>Holiday</option>
+                    </select>
+                </div>
+                </div>';
+
+        $current_date->addDay();
+        $index++;
+    }
+
+    return response()->json(['success' => true, 'html' => $prop, 'holidays' => $holidays]);
+}
 
 
 }
