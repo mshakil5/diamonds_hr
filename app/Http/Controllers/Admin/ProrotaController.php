@@ -138,130 +138,68 @@ class ProrotaController extends Controller
 
     public function edit($id)
     {
-        $preRota = PreRota::with('employees')->findOrFail($id);
+        $preRota = PreRota::with(['employees' => function ($query) {
+            $query->withPivot('date', 'day_name', 'start_time', 'end_time', 'status');
+        }])->findOrFail($id);
 
         $employees = Employee::all();
-        
-        return view('admin.prorota.edit', compact('preRota','employees'));
-        
+
+        return view('admin.prorota.edit', compact('preRota', 'employees'));
     }
 
     public function update(Request $request)
     {
-        $validated = $request->validate([
-            'employee_id' => 'required|array',
-            'employee_id.*' => 'exists:employees,id',
+        $request->validate([
+            'employee_id' => 'required',
             'start_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:start_date',
             'type' => 'required|in:Regular,Authorized Holiday,Unauthorized Holiday',
-            'details' => 'nullable|string',
-            'dates' => 'nullable|array',
-            'dates.*' => 'nullable|date',
-            'day_names' => 'nullable|array',
-            'day_names.*' => 'nullable|string',
-            'start_times' => 'nullable|array',
-            'start_times.*' => 'nullable|date_format:H:i',
-            'end_times' => 'nullable|array',
-            'end_times.*' => 'nullable|date_format:H:i',
-            'employee_ids' => 'nullable|array',
-            'employee_ids.*' => 'nullable|exists:employees,id',
-            'codeid' => 'required|exists:pre_rotas,id',
+            'dates' => 'required|array',
+            'day_names' => 'required|array',
+            'start_times' => 'required|array',
+            'end_times' => 'required|array',
+            'status' => 'required|array',
         ]);
 
-        try {
-            $branchId = Auth::user()->branch_id;
-            $createdBy = Auth::id();
+        $preRota = PreRota::findOrFail($request->codeid);
+        $start = Carbon::parse($request->start_date);
+        $end = Carbon::parse($request->to_date);
+        $createdBy = auth()->id(); // Assuming authenticated user ID
 
-            $datesCount = count($request->input('dates', []));
-            if ($datesCount > 0 && (
-                $datesCount !== count($request->input('employee_ids', [])) ||
-                $datesCount !== count($request->input('day_names', [])) ||
-                $datesCount !== count($request->input('start_times', [])) ||
-                $datesCount !== count($request->input('end_times', []))
-            )) {
-                throw new \Exception('Mismatch in array lengths for dates, employee_ids, day_names, start_times, or end_times.');
+        // Update PreRota details
+        $preRota->update([
+            'start_date' => $request->start_date,
+            'end_date' => $request->to_date,
+            'type' => $request->type,
+            'details' => $request->details,
+        ]);
+
+        
+            // Delete existing EmployeePreRota records for this employee and date range
+            EmployeePreRota::where('employee_id', $request->employee_id)
+                ->where('pre_rota_id', $preRota->id)
+                ->whereBetween('date', [$start, $end])
+                ->delete();
+
+            // Create new EmployeePreRota records
+            foreach ($request->dates as $index => $date) {
+                $employeBranchId = Employee::find($request->employee_id)->branch_id ?? $preRota->branch_id;
+
+                EmployeePreRota::create([
+                    'employee_id' => $request->employee_id,
+                    'pre_rota_id' => $preRota->id,
+                    'branch_id' => $employeBranchId,
+                    'date' => $date,
+                    'day_name' => $request->day_names[$index],
+                    'start_time' => $request->start_times[$index],
+                    'end_time' => $request->end_times[$index],
+                    'status' => $request->status[$index] ?: null, // Handle empty status
+                    'created_by' => $createdBy,
+                ]);
             }
+            
 
-            $preRota = PreRota::findOrFail($request->codeid);
-            $preRota->update([
-                'branch_id'   => $branchId,
-                'start_date'  => $request->start_date,
-                'end_date'    => $request->to_date,
-                'type'        => $request->type,
-                'details'     => $request->details,
-                'start_time'  => null,
-                'end_time'    => null,
-            ]);
-
-            $scheduleTemplate = [];
-            foreach ($request->input('dates', []) as $i => $date) {
-                if (isset($request->employee_ids[$i])) {
-                    $scheduleTemplate[] = [
-                        'date'       => $date,
-                        'day_name'   => $request->day_names[$i] ?? null,
-                        'start_time' => $request->start_times[$i] ?? null,
-                        'end_time'   => $request->end_times[$i] ?? null,
-                        'employee_id' => $request->employee_ids[$i],
-                    ];
-                }
-            }
-
-
-            $start = Carbon::parse($request->start_date);
-            $end = Carbon::parse($request->to_date);
-            $allDates = [];
-            for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-                $allDates[] = $date->copy();
-            }
-
-            EmployeePreRota::where('pre_rota_id', $preRota->id)->delete();
-
-            foreach ($request->employee_id as $employeeId) {
-                foreach ($allDates as $dateObj) {
-                    $date = $dateObj->format('Y-m-d');
-                    $dayName = $dateObj->format('l');
-
-                    $pattern = collect($scheduleTemplate)->firstWhere(function ($item) use ($dayName, $employeeId) {
-                        return $item['day_name'] === $dayName && $item['employee_id'] == $employeeId;
-                    });
-
-                    $employee = Employee::find($employeeId);
-                    if (!$employee) {
-                        throw new \Exception("Employee ID $employeeId not found.");
-                    }
-                    $employeBranchId = $employee->branch_id ?? $branchId;
-
-                    $startTime = $pattern['start_time'] ?? null;
-                    $endTime = $pattern['end_time'] ?? null;
-                    $status = $pattern['status'] ?? null;
-
-                    // 1 = In Rota, 2 = Day off, 3 = Holiday
-
-                    EmployeePreRota::create([
-                        'employee_id' => $employeeId,
-                        'pre_rota_id' => $preRota->id,
-                        'branch_id'   => $employeBranchId,
-                        'date'        => $date,
-                        'day_name'    => $dayName,
-                        'start_time'  => $startTime,
-                        'end_time'    => $endTime,
-                        'status'      => $status,
-                        'created_by'  => $createdBy,
-                    ]);
-                }
-            }
-
-            return response()->json([
-                'type' => 'success',
-                'data' => $request->all(),
-                'message' => 'Pre Rota and schedules updated successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 422,
-                'message' => 'Error updating Pre Rota: ' . $e->getMessage()
-            ], 422);
-        }
+        return response()->json(['status' => 200, 'message' => 'PreRota updated successfully']);
     }
 
 
