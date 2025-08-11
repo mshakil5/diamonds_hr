@@ -17,7 +17,7 @@ class HolidayController extends Controller
 {
     public function index()
     {
-        $data = Holiday::where('branch_id', Auth::user()->branch_id)->with('branch','holidayDetail')->orderby('id','DESC')->get();
+        $data = Holiday::where('branch_id', Auth::user()->branch_id)->with('branch','employeePreRota')->orderby('id','DESC')->get();
         $employees = Employee::where('is_active', 1)->get();
         return view('admin.holiday.index', compact('data','employees'));
     }
@@ -87,16 +87,54 @@ class HolidayController extends Controller
             $data->created_by = auth()->id();
             $data->save();
 
-            $this->preRota($holidayDates, $from, $to, $request, $data);
+
+            $start = Carbon::parse($request->from_date);
+            $end = Carbon::parse($request->to_date);
+            $employeBranchId = $employee->branch_id ?? Auth::user()->branch_id;
+            
+            foreach ($request->dates as $index => $date) {
+                $dateObj = Carbon::parse($date);
+                if ($dateObj->lt($start) || $dateObj->gt($end)) {
+                    continue; // Skip dates outside the range
+                }
+
+                // Check for existing EmployeePreRota record for this employee and date
+                $existingRecord = EmployeePreRota::where('employee_id', $request->employee_id)
+                    ->where('date', $date)
+                    ->first();
+
+                if ($existingRecord) {
+                    // Update existing record
+                    $existingRecord->update([
+                        'holiday_id' => $data->id,
+                        'branch_id' => $employeBranchId,
+                        'day_name' => $request->day_names[$index],
+                        'start_time' => $request->start_times[$index] ?? null,
+                        'end_time' => $request->end_times[$index] ?? null,
+                        'status' => $request->status[$index] ?? null,
+                    ]);
+                } else {
+                    // Create new record
+                    EmployeePreRota::create([
+                        'employee_id' => $request->employee_id,
+                        'holiday_id' => $data->id,
+                        'branch_id' => $employeBranchId,
+                        'date' => $date,
+                        'day_name' => $request->day_names[$index],
+                        'start_time' => $request->start_times[$index] ?? null,
+                        'end_time' => $request->end_times[$index] ?? null,
+                        'status' => $request->status[$index] ?? null,
+                        'created_by' => auth()->id,
+                    ]);
+                }
+            }
 
             DB::commit();
 
-            $holiday = $employee->holidays()->get();
             return response()->json([
                 'status' => 200,
                 'message' => 'Data created successfully.',
-                'counts' => $counts,
-                'holiday' => $holiday
+                'counts' => $counts
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -171,11 +209,6 @@ class HolidayController extends Controller
             $data->updated_by = auth()->id();
             $data->save();
 
-            // Delete existing holiday_details for this holiday
-            DB::table('holiday_details')->where('holiday_id', $data->id)->delete();
-
-            
-
             $this->preRota($holidayDates, $from, $to, $request, $data);
 
             DB::commit();
@@ -196,86 +229,7 @@ class HolidayController extends Controller
         }
     }
 
-    public function preRota($holidayDates, $from, $to, $request, $data)
-    {
-        if (!empty($holidayDates)) {
-            EmployeePreRota::where('employee_id', $request->employee_id)
-                ->whereIn('date', $holidayDates)
-                ->update([
-                    'status' => 3, // authorised holiday
-                    'start_time' => null,
-                    'end_time' => null,
-                    'updated_by' => auth()->id(),
-                ]);
-
-            $existingDates = EmployeePreRota::where('employee_id', $request->employee_id)
-                ->whereIn('date', $holidayDates)
-                ->pluck('date')
-                ->map(function ($date) {
-                    return Carbon::parse($date)->format('Y-m-d');
-                })->toArray();
-
-            $newDates = array_diff($holidayDates, $existingDates);
-            foreach ($newDates as $date) {
-                $holidayDate = Carbon::parse($date);
-                $newPrerota = new EmployeePreRota();
-                $newPrerota->employee_id = $request->employee_id;
-                $newPrerota->date = $date;
-                $newPrerota->day_name = $holidayDate->format('l');
-                $newPrerota->status = 3; // authorised holiday
-                $newPrerota->start_time = null;
-                $newPrerota->end_time = null;
-                $newPrerota->updated_by = auth()->id();
-                $newPrerota->save();
-            }
-
-            foreach ($holidayDates as $date) {
-                DB::table('holiday_details')->insert([
-                    'holiday_id' => $data->id,
-                    'employee_id' => $request->employee_id,
-                    'date' => $date,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        } else {
-            $currentDate = $from->copy();
-            while ($currentDate <= $to) {
-                $dateStr = $currentDate->format('Y-m-d');
-                $employeePreRota = EmployeePreRota::where('employee_id', $request->employee_id)
-                    ->where('date', $dateStr)
-                    ->first();
-
-                if ($employeePreRota) {
-                    $employeePreRota->status = 3;
-                    $employeePreRota->start_time = null;
-                    $employeePreRota->end_time = null;
-                    $employeePreRota->updated_by = auth()->id();
-                    $employeePreRota->save();
-                } else {
-                    $newPrerota = new EmployeePreRota();
-                    $newPrerota->employee_id = $request->employee_id;
-                    $newPrerota->date = $dateStr;
-                    $newPrerota->day_name = $currentDate->format('l');
-                    $newPrerota->status = 3;
-                    $newPrerota->start_time = null;
-                    $newPrerota->end_time = null;
-                    $newPrerota->updated_by = auth()->id();
-                    $newPrerota->save();
-                }
-
-                DB::table('holiday_details')->insert([
-                    'holiday_id' => $data->id,
-                    'employee_id' => $request->employee_id,
-                    'date' => $dateStr,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-
-                $currentDate->addDay();
-            }
-        }
-    }
+    
 
     // public function edit($id)
     // {
@@ -351,33 +305,6 @@ class HolidayController extends Controller
     }
 
 
-    public function checkHolidays2(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
-
-        $start_date = $request->start_date;
-        $end_date = $request->end_date ?? $start_date; 
-        $employee_ids = $request->employee_ids;
-
-        $holidays = HolidayDetail::where('employee_id', $employee_ids)
-            ->whereBetween('date', [$start_date, $end_date])
-            ->with('employee') 
-            ->get();
-
-        if ($holidays->isEmpty()) {
-            return response()->json(['success' => false]);
-        }
-
-        $chkPrerota = EmployeePreRota::where('employee_id', $employee_ids)
-            ->whereBetween('date', [$start_date, $end_date])
-            ->get();
-
-
-        return response()->json(['success' => true, 'html' => $chkPrerota, 'holidays' => $holidays]);
-    }
 
 public function checkHolidays(Request $request)
 {

@@ -31,5 +31,10 @@ class EmployeePreRota extends Model
         return $this->belongsTo(Employee::class);
     }
 
+    public function holiday()
+    {
+        return $this->belongsTo(Holiday::class);
+    }
+
 
 }

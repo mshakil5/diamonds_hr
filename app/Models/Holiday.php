@@ -31,6 +31,11 @@ class Holiday extends Model
         return $this->belongsTo(Employee::class);
     }
 
+    public function employeePreRota()
+    {
+        return $this->hasMany(EmployeePreRota::class);
+    }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);

@@ -95,12 +95,15 @@
                             </thead>
                             <tbody>
                                 @foreach ($data as $key => $data)
+                                @php
+                                    $hoildayCount = \App\Models\EmployeePreRota::where('employee_id', $data->employee_id)->whereBetween('date', [$data->from_date, $data->to_date])->where('status', 3)->count();
+                                @endphp
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->from_date)->format('d-m-Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->to_date)->format('d-m-Y') }}</td>
-                                    <td><span class="btn btn-warning btn-sm">{{ $data->holidayDetail->count() }}</span></td>
+                                    <td><span class="btn btn-warning btn-sm">{{ $hoildayCount }}</span></td>
                                     <td>{{ $data->employee->name }}</td>
                                     <td>{{ $data->type }}</td>
                                     <td>{{ $data->branch->name ?? '' }}</td>
@@ -178,17 +181,34 @@
             const endTimes = $("input[name='end_times[]']");
             
             let timeError = false;
+            let hasHoliday = false;
 
+            // Check if any row has Holiday status
+            $(".schedule-row").each(function () {
+                const statusSelect = $(this).find(".status-select");
+                if (statusSelect.val() === '3') {
+                    hasHoliday = true;
+                }
+            });
+
+            // Show single alert for Holiday status if present
+            if (hasHoliday && !confirm('One or more rows are marked as Holiday. Continue?')) {
+                return;
+            }
+
+            // Validate schedule rows
             $(".schedule-row").each(function (index) {
                 const row = $(this);
                 const startInput = row.find(".start-time");
                 const endInput = row.find(".end-time");
+                const statusSelect = row.find(".status-select");
+                const status = statusSelect.val();
 
-                const start = startInput.val();
-                const end = endInput.val();
-                const isDayOff = startInput.prop('disabled') && endInput.prop('disabled');
+                // Handle In Rota (status 1) and empty status (Please Select)
+                if (status === '1' || status === '') {
+                    const start = startInput.val();
+                    const end = endInput.val();
 
-                if (!isDayOff) {
                     if (!start) {
                         showError(`Start time is required for Row ${index + 1}.`, startInput[0]);
                         timeError = true;
@@ -201,14 +221,16 @@
                         return false;
                     }
 
-                    const startDate = new Date(`1970-01-01T${start}:00`);
-                    const endDate = new Date(`1970-01-01T${end}:00`);
+                    const startDate = new Date(`2025-01-01T${start}:00`);
+                    const endDate = new Date(`2025-01-01T${end}:00`);
                     if (startDate >= endDate) {
                         showError(`End time must be after Start time (Row ${index + 1}).`, endInput[0]);
                         timeError = true;
                         return false;
                     }
                 }
+
+                // No validation needed for Day Off (status 2) or Holiday (status 3)
             });
 
             if (timeError) return;
@@ -223,21 +245,12 @@
                 form_data.append("codeid", $("#codeid").val());
             }
 
-            var holidayDates = [];
-            $('input[name="make_holiday[]"]:checked').each(function() {
-                holidayDates.push($(this).val());
-            });
-            form_data.append("holiday_dates", JSON.stringify(holidayDates));
-
-            for (let pair of form_data.entries()) {
-                console.log(pair[0] + ": " + pair[1]);
-            }
-
-            var available_prerota = $('#available_prerota').val();
-            if (available_prerota == 1 && !$('#is_prorota').is(':checked')) {
-                showError('Please check the prerota checkbox if you want to continue.');
-                return;
-            }
+            
+            $("input[name='dates[]']").each((i, el) => form_data.append("dates[]", el.value));
+            $("input[name='day_names[]']").each((i, el) => form_data.append("day_names[]", el.value));
+            $("input[name='start_times[]']").each((i, el) => form_data.append("start_times[]", el.value));
+            $("input[name='end_times[]']").each((i, el) => form_data.append("end_times[]", el.value));
+            $("select[name='status[]']").each((i, el) => form_data.append("status[]", el.value));
 
             $.ajax({
                 url: isUpdate ? upurl : url,
@@ -334,11 +347,11 @@
 
         $("#employee_id").change(function() {
             var employee_id = $(this).val();
-            var from_date = $("#from_date").val();
-            var to_date = $("#to_date").val();
+            var start_date = $("#from_date").val();
+            var end_date = $("#to_date").val();
             $("#prerotaContainer").html('');
 
-            if (from_date === '' || to_date === '') {
+            if (start_date === '' || end_date === '') {
                 showError('Please select From Date and To Date first.');
                 return;
             }
@@ -348,7 +361,7 @@
                 $.ajax({
                     url: "{{ route('admin.employee.prorota') }}",
                     type: "GET",
-                    data: { employee_id: employee_id, from_date: from_date, to_date: to_date },
+                    data: { employee_ids: employee_id, start_date: start_date, end_date: end_date },
                     statusCode: {
                         400: function(response) {
                             handleResponse(response.responseJSON);
@@ -370,8 +383,8 @@
                 function handleResponse(data) {
                     if (data.status === 400 || data.status === 404) {
                         $(".perrmsg").html(`<div class="alert alert-danger">${data.message}</div>`);
-                    } else if (data.status === 200) {
-                        $("#prerotaContainer").html(data.prerota);
+                    } else if (data.success) {
+                        $("#prerotaContainer").html(data.html);
                         initTimepickers();
                         addDayOffToggle();
                         addEndTimeValidation();
@@ -419,56 +432,38 @@
         }
 
         function addDayOffToggle() {
-            document.querySelectorAll('.day-off-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const row = this.closest('.row');
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', function () {
+                    const row = this.closest('.schedule-row');
                     const startInput = row.querySelector('[name="start_times[]"]');
                     const endInput = row.querySelector('[name="end_times[]"]');
-                    const makeHolidayBtn = row.querySelector('.make-holiday-btn');
 
-                    const isDisabled = startInput.disabled;
-
-                    if (isDisabled) {
-                        startInput.disabled = false;
-                        endInput.disabled = false;
-                        makeHolidayBtn.style.display = 'inline-block';
-                        this.classList.remove('btn-warning');
-                        this.classList.add('btn-success');
-                        this.textContent = 'Working Day';
-                    } else {
+                    if (this.value === '2') {
                         startInput.disabled = true;
                         endInput.disabled = true;
                         startInput.value = '';
                         endInput.value = '';
-                        makeHolidayBtn.style.display = 'none';
-                        this.classList.remove('btn-success');
-                        this.classList.add('btn-warning');
-                        this.textContent = 'Day Off';
-                    }
-                });
-            });
-
-            document.querySelectorAll('.make-holiday-btn input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    const row = this.closest('.row');
-                    const startInput = row.querySelector('[name="start_times[]"]');
-                    const endInput = row.querySelector('[name="end_times[]"]');
-                    const otherButton = row.querySelector('.day-off-btn');
-
-                    if (this.checked) {
-                        startInput.disabled = true;
-                        endInput.disabled = true;
-                        startInput.value = '';
-                        endInput.value = '';
-                        otherButton.style.display = 'none';
                     } else {
                         startInput.disabled = false;
                         endInput.disabled = false;
-                        otherButton.style.display = 'inline-block';
                     }
                 });
             });
         }
     });
+</script>
+
+
+<script>
+
+
+
+
+
+    
+
+   
+
+
 </script>
 @endsection

@@ -77,7 +77,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
 
     });
 
-    Route::get('/pre-rota', [EmployeeController::class, 'checkProrota'])->name('admin.employee.prorota');
+    Route::get('/pre-rota', [HolidayController::class, 'checkHolidays'])->name('admin.employee.prorota');
 
     Route::prefix('branches')->group(function () {
         Route::get('/', [BranchController::class, 'index'])->name('branches.index');

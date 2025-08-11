@@ -96,24 +96,39 @@ class ProrotaController extends Controller
             foreach ($request->dates as $index => $date) {
                 $dateObj = Carbon::parse($date);
                 if ($dateObj->lt($start) || $dateObj->gt($end)) {
-                    continue; 
+                    continue; // Skip dates outside the range
                 }
 
-                EmployeePreRota::where('employee_id', $request->employee_id)
+                // Check for existing EmployeePreRota record for this employee and date
+                $existingRecord = EmployeePreRota::where('employee_id', $request->employee_id)
                     ->where('date', $date)
-                    ->delete();
+                    ->first();
 
-                EmployeePreRota::create([
-                    'employee_id' => $request->employee_id,
-                    'pre_rota_id' => $preRota->id,
-                    'branch_id' => $employeBranchId,
-                    'date' => $date,
-                    'day_name' => $request->day_names[$index],
-                    'start_time' => $request->start_times[$index] ?? null,
-                    'end_time' => $request->end_times[$index] ?? null,
-                    'status' => $request->status[$index] ?? null,
-                    'created_by' => $createdBy,
-                ]);
+                if ($existingRecord) {
+                    // Update existing record
+                    $existingRecord->update([
+                        'pre_rota_id' => $preRota->id,
+                        'branch_id' => $employeBranchId,
+                        'day_name' => $request->day_names[$index],
+                        'start_time' => $request->start_times[$index] ?? null,
+                        'end_time' => $request->end_times[$index] ?? null,
+                        'status' => $request->status[$index] ?? null,
+                        'created_by' => $createdBy,
+                    ]);
+                } else {
+                    // Create new record
+                    EmployeePreRota::create([
+                        'employee_id' => $request->employee_id,
+                        'pre_rota_id' => $preRota->id,
+                        'branch_id' => $employeBranchId,
+                        'date' => $date,
+                        'day_name' => $request->day_names[$index],
+                        'start_time' => $request->start_times[$index] ?? null,
+                        'end_time' => $request->end_times[$index] ?? null,
+                        'status' => $request->status[$index] ?? null,
+                        'created_by' => $createdBy,
+                    ]);
+                }
             }
 
             return response()->json([
@@ -191,30 +206,40 @@ class ProrotaController extends Controller
                     ], 422);
                 }
 
-                EmployeePreRota::where('employee_id', $request->employee_id)
-                    ->where('pre_rota_id', $preRota->id)
-                    ->whereBetween('date', [$start, $end])
-                    ->delete();
-
+                $employeBranchId = $employee->branch_id ?? $preRota->branch_id;
                 foreach ($request->dates as $index => $date) {
                     $dateObj = Carbon::parse($date);
                     if ($dateObj->lt($start) || $dateObj->gt($end)) {
                         continue; 
                     }
 
-                    $employeBranchId = $employee->branch_id ?? $preRota->branch_id;
+                    $existingRecord = EmployeePreRota::where('employee_id', $request->employee_id)
+                        ->where('date', $date)
+                        ->first();
 
-                    EmployeePreRota::create([
-                        'employee_id' => $request->employee_id,
-                        'pre_rota_id' => $preRota->id,
-                        'branch_id' => $employeBranchId,
-                        'date' => $date,
-                        'day_name' => $request->day_names[$index],
-                        'start_time' => $request->start_times[$index] ?? null,
-                        'end_time' => $request->end_times[$index] ?? null,
-                        'status' => $request->status[$index] ?? null,
-                        'created_by' => $createdBy,
-                    ]);
+                    if ($existingRecord) {
+                        $existingRecord->update([
+                            'pre_rota_id' => $preRota->id,
+                            'branch_id' => $employeBranchId,
+                            'day_name' => $request->day_names[$index],
+                            'start_time' => $request->start_times[$index] ?? null,
+                            'end_time' => $request->end_times[$index] ?? null,
+                            'status' => $request->status[$index] ?? null,
+                            'created_by' => $createdBy,
+                        ]);
+                    } else {
+                        EmployeePreRota::create([
+                            'employee_id' => $request->employee_id,
+                            'pre_rota_id' => $preRota->id,
+                            'branch_id' => $employeBranchId,
+                            'date' => $date,
+                            'day_name' => $request->day_names[$index],
+                            'start_time' => $request->start_times[$index] ?? null,
+                            'end_time' => $request->end_times[$index] ?? null,
+                            'status' => $request->status[$index] ?? null,
+                            'created_by' => $createdBy,
+                        ]);
+                    }
                 }
 
             return response()->json(['status' => 200, 'message' => 'PreRota updated successfully']);
