@@ -64,15 +64,16 @@ class ReportController extends Controller
             $contractDateEnd = date('Y', strtotime('+1 year')) . '-03-31';
 
             $employee = Employee::find($employeeId);
-            $holidayData = Holiday::with('employee')
+            $holidayData = EmployeePreRota::with('employee')
                 ->whereEmployeeId($employeeId)
-                ->where('branch_id', $employee->branch_id)
+                ->where('status', 3)
                 ->get();
             $counts = $employee->leave_status_counts;
-                // dd($holidayData);
-            $holidayDataCount=Holiday::whereEmployeeId($employeeId)
-                ->whereBetween('date',[$contractDateBegin,$contractDateEnd])
-                ->where('type','Authorized holiday')
+
+            
+            $holidayDataCount = EmployeePreRota::where('employee_id', $employeeId)
+                ->whereBetween('date', [$contractDateBegin, $contractDateEnd])
+                ->where('status', '3')
                 ->where('branch_id', $employee->branch_id)
                 ->count();
             $sickDays = Attendance::whereEmployeeId($employeeId)

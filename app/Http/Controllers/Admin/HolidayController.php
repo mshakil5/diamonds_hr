@@ -209,7 +209,48 @@ class HolidayController extends Controller
             $data->updated_by = auth()->id();
             $data->save();
 
-            $this->preRota($holidayDates, $from, $to, $request, $data);
+            $start = Carbon::parse($request->from_date);
+            $end = Carbon::parse($request->to_date);
+            $employeBranchId = $employee->branch_id ?? Auth::user()->branch_id;
+            
+            foreach ($request->dates as $index => $date) {
+                $dateObj = Carbon::parse($date);
+                if ($dateObj->lt($start) || $dateObj->gt($end)) {
+                    continue; // Skip dates outside the range
+                }
+
+                // Check for existing EmployeePreRota record for this employee and date
+                $existingRecord = EmployeePreRota::where('employee_id', $request->employee_id)
+                    ->where('date', $date)
+                    ->first();
+
+                if ($existingRecord) {
+                    // Update existing record
+                    $existingRecord->update([
+                        'holiday_id' => $data->id,
+                        'branch_id' => $employeBranchId,
+                        'day_name' => $request->day_names[$index],
+                        'start_time' => $request->start_times[$index] ?? null,
+                        'end_time' => $request->end_times[$index] ?? null,
+                        'status' => $request->status[$index] ?? null,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                } else {
+                    // Create new record
+                    EmployeePreRota::create([
+                        'employee_id' => $request->employee_id,
+                        'holiday_id' => $data->id,
+                        'branch_id' => $employeBranchId,
+                        'date' => $date,
+                        'day_name' => $request->day_names[$index],
+                        'start_time' => $request->start_times[$index] ?? null,
+                        'end_time' => $request->end_times[$index] ?? null,
+                        'status' => $request->status[$index] ?? null,
+                        'created_by' => Auth::user()->id,
+                    ]);
+                }
+            }
+
 
             DB::commit();
 

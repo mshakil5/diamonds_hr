@@ -59,72 +59,61 @@ class Employee extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function preRotas()
-    {
-        return $this->belongsToMany(PreRota::class, 'employee_pre_rotas', 'employee_id', 'pre_rota_id');
-    }
     
-    public function holidays()
-    {
-        return $this->hasMany(Holiday::class);
-    }
 
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
     }
 
-    public function getLeaveStatusCountsAttribute_old()
+    public function holidays()
     {
-        $holidays = $this->holidays()->get();
+        return $this->hasMany(Holiday::class);
+    }
 
-        $durations = $holidays->groupBy('status')->map(function ($group) {
-            return $group->sum(function ($holiday) {
-                $start = Carbon::parse($holiday->from_date);
-                $end = Carbon::parse($holiday->to_date);
-                return $start->diffInDays($end) + 1;
-            });
-        });
-
-        return [
-            'booked' => $durations['Booked'] ?? 0,
-            'not_taken' => $durations['Not Taken'] ?? 0,
-            'taken' => $durations['Taken'] ?? 0,
-        ];
+    public function preRotas()
+    {
+        return $this->belongsToMany(PreRota::class, 'employee_pre_rotas', 'employee_id', 'pre_rota_id')
+            ->withPivot('date', 'day_name', 'start_time', 'end_time', 'status');
     }
 
     public function getLeaveStatusCountsAttribute()
     {
-        // Fetch holidays and related attendance data
-        $holidays = $this->holidays()->get();
-        $today = Carbon::today();
+        // Fetch EmployeePreRota records with status 3 (Holiday) for this employee
+        $holidays = EmployeePreRota::where('employee_id', $this->id)
+            ->where('status', '3')
+            ->get();
 
+        $today = Carbon::today();
         $durations = ['booked' => 0, 'not_taken' => 0, 'taken' => 0];
 
+        // Debug: Log the holidays found
+        \Log::debug('Employee ID: ' . $this->id . ', Holiday records found: ' . $holidays->count(), $holidays->toArray());
+
         foreach ($holidays as $holiday) {
-            $start = Carbon::parse($holiday->from_date);
-            $end = Carbon::parse($holiday->to_date);
-            $days = $start->diffInDays($end) + 1;
+            $date = Carbon::parse($holiday->date);
 
-            $attendances = $this->attendances()
-                ->whereBetween('clock_in', [$holiday->from_date, $holiday->to_date])
-                ->get();
+            // Debug: Log the date being processed
+            \Log::debug('Processing holiday date: ' . $date->toDateString() . ', Is future: ' . ($date->isFuture() ? 'Yes' : 'No'));
 
-            for ($date = $start; $date <= $end; $date->addDay()) {
+            // Fetch attendance for the specific date
+            $attendance = $this->attendances()
+                ->whereDate('clock_in', $date->toDateString())
+                ->first();
 
-                $attendance = $attendances->firstWhere(function ($attendance) use ($date) {
-                    return Carbon::parse($attendance->clock_in)->toDateString() === $date->toDateString();
-                });
-
-                if ($date->isFuture()) {
-                    $durations['booked']++;
-                } elseif ($attendance) {
-                    $durations['not_taken']++;
-                } else {
-                    $durations['taken']++;
-                }
+            if ($date->isFuture()) {
+                $durations['booked']++;
+            } elseif ($attendance) {
+                $durations['not_taken']++;
+                // Debug: Log attendance found
+                \Log::debug('Attendance found for date: ' . $date->toDateString(), $attendance->toArray());
+            } else {
+                $durations['taken']++;
             }
         }
+
+        // Debug: Log final counts
+        \Log::debug('Leave status counts for Employee ID ' . $this->id . ': ', $durations);
 
         return [
             'booked' => $durations['booked'],

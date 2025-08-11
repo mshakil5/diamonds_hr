@@ -57,7 +57,7 @@
                                         <select class="form-control select2" id="employee_id" name="employee_id" required>
                                             <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
-                                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                                <option value="{{ $employee->id }}">{{ $employee->name }}-{{ $employee->branch->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -158,26 +158,19 @@
                         <table class="table table-bordered table-hover">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
+                                    <th> Date</th>
                                     <th>Type</th>
                                     <th>Duration (Days)</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($holidayData as $key => $item)
-                                @php
-                                    $start = Carbon\Carbon::parse($item->from_date);
-                                    $end = Carbon\Carbon::parse($item->to_date);
-                                    $diffInDays = $start->diffInDays($end) + 1;
-                                @endphp
+                               @foreach ($holidayData as $key => $item)
                                     <tr>
-                                        <td>{{ \Carbon\Carbon::parse($item->from_date)->format('d-m-Y') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($item->to_date)->format('d-m-Y') }}</td>
-                                        <td>{{ $item->type }}</td>
-                                        <td>{{ $diffInDays }} days</td>
-                                        <td><span class="badge badge-info">{{ $item->status }}</span></td>
+                                        <td>{{ \Carbon\Carbon::parse($item->date)->format('d-m-Y') }}</td>
+                                        <td>{{ $item->holiday->type ?? '' }}</td>
+                                        <td>1 day</td>
+                                        <td><span class="badge badge-info">{{ $item->holiday_status_label }}</span></td>
                                     </tr>
                                 @endforeach
                             </tbody>
