@@ -84,7 +84,7 @@ class HolidayController extends Controller
             $data->type = $request->employee_type;
             $data->details = $request->details;
             $data->branch_id = Auth::user()->branch_id;
-            $data->created_by = auth()->id();
+            $data->created_by = Auth::user()->id;
             $data->save();
 
 
@@ -124,7 +124,7 @@ class HolidayController extends Controller
                         'start_time' => $request->start_times[$index] ?? null,
                         'end_time' => $request->end_times[$index] ?? null,
                         'status' => $request->status[$index] ?? null,
-                        'created_by' => auth()->id,
+                        'created_by' => Auth::user()->id,
                     ]);
                 }
             }
@@ -206,7 +206,7 @@ class HolidayController extends Controller
             $data->employee_id = $request->employee_id;
             $data->type = $request->employee_type;
             $data->details = $request->details;
-            $data->updated_by = auth()->id();
+            $data->updated_by = Auth::user()->id;
             $data->save();
 
             $start = Carbon::parse($request->from_date);

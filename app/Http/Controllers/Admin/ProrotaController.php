@@ -178,7 +178,7 @@ class ProrotaController extends Controller
         try {
             $start = Carbon::parse($request->start_date);
             $end = Carbon::parse($request->to_date);
-            $createdBy = auth()->id();
+            $createdBy = Auth::user()->id;
             $preRota = PreRota::findOrFail($request->codeid);
 
             $preRota->update([
