@@ -19,9 +19,7 @@ class AttendanceController extends Controller
         
         $fromDate = $request->from_date ?? '';
         $toDate = $request->to_date ?? '';
-
-        // dd($fromDate);
-
+        
         $query = Attendance::where('branch_id', Auth::user()->branch_id)
                 ->with(['employee', 'branch'])
                 ->orderBy('id', 'DESC');
@@ -42,47 +40,7 @@ class AttendanceController extends Controller
 
 
 
-    public function index2(Request $request)
-    {
-        if ($request->ajax()) {
-            $fromDate = $request->query('from_date');
-            $toDate = $request->query('to_date');
-
-            $query = Attendance::where('branch_id', Auth::user()->branch_id)
-                ->with(['employee', 'branch'])
-                ->orderBy('id', 'DESC');
-
-            if ($fromDate && $toDate) {
-                $query->whereBetween('clock_in', [
-                    Carbon::parse($fromDate)->startOfDay(),
-                    Carbon::parse($toDate)->endOfDay()
-                ]);
-            }
-
-            $attendances = $query->get();
-
-            return response()->json([
-                'data' => $attendances->map(function ($data) {
-                    return [
-                        'id' => $data->id,
-                        'employee' => ['name' => $data->employee->name],
-                        'branch' => $data->branch ? ['name' => $data->branch->name] : null,
-                        'type' => $data->type,
-                        'clock_in' => $data->clock_in,
-                        'clock_out' => $data->clock_out,
-                        'details' => $data->details,
-                        'created_at' => $data->created_at
-                    ];
-                })
-            ]);
-        }
-
-        $employees = Employee::where('is_active', 1)
-            ->where('branch_id', Auth::user()->branch_id)
-            ->get();
-
-        return view('admin.attendance.index', compact('employees'));
-    }
+    
 
 
     public function store(Request $request)

@@ -454,9 +454,10 @@ $(document).ready(function() {
         if (!confirm('Sure?')) return;
         var codeid = $(this).attr('rid');
         var info_url = url + '/' + codeid;
+        console.log(info_url);
         $.ajax({
             url: info_url,
-            method: "GET",
+            method: "DELETE",
             type: "DELETE",
             data: {},
             success: function(d) {
