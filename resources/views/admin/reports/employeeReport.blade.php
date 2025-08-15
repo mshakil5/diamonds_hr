@@ -169,7 +169,7 @@
                                 @endphp
 
                                 <tr>
-                                    <td colspan="5" class="text-right"><strong>Total Time</strong></td>
+                                    <td colspan="8" class="text-right"><strong>Total Time</strong></td>
                                     <td><strong>{{ $h }}h {{ $m }}m {{ $s }}s</strong></td>
                                 </tr>
                             </tbody>
