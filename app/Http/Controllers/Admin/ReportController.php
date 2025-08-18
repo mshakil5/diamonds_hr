@@ -108,6 +108,7 @@ class ReportController extends Controller
     public function stockReport(Request $request)
     {
         $query = DB::table('products as p')
+            ->where('sm.branch_id', Auth::user()->branch_id)
             ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
             ->select(
                 'p.name',
@@ -119,8 +120,9 @@ class ReportController extends Controller
                 DB::raw("SUM(CASE WHEN sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE 0 END) as lost"),
                 DB::raw("SUM(sm.marks) as marks")
             )
-            ->groupBy('p.id', 'p.name')
-            ->where('sm.branch_id', Auth::user()->branch_id);
+            ->whereNull('sm.deleted_at')
+            ->groupBy('p.id', 'p.name');
+
 
         if ($request->isMethod('post') && $request->has(['from_date', 'to_date'])) {
             $fromDate = $request->input('from_date');
