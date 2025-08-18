@@ -71,7 +71,7 @@
                             <tbody>
                                 @foreach($products as $product)
                                     <tr>
-                                        <td>{{ $product->name }} - {{ $product->id }}</td>
+                                        <td>{{ $product->name }}</td>
                                         <td>{{ $product->initial_stock ?? 0 }}</td>
                                         <td>{{ $product->dirty ?? 0 }}</td>
                                         <td>{{ $product->bed ?? 0 }}</td>
