@@ -36,6 +36,7 @@ Route::post('/logout-with-activity', [FrontendController::class, 'logoutWithActi
 
 Route::get('/login/admin', [FrontendController::class, 'showAdminLogin'])->name('login.admin');
 Route::post('/login/admin', [FrontendController::class, 'adminLogin'])->name('login.admin');
+Route::get('/log', [FrontendController::class, 'showAdminLogin'])->name('login.admin');
 
 
 Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user']], function(){
