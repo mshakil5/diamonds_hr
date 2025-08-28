@@ -106,7 +106,7 @@ class EmployeeController extends Controller
             'password' => $request->password,
             'is_type' => '0',
             'photo' => $userphoto ?? '',
-            'branch_id' => Auth::user()->branch_id,
+            'branch_id' =>$request->branch_id ?? Auth::user()->branch_id,
             'created_by' => Auth::user()->id,
             'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
         ]);
@@ -169,7 +169,7 @@ class EmployeeController extends Controller
                 'password'=>$request->password,
                 'photo'=>$userphoto,
                 'username'=>$request->username,
-                'branch_id' => Auth::user()->branch_id,
+                'branch_id' => $request->branch_id ?? Auth::user()->branch_id,
                 'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
             ]);
 
@@ -180,7 +180,7 @@ class EmployeeController extends Controller
                 'email'=>$request->email,
                 'photo'=>$userphoto ?? '',
                 'username'=>$request->username,
-                'branch_id' => Auth::user()->branch_id,
+                'branch_id' => $request->branch_id ?? Auth::user()->branch_id,
                 'role_id' => is_numeric($request->role_id) ? (int)$request->role_id : null
             ]);
         }
