@@ -21,6 +21,47 @@
       </li>
       @endif
 
+      @if (auth()->user()->canDo([27, 28, 29, 30, 31]))
+      <li class="nav-item dropdown {{ request()->is('admin/settings*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/settings*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-blog"></i>
+              <p>
+                  Settings <i class="fas fa-angle-left right"></i>
+              </p>
+          </a>
+          @if (auth()->user()->canDo(27))
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('changeBranch') }}" class="nav-link {{ request()->routeIs('changeBranch') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Change Branch</p>
+                  </a>
+              </li>
+          </ul>
+          @endif
+          @if (auth()->user()->canDo(28))
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="#" class="nav-link ">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Attendance Log</p>
+                  </a>
+              </li>
+          </ul>
+          @endif
+          @if (auth()->user()->canDo(30))
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('admin.role') }}" class="nav-link {{ (request()->is('admin/role*')) ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-shield-alt"></i>
+                    <p>Roles & Permissions</p>
+                  </a>
+              </li>
+          </ul> 
+          @endif
+      </li>
+      @endif
+
       @if (auth()->user()->canDo([5, 6, 7]))
       <li class="nav-item">
         <a href="{{route('branches.index')}}" class="nav-link {{ (request()->is('admin/branches*')) ? 'active' : '' }}">
@@ -203,7 +244,7 @@
               <li class="nav-item">
                   <a href="{{ route('stockReport') }}" class="nav-link {{ request()->routeIs('stockReport') ? 'active' : '' }}">
                       <i class="fas fa-list nav-icon"></i>
-                      <p>Product Stock Report</p>
+                      <p>Laundry Stock Report</p>
                   </a>
               </li>
               @endif
@@ -225,46 +266,7 @@
       </li>
       @endif
 
-      @if (auth()->user()->canDo([27, 28, 29, 30, 31]))
-      <li class="nav-item dropdown {{ request()->is('admin/settings*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/settings*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-blog"></i>
-              <p>
-                  Settings <i class="fas fa-angle-left right"></i>
-              </p>
-          </a>
-          @if (auth()->user()->canDo(27))
-          <ul class="nav nav-treeview">
-              <li class="nav-item">
-                  <a href="{{ route('changeBranch') }}" class="nav-link {{ request()->routeIs('changeBranch') ? 'active' : '' }}">
-                      <i class="fas fa-list nav-icon"></i>
-                      <p>Change Branch</p>
-                  </a>
-              </li>
-          </ul>
-          @endif
-          @if (auth()->user()->canDo(28))
-          <ul class="nav nav-treeview">
-              <li class="nav-item">
-                  <a href="#" class="nav-link ">
-                      <i class="fas fa-list nav-icon"></i>
-                      <p>Attendance Log</p>
-                  </a>
-              </li>
-          </ul>
-          @endif
-          @if (auth()->user()->canDo(30))
-          <ul class="nav nav-treeview">
-              <li class="nav-item">
-                  <a href="{{ route('admin.role') }}" class="nav-link {{ (request()->is('admin/role*')) ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-shield-alt"></i>
-                    <p>Roles & Permissions</p>
-                  </a>
-              </li>
-          </ul> 
-          @endif
-      </li>
-      @endif
+      
 
       <li class="nav-item dropdown d-none {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'active' : '' }}">

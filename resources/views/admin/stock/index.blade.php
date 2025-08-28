@@ -332,6 +332,7 @@
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
+            "pageLength": 20,
             "order": [[1, "desc"]], // 🚀 column index 1 = Date column
             "buttons": ["copy", "csv", "excel", "pdf", "print"]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');

@@ -109,6 +109,7 @@ class ReportController extends Controller
     {
         $query = DB::table('products as p')
             ->where('sm.branch_id', Auth::user()->branch_id)
+            ->where('p.branch_id', Auth::user()->branch_id)
             ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
             ->select(
                 'p.name',
@@ -121,7 +122,17 @@ class ReportController extends Controller
                 DB::raw("SUM(sm.marks) as marks")
             )
             ->whereNull('sm.deleted_at')
+            ->whereNull('p.deleted_at') 
             ->groupBy('p.id', 'p.name');
+
+
+            $data = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Initial Stock')->whereNull('deleted_at')->sum('quantity');
+
+            $dirty = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Dirty')->whereNull('deleted_at')->sum('quantity');
+
+            $arrived = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Arrived')->whereNull('deleted_at')->sum('quantity');
+
+            // dd($data, $dirty, $arrived);
 
 
         if ($request->isMethod('post') && $request->has(['from_date', 'to_date'])) {

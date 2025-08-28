@@ -51,7 +51,7 @@
                 <div class="card card-secondary">
                     <!-- Report Header for PDF -->
                     <div id="report-header" style="text-align: center; margin-bottom: 20px;">
-                        <h2>Stock Report</h2>
+                        <h2>Stock Report {{Auth::user()->branch_id }}</h2>
                         <p>Date: <span id="date-range">{{ request()->from_date ? (request()->from_date . ' to ' . request()->to_date) : 'All Dates' }}</span></p>
                     </div>
                     <div class="card-body">
@@ -71,7 +71,7 @@
                             <tbody>
                                 @foreach($products as $product)
                                     <tr>
-                                        <td>{{ $product->name }}</td>
+                                        <td>{{ $product->name }} - (P{{ $product->id }})</td>
                                         <td>{{ $product->initial_stock ?? 0 }}</td>
                                         <td>{{ $product->dirty ?? 0 }}</td>
                                         <td>{{ $product->bed ?? 0 }}</td>
