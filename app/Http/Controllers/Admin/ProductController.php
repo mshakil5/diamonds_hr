@@ -46,7 +46,7 @@ class ProductController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:products,name,' . $request->codeid,
+            'name' => 'required|string|max:255|unique:products,name,' . $request->codeid . ',id,branch_id,' . Auth::user()->branch_id,
             'status' => 'required|boolean',
         ]);
 
