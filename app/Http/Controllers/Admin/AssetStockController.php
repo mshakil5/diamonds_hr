@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Maintenance;
 use App\Models\Branch;
 use App\Models\Floor;
+use Illuminate\Support\Facades\Auth;
 
 class AssetStockController extends Controller
 {
     public function index()
     {
-        $data = Stock::with('stockAssetTypes', 'assetType')->latest()->get();
+        $data = Stock::with('stockAssetTypes', 'assetType')->where('branch_id', Auth::user()->branch_id)->latest()->get();
         $assetTypes = AssetType::where('status', 1)->get();
         $locations = Location::where('status', 1)->get();
         $floors = Floor::where('status', 1)->get();
