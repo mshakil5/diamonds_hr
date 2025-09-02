@@ -115,9 +115,16 @@
                         <h3 class="card-title">Stock Maintenance List</h3>
                     </div>
                     <div class="card-body">
+                        <style>
+                            #example1 th:first-child,
+                            #example1 td:first-child {
+                                display: none !important;
+                            }
+                        </style>
                         <table id="example1" class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>Id</th>
                                     <th>Staff</th>
                                     <th>Date</th>
                                     <th>Branch</th>
@@ -130,6 +137,7 @@
                             <tbody>
                                 @foreach ($data as $key => $data)
                                 <tr>
+                                    <td>{{ $data->id }}</td>
                                     <td>{{ $data->user->name ?? "" }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ $data->branch->name ?? '' }}</td>
@@ -333,7 +341,7 @@
             "lengthChange": false,
             "autoWidth": false,
             "pageLength": 20,
-            "order": [[1, "desc"]], // 🚀 column index 1 = Date column
+            "order": [[0, "desc"]], // 🚀 column index 1 = Date column
             "buttons": ["copy", "csv", "excel", "pdf", "print"]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
