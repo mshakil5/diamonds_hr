@@ -32,7 +32,6 @@ class StockController extends Controller
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|string|max:255',
             'cloth_type' => 'required|string|max:255',
-            'details' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -65,7 +64,6 @@ class StockController extends Controller
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|string|max:255',
             'cloth_type' => 'required|string|max:255',
-            'details' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {

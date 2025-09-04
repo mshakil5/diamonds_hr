@@ -87,7 +87,7 @@
                                 <div class="col-sm-12">
                                 <!-- text input -->
                                     <div class="form-group">
-                                        <label>Details <span class="text-danger">*</span></label>
+                                        <label>Details</label>
                                         <textarea class="form-control" name="details" id="details" cols="30" rows="2"></textarea>
                                     </div>
                                 </div>
