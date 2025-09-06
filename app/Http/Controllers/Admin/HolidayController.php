@@ -8,6 +8,7 @@ use App\Models\EmployeePreRota;
 use Illuminate\Http\Request;
 use App\Models\Holiday;
 use App\Models\HolidayDetail;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -367,6 +368,10 @@ public function checkHolidays(Request $request)
         ->whereBetween('date', [$start_date, $end_date])
         ->get();
 
+    $employee = Employee::where('id', $employee_ids)->first();
+    $user = User::where('id', $employee->user_id)->first();
+
+
     // Generate HTML for each date in the range
     $prop = '';
     $current_date = $start_date->copy();
@@ -380,13 +385,28 @@ public function checkHolidays(Request $request)
         $prorota = $chkPrerota->firstWhere('date', $date_str);
 
         // If no pre-rota entry exists, create a default one with empty fields
-        $prorota = $prorota ?: (object)[
-            'date' => $date_str,
-            'day_name' => $day_name,
-            'start_time' => '',
-            'end_time' => '',
-            'status' => '', // Default to empty for "Please Select"
-        ];
+
+        if ($user->is_type == 1) {
+            $prorota = $prorota ?: (object)[
+                'date' => $date_str,
+                'day_name' => $day_name,
+                'start_time' => '10:00',
+                'end_time' => '17:30',
+                'status' => '1',
+            ];
+        } else {
+            $prorota = $prorota ?: (object)[
+                'date' => $date_str,
+                'day_name' => $day_name,
+                'start_time' => '09:30',
+                'end_time' => '17:30',
+                'status' => '1',
+            ];
+        }
+        
+
+
+        
 
         $prop .= '<div class="row schedule-row"><div class="col-md-2">
                     <input type="text" class="form-control" name="dates[]" value="' . $prorota->date . '" readonly>
@@ -424,7 +444,7 @@ public function checkHolidays(Request $request)
         $index++;
     }
 
-    return response()->json(['success' => true, 'html' => $prop, 'holidays' => $holidays]);
+    return response()->json(['success' => true, 'html' => $prop, 'holidays' => $holidays, 'user' => $user]);
 }
 
 

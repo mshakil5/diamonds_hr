@@ -722,7 +722,7 @@ $(document).ready(function() {
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
-                // console.log(response );
+                // console.log(response ); 
                 if (response.success) {
                     $('#holiday_results').html('');
                     $('#weekly-schedule').html(response.html);
