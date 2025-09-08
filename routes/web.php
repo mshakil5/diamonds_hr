@@ -22,11 +22,7 @@ Route::get('/clear', function() {
   
 Auth::routes();
 
-// Route::fallback(function () {
-//     return redirect('/');
-// });
-  
-Route::get('/', [FrontendController::class, 'login'])->name('homepage');
+Route::get('/', [FrontendController::class, 'login'])->name('homepage')->middleware('ip.whitelist');
 Route::get('/home', [FrontendController::class, 'login'])->name('home');
 Route::get('about-us', [FrontendController::class, 'about'])->name('about');
 Route::get('/blog/{slug}', [FrontendController::class, 'showBlogDetails'])->name('blog.details');
@@ -34,11 +30,11 @@ Route::get('/blog/{slug}', [FrontendController::class, 'showBlogDetails'])->name
 Route::post('/clear-session', [HomeController::class, 'clearSession'])->name('clearSession');
 Route::post('/logout-with-activity', [FrontendController::class, 'logoutWithActivity'])->name('logout.with.activity');
 
-Route::get('/login/admin', [FrontendController::class, 'showAdminLogin'])->name('login.admin');
-Route::post('/login/admin', [FrontendController::class, 'adminLogin'])->name('login.admin');
+Route::get('/login/admin', [FrontendController::class, 'showAdminLogin'])->name('login.admin')->middleware('ip.whitelist');
+Route::post('/login/admin', [FrontendController::class, 'adminLogin'])->name('login.admin')->middleware('ip.whitelist');
 
 
-Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user']], function(){
+Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user','ip.whitelist']], function(){
   
     Route::get('/dashboard', [HomeController::class, 'userHome'])->name('user.dashboard');
     Route::get('/profile', [ProfileController::class, 'profile'])->name('user.profile');
@@ -46,7 +42,7 @@ Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user']], function
 });
   
 
-Route::group(['prefix' =>'manager/', 'middleware' => ['auth', 'is_manager']], function(){
+Route::group(['prefix' =>'manager/', 'middleware' => ['auth', 'is_manager','ip.whitelist']], function(){
   
     Route::get('/dashboard', [HomeController::class, 'managerHome'])->name('manager.dashboard');
 });
