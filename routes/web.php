@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\User\ProfileController;
+use Illuminate\Http\Request;
   
 
 // cache clear
@@ -19,6 +20,19 @@ Route::get('/clear', function() {
  });
 //  cache clear
   
+
+// note
+Route::get('/_debug-myip', function (Request $request) {
+    return response()->json([
+        'request_ip'     => $request->ip(),
+        'request_ips'    => $request->ips(),   
+        'xff_header'     => $request->header('X-Forwarded-For'),
+        'remote_addr'    => $_SERVER['REMOTE_ADDR'] ?? null,
+        'all_headers'    => $request->headers->all(),
+    ]);
+});
+
+//note
   
 Auth::routes();
 
