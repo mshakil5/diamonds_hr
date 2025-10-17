@@ -29,6 +29,19 @@ class ReportController extends Controller
         $fromDate = Carbon::parse($request->from_date)->startOfDay();
         $toDate = Carbon::parse($request->to_date)->endOfDay();
 
+        $query = Attendance::where('branch_id', Auth::user()->branch_id)
+                ->with(['employee', 'branch'])
+                ->orderBy('id', 'DESC');
+
+                $query->when($fromDate && $toDate, function ($q) use ($fromDate, $toDate) {
+                    $q->whereBetween('clock_in', [
+                        Carbon::parse($fromDate)->startOfDay(),
+                        Carbon::parse($toDate)->endOfDay()
+                    ]);
+                });
+
+            $data = $query->get();
+
         
 
         $data = DB::table('attendances')
@@ -37,6 +50,7 @@ class ReportController extends Controller
             ->where('attendances.employee_id', $request->input('employee_id'))
             ->where('attendances.branch_id', Auth::user()->branch_id)
             ->whereBetween('attendances.clock_in', [$fromDate, $toDate])
+            ->whereNull('attendances.deleted_at')
             ->get();
 
             // dd($data);
