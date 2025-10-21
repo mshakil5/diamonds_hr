@@ -1,5 +1,6 @@
 <?php
-  
+
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
   
 use App\Http\Controllers\HomeController;
@@ -36,8 +37,9 @@ Route::get('/_debug-myip', function (Request $request) {
   
 Auth::routes();
 
+Route::get('/login', [LoginController::class, 'login'])->name('login')->middleware('ip.whitelist');
 Route::get('/', [FrontendController::class, 'login'])->name('homepage')->middleware('ip.whitelist');
-Route::get('/home', [FrontendController::class, 'login'])->name('home');
+Route::get('/home', [FrontendController::class, 'login'])->name('home')->middleware('ip.whitelist');
 Route::get('about-us', [FrontendController::class, 'about'])->name('about');
 Route::get('/blog/{slug}', [FrontendController::class, 'showBlogDetails'])->name('blog.details');
 
