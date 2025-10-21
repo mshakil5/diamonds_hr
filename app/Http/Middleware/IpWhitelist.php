@@ -58,6 +58,11 @@ class IpWhitelist
             'user_agent'   => $request->userAgent(),
         ]);
 
-        abort(403, 'Access denied');
+        $clientIp = $request->ip();
+
+        if (!IpUtils::checkIp($clientIp, $allowed)) {
+            abort(403, "Access denied for IP: {$clientIp}");
+        }
+
     }
 }
