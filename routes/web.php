@@ -33,7 +33,11 @@ Route::get('/_debug-myip', function (Request $request) {
     ]);
 });
 
-//note
+
+Route::get('/my-ip', function (Request $request) {
+    $clientIp = $request->ip();
+    return view('my-ip', compact('clientIp'));
+});
   
 Auth::routes();
 
