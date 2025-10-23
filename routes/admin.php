@@ -24,7 +24,7 @@ use App\Http\Controllers\Admin\AssetStockController;
 use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Controllers\Admin\FloorController;
 
-Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'ip.whitelist']], function(){
+Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
     Route::get('/dashboard', [HomeController::class, 'adminHome'])->name('admin.dashboard');
 
