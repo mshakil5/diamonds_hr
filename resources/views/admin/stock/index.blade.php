@@ -138,18 +138,17 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $data->id }}</td>
-                                    <td>{{ $data->user->name ?? "" }}</td>
+                                    <td>{{ $data->user->name ?? '' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
                                     <td>{{ $data->branch->name ?? '' }}</td>
-                                    <td>{{ $data->product->name }}</td>
+                                    <td>{{ $data->product->name ?? '' }}</td>
                                     <td>{{ $data->cloth_type }}</td>
                                     <td>{{ $data->quantity }}</td>
                                     <td>
                                         <a id="DetailsBtn"
                                             data-id="{{ $data->id }}"
-                                            data-product="{{ $data->product->name }}"
+                                            data-product="{{ $data->product->name ?? ''  }}"
                                             data-date="{{ $data->date }}"
-                                            data-product="{{ $data->product->name }}"
                                             data-type="{{ $data->cloth_type }}"
                                             data-quantity="{{ $data->quantity }}"
                                             data-marks="{{ $data->marks }}"
