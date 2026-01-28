@@ -63,7 +63,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">All Categories</h3>
+                        <h3 class="card-title">All Items</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table table-bordered table-striped">
@@ -71,6 +71,7 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Name</th>
+                                    <th>Category</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -79,6 +80,7 @@
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ $data->name }}</td>
+                                    <td>{{ $data->category->name }}</td>
                                     <td>
                                         <a id="EditBtn" rid="{{ $data->id }}"><i class="fa fa-edit" style="color: #2196f3;font-size:16px;"></i></a>
                                         <a id="deleteBtn" rid="{{ $data->id }}"><i class="fa fa-trash-o" style="color: red;font-size:16px;"></i></a>
@@ -119,7 +121,8 @@
         var url = "{{URL::to('/admin/checklist-items')}}";
         var upurl = "{{URL::to('/admin/checklist-items-update')}}";
 
-        $("#addBtn").click(function() {
+        $("#addBtn").click(function(e) {
+            e.preventDefault();
             if ($(this).val() == 'Create') {
                 var requiredFields = ['#name', '#status'];
                 for (var i = 0; i < requiredFields.length; i++) {
@@ -141,11 +144,15 @@
                     processData: false,
                     data: form_data,
                     success: function(d) {
-                        showSuccess('Data created successfully.');
-                        reloadPage(2000);
+                        if (d.status == 200) {
+                            showSuccess(d.message);
+                            reloadPage(2000);
+                        } else {
+                            showError(d.message); // This will show the validation error (e.g., "The name field is required")
+                        }
                     },
                     error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
+                        console.log(xhr.responseText);
                         showError('An error occurred. Please try again.');
                     }
                 });
@@ -215,7 +222,7 @@
 
         function populateForm(data) {
             $("#name").val(data.name);
-            $("#category_id").val(data.category_id);
+            $("#category_id").val(data.checklist_category_id);
             $("#status").val(data.status);
             $("#codeid").val(data.id);
             $("#addBtn").val('Update');

@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class ChecklistCategory extends Model
 {
     use HasFactory;
+
+    public function item()
+    {
+        return $this->hasMany(ChecklistItem::class);
+    }
 }

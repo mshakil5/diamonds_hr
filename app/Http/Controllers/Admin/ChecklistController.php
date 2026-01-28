@@ -95,7 +95,7 @@ class ChecklistController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'category_id' => 'nullable|string|max:255',
+            'category_id' => 'nullable',
             'status' => 'required|boolean',
         ]);
 
@@ -103,14 +103,26 @@ class ChecklistController extends Controller
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
-        $data = new ChecklistItem();
-        $data->name = $request->name;
-        $data->category_id = $request->category_id;
-        $data->status = $request->status;
-        $data->created_by = auth()->id();
-        $data->save();
-
-        return response()->json(['status' => 200, 'message' => 'Data created successfully.']);
+        try {
+            $data = new ChecklistItem();
+            $data->name = $request->name;
+            $data->checklist_category_id = $request->category_id;
+            $data->status = $request->status;
+            
+            // Safety check for auth
+            if (auth()->check()) {
+                $data->created_by = auth()->id();
+            } else {
+                return response()->json(['status' => 401, 'message' => 'Your session has expired. Please login again.']);
+            }
+            
+            $data->save();
+            return response()->json(['status' => 200, 'message' => 'Data created successfully.']);
+            
+        } catch (\Exception $e) {
+            // This will catch DB errors and return them as JSON so you can see them
+            return response()->json(['status' => 500, 'message' => $e->getMessage()]);
+        }
     }
 
     public function edit($id)
@@ -123,7 +135,7 @@ class ChecklistController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'category_id' => 'nullable|string|max:255',
+            'category_id' => 'nullable',
             'status' => 'required|boolean',
         ]);
 
@@ -133,7 +145,7 @@ class ChecklistController extends Controller
 
         $data = ChecklistItem::findOrFail($request->codeid);
         $data->name = $request->name;
-        $data->category_id = $request->category_id;
+        $data->checklist_category_id = $request->category_id;
         $data->status = $request->status;
         $data->updated_by = auth()->id();
         $data->save();

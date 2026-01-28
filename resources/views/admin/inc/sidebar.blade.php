@@ -266,8 +266,8 @@
       </li>
       @endif
 
-      <li class="nav-item dropdown {{ request()->is('admin/blogs*') || request()->is('admin/checklist-categories*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/checklist-categories*') ? 'active' : '' }}">
+      <li class="nav-item dropdown {{ request()->is('admin/checklist-items*') || request()->is('admin/checklist-categories*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/checklist-items*') || request()->is('admin/checklist-categories*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
               <p>
                   Checklist Items <i class="fas fa-angle-left right"></i>
@@ -275,7 +275,7 @@
           </a>
           <ul class="nav nav-treeview">
               <li class="nav-item">
-                  <a href="{{ route('allBlogs') }}" class="nav-link {{ request()->routeIs('allBlogs') ? 'active' : '' }}">
+                  <a href="{{ route('allchecklistitems') }}" class="nav-link {{ request()->routeIs('allchecklistitems') ? 'active' : '' }}">
                       <i class="fas fa-list nav-icon"></i>
                       <p>Checklist</p>
                   </a>
