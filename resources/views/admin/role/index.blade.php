@@ -288,7 +288,7 @@
                                             <fieldset class="border p-2">
                                                 <legend class="w-auto px-2">Roles & Permissions</legend>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="p30" name="permission[]" value="p30">
+                                                    <input class="form-check-input" type="checkbox" id="p30" name="permission[]" value="30">
                                                     <label class="form-check-label" for="p30">Create Role</label>
                                                 </div>
                                                 <div class="form-check">
@@ -296,6 +296,29 @@
                                                     <label class="form-check-label" for="p31">Edit Role</label>
                                                 </div>
                                             </fieldset>
+
+                                            
+                                            <fieldset class="border p-2">
+                                                <legend class="w-auto px-2">Room Checklist</legend>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="p32" name="permission[]" value="32">
+                                                    <label class="form-check-label" for="p32">Check Room</label>
+                                                </div>
+                                            </fieldset>
+
+                                            <fieldset class="border p-2">
+                                                <legend class="w-auto px-2">Checklist Items</legend>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="p33" name="permission[]" value="33">
+                                                    <label class="form-check-label" for="p33">Checklist Category</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="p34" name="permission[]" value="34">
+                                                    <label class="form-check-label" for="p34">Checklist Items</label>
+                                                </div>
+                                            </fieldset>
+
+
                                         </div>
                                     </div>
                                 </div>

@@ -260,6 +260,14 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/checklist-items/{id}', [ChecklistController::class, 'delete']);
 
 
+    
+    Route::get('/room-check', [ChecklistController::class, 'roomcheck'])->name('roomcheck');
+    
+    Route::get('/inspection-edit/{id}', [ChecklistController::class, 'inspectionEdit']);
+    Route::post('/inspection-store', [ChecklistController::class, 'inspectionStore'])->name('inspectionStore');
+
+
+
 
 });
   

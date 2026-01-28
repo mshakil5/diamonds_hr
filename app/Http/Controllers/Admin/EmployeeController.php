@@ -126,7 +126,7 @@ class EmployeeController extends Controller
         return Employee::with('user')->find($id);
     }
 
-    public function update(Request $request)
+    public function update2(Request $request)
     {
 
         $employee = Employee::find($request->codeid);
@@ -191,6 +191,69 @@ class EmployeeController extends Controller
             'type'=>'success',
             'message'=>'Staff updated successfully'
         ]);
+    }
+
+    public function update(Request $request)
+    {
+        // 1. Find records or fail early
+        $employee = Employee::findOrFail($request->codeid);
+        $user = User::findOrFail($employee->user_id);
+
+        // 2. Validation (Matches JS 'photo' name)
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'username' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
+            'password' => 'nullable|string|min:4',
+            'photo'    => 'nullable|image|mimes:jpg,jpeg,png', // Changed from 'image' to 'photo'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // 3. Handle File Upload
+            $photoPath = $user->photo; // Default to existing photo
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+                $imageName = uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images/employees'), $imageName);
+                $photoPath = '/images/employees/' . $imageName;
+            }
+
+            // 4. Update User Model
+            $userData = [
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'username'  => $request->username,
+                'photo'     => $photoPath,
+                'branch_id' => $request->branch_id ?? auth()->user()->branch_id,
+                'role_id'   => is_numeric($request->role_id) ? (int)$request->role_id : $user->role_id,
+            ];
+
+            if ($request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+            }
+
+            $user->update($userData);
+
+            // 5. Update Employee Model 
+            // Use except() to avoid sending User-specific data into the Employee table
+            $employee->update($request->except(['password', 'photo', 'codeid']));
+
+            DB::commit();
+
+            return response()->json([
+                'type'    => 'success',
+                'message' => 'Staff updated successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'type'    => 'error',
+                'message' => 'Update failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 

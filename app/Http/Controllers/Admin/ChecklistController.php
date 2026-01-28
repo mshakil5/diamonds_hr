@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\ChecklistCategory;
 use App\Models\ChecklistItem;
+use App\Models\Employee;
+use App\Models\Floor;
+use App\Models\RoomInspection;
+use App\Models\RoomInspectionItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class ChecklistController extends Controller
 {
@@ -160,6 +166,76 @@ class ChecklistController extends Controller
 
         return response()->json(['status' => 200, 'message' => 'Data deleted successfully.']);
     }
+
+
+    public function roomcheck()
+    {
+        $data = RoomInspection::with('items')->orderby('id', 'DESC')->get();
+        $categories = ChecklistCategory::with('item')->where('status', 1)->get();
+        $branches = Branch::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
+        return view('admin.checklist.roomcheck', compact('data','categories','branches','floors'));
+    }
+
+
+    public function inspectionEdit($id)
+    {
+        $inspection = RoomInspection::with('items')->find($id);
+        return response()->json($inspection);
+    }
+
+    public function inspectionStore(Request $request)
+{
+    $request->validate([
+        'branch_id' => 'required',
+        'floor_id'  => 'required',
+        'room'      => 'required',
+    ]);
+
+    try {
+        return DB::transaction(function () use ($request) {
+            $employee = Employee::where('user_id', auth()->id())->first();
+            
+            // Ensure ID is null if empty string
+            $id = $request->inspection_id ?: null;
+
+            $inspection = RoomInspection::updateOrCreate(
+                ['id' => $id], 
+                [
+                    'user_id'     => auth()->id(),
+                    'employee_id' => $employee->id ?? null,
+                    'branch_id'   => $request->branch_id,
+                    'floor_id'    => $request->floor_id,
+                    'room'        => $request->room,
+                    'note'        => $request->note,
+                    'date'        => now()->format('Y-m-d'),
+                ]
+            );
+
+            // Sync Checked Items
+            RoomInspectionItem::where('room_inspection_id', $inspection->id)->delete();
+            
+            if ($request->has('checkitem')) {
+                $items = [];
+                foreach ($request->checkitem as $itemId) {
+                    $items[] = [
+                        'room_inspection_id' => $inspection->id,
+                        'checklist_item_id'  => $itemId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                RoomInspectionItem::insert($items); // Bulk insert is faster
+            }
+
+            return response()->json(['success' => true, 'message' => 'Inspection saved successfully!']);
+        });
+        
+    } catch (\Exception $e) {
+        // This will now catch DB errors and tell you exactly what happened
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
 
 
 

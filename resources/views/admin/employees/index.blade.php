@@ -745,8 +745,6 @@ $(document).ready(function() {
         }
     });
 
-    var url = "{{ URL::to('/admin/employees') }}";
-    var upurl = "{{ URL::to('/admin/employees/update') }}";
 
     // Add/Edit form logic (unchanged)
     $("#addThisFormContainer").hide();
@@ -761,101 +759,78 @@ $(document).ready(function() {
         clearform();
     });
 
+    
+    var url = "{{ URL::to('/admin/employees') }}";
+    var upurl = "{{ URL::to('/admin/employees/update') }}";
+    
     $("#addBtn").click(function() {
-        if ($(this).val() == 'Create') {
-            var requiredFields = [
-                '#employee_id',
-                '#name',
-                '#employee_type',
-                '#pay_rate',
-                '#tax_code',
-                '#entitled_holiday',
-                '#branch_id',
-                '#username',
-                '#password'
-            ];
-            for (var i = 0; i < requiredFields.length; i++) {
-                if ($(requiredFields[i]).val() === '') {
-                    showError('Please fill all required fields.');
-                    return;
-                }
-            }
-
-            var form_data = new FormData($('#createThisForm')[0]);
-            var featureImgInput = document.getElementById('image');
-            if (featureImgInput.files && featureImgInput.files[0]) {
-                form_data.append("photo", featureImgInput.files[0]);
-            }
-            $.ajax({
-                url: url,
-                method: "POST",
-                contentType: false,
-                processData: false,
-                data: form_data,
-                success: function(d) {
-                    pagetop();
-                    showSuccess('Data created successfully.');
-                    reloadPage(2000);
-                },
-                error: function(xhr, status, error) {
-                    let response = xhr.responseJSON;
-                    if (response && response.errors) {
-                        let firstError = Object.values(response.errors)[0][0];
-                        showError(firstError);
-                    } else {
-                        showError('An error occurred. Please try again.');
-                    }
-                }
-            });
+        const btnMode = $(this).val(); // 'Create' or 'Update'
+        const isUpdate = (btnMode === 'Update');
+        
+        // 1. Configuration: Set URL and Required Fields based on mode
+        const ajaxUrl = isUpdate ? "{{ URL::to('/admin/employees/update') }}" : "{{ URL::to('/admin/employees') }}";
+        
+        const requiredFields = [
+            '#employee_id', '#name', '#employee_type', '#pay_rate', 
+            '#tax_code', '#entitled_holiday', '#branch_id', '#username'
+        ];
+        
+        // Password is only required during creation
+        if (!isUpdate) {
+            requiredFields.push('#password');
         }
-        if ($(this).val() == 'Update') {
-            var requiredFields = [
-                '#employee_id',
-                '#name',
-                '#employee_type',
-                '#pay_rate',
-                '#tax_code',
-                '#entitled_holiday',
-                '#branch_id',
-                '#username'
-            ];
-            for (var i = 0; i < requiredFields.length; i++) {
-                if ($(requiredFields[i]).val() === '') {
-                    showError('Please fill all required fields.');
-                    return;
-                }
-            }
 
-            var form_data = new FormData($('#createThisForm')[0]);
-            var featureImgInput = document.getElementById('image');
-            if (featureImgInput.files && featureImgInput.files[0]) {
-                form_data.append("photo", featureImgInput.files[0]);
+        // 2. Validation Loop
+        for (const field of requiredFields) {
+            if ($(field).val()?.trim() === '') {
+                showError('Please fill all required fields.');
+                $(field).focus(); // Professional touch: focus the empty field
+                return;
             }
-            form_data.append("codeid", $("#codeid").val());
-
-            $.ajax({
-                url: upurl,
-                type: "POST",
-                dataType: 'json',
-                contentType: false,
-                processData: false,
-                data: form_data,
-                success: function(d) {
-                    pagetop();
-                    showSuccess('Data updated successfully.');
-                    reloadPage(2000);
-                },
-                error: function(xhr, status, error) {
-                    let response = xhr.responseJSON;
-                    if (response && response.errors) {
-                        let firstError = Object.values(response.errors)[0][0];
-                        showError(firstError);
-                    } else {
-                        showError('An error occurred. Please try again.');
-                    }
-                }
-            });
         }
+
+        // 3. Prepare Data
+        const formData = new FormData($('#createThisForm')[0]);
+        const featureImgInput = document.getElementById('image');
+        
+        if (featureImgInput.files && featureImgInput.files[0]) {
+            formData.append("photo", featureImgInput.files[0]);
+        }
+
+        // Add ID if updating
+        if (isUpdate) {
+            formData.append("codeid", $("#codeid").val());
+        }
+
+        // 4. Single AJAX Call
+        $.ajax({
+            url: ajaxUrl,
+            method: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            beforeSend: function() {
+                // Optional: Disable button to prevent double-submissions
+                $("#addBtn").prop('disabled', true).text('Processing...');
+            },
+            success: function(response) {
+                pagetop();
+                showSuccess(`Data ${isUpdate ? 'updated' : 'created'} successfully.`);
+                reloadPage(2000);
+            },
+            error: function(xhr) {
+                $("#addBtn").prop('disabled', false).val(btnMode); // Re-enable on error
+                
+                const response = xhr.responseJSON;
+                if (response && response.errors) {
+                    const firstError = Object.values(response.errors)[0][0];
+                    showError(firstError);
+                } else {
+                    showError('An error occurred. Please try again.');
+                }
+            }
+        });
     });
 
 function showSuccess(message) {

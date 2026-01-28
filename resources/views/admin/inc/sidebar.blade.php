@@ -144,6 +144,17 @@
       </li>
       @endif
 
+      
+      <li class="nav-item">
+        <a href="{{route('roomcheck')}}" class="nav-link {{ (request()->is('admin/room-check*')) ? 'active' : '' }}">
+         <i class="fas fa-users"></i>
+          <p>
+            Room Check
+          </p>
+        </a>
+      </li>
+      
+
       <li class="nav-item dropdown {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') || request()->routeIs('maintenance.index') || request()->routeIs('floors') || request()->routeIs('faultyProducts') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle bg-success {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') || request()->routeIs('maintenance.index') || request()->routeIs('floors') || request()->routeIs('faultyProducts') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
@@ -266,28 +277,32 @@
       </li>
       @endif
 
-      <li class="nav-item dropdown {{ request()->is('admin/checklist-items*') || request()->is('admin/checklist-categories*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/checklist-items*') || request()->is('admin/checklist-categories*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-blog"></i>
-              <p>
-                  Checklist Items <i class="fas fa-angle-left right"></i>
-              </p>
-          </a>
-          <ul class="nav nav-treeview">
-              <li class="nav-item">
-                  <a href="{{ route('allchecklistitems') }}" class="nav-link {{ request()->routeIs('allchecklistitems') ? 'active' : '' }}">
-                      <i class="fas fa-list nav-icon"></i>
-                      <p>Checklist</p>
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="{{ route('allchecklistCategories') }}" class="nav-link {{ request()->routeIs('allchecklistCategories') ? 'active' : '' }}">
-                      <i class="fas fa-tags nav-icon"></i>
-                      <p>Checklist Categories</p>
-                  </a>
-              </li>
-          </ul>
-      </li>
+      @if (auth()->user()->canDo([33, 34 ]))
+            <li class="nav-item dropdown {{ request()->is('admin/checklist-items*') || request()->is('admin/checklist-categories*') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/checklist-items*') || request()->is('admin/checklist-categories*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-blog"></i>
+                    <p>
+                        Checklist Items <i class="fas fa-angle-left right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ route('allchecklistitems') }}" class="nav-link {{ request()->routeIs('allchecklistitems') ? 'active' : '' }}">
+                            <i class="fas fa-list nav-icon"></i>
+                            <p>Checklist</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('allchecklistCategories') }}" class="nav-link {{ request()->routeIs('allchecklistCategories') ? 'active' : '' }}">
+                            <i class="fas fa-tags nav-icon"></i>
+                            <p>Checklist Categories</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+      @endif
+
+
 
       
 
