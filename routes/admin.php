@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ProrotaController;
 use App\Http\Controllers\Admin\AssetStockController;
 use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Controllers\Admin\FloorController;
+use App\Http\Controllers\Admin\ChecklistController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
@@ -238,5 +239,27 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
 
   Route::get('/faulty-products', [StockController::class, 'faultyProducts'])->name('faultyProducts');
   Route::post('/update-faulty-status', [StockController::class, 'updateFaultyStatus'])->name('admin.updateFaultyStatus');
+
+
+
+
+
+    // checklist categories
+    Route::get('/checklist-categories', [ChecklistController::class, 'category'])->name('allchecklistCategories');
+    Route::post('/checklist-categories', [ChecklistController::class, 'storeCategory']);
+    Route::get('/checklist-categories/{id}/edit', [ChecklistController::class, 'editCategory']);
+    Route::post('/checklist-categories-update', [ChecklistController::class, 'updateCategory']);
+    Route::get('/checklist-categories/{id}', [ChecklistController::class, 'deleteCategory']);
+    Route::post('/checklist-categories/{id}/status', [ChecklistController::class, 'updateChecklistStatus'])->name('checklistCategories.updateStatus');
+
+
+    Route::get('/checklist-items', [ChecklistController::class, 'checklistItems'])->name('allchecklistitems');
+    Route::post('/checklist-items', [ChecklistController::class, 'store']);
+    Route::get('/checklist-items/{id}/edit', [ChecklistController::class, 'edit']);
+    Route::post('/checklist-items-update', [ChecklistController::class, 'update']);
+    Route::get('/checklist-items/{id}', [ChecklistController::class, 'delete']);
+
+
+
 });
   

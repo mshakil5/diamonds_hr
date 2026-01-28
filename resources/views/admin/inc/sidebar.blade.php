@@ -266,6 +266,29 @@
       </li>
       @endif
 
+      <li class="nav-item dropdown {{ request()->is('admin/blogs*') || request()->is('admin/checklist-categories*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/blogs*') || request()->is('admin/checklist-categories*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-blog"></i>
+              <p>
+                  Checklist Items <i class="fas fa-angle-left right"></i>
+              </p>
+          </a>
+          <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ route('allBlogs') }}" class="nav-link {{ request()->routeIs('allBlogs') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Checklist</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a href="{{ route('allchecklistCategories') }}" class="nav-link {{ request()->routeIs('allchecklistCategories') ? 'active' : '' }}">
+                      <i class="fas fa-tags nav-icon"></i>
+                      <p>Checklist Categories</p>
+                  </a>
+              </li>
+          </ul>
+      </li>
+
       
 
       <li class="nav-item dropdown d-none {{ request()->is('admin/blogs*') || request()->is('admin/blog-categories*') ? 'menu-open' : '' }}">
