@@ -185,57 +185,57 @@ class ChecklistController extends Controller
     }
 
     public function inspectionStore(Request $request)
-{
-    $request->validate([
-        'branch_id' => 'required',
-        'floor_id'  => 'required',
-        'room'      => 'required',
-    ]);
+    {
+        $request->validate([
+            'branch_id' => 'required',
+            'floor_id'  => 'required',
+            'room'      => 'required',
+        ]);
 
-    try {
-        return DB::transaction(function () use ($request) {
-            $employee = Employee::where('user_id', auth()->id())->first();
-            
-            // Ensure ID is null if empty string
-            $id = $request->inspection_id ?: null;
+        try {
+            return DB::transaction(function () use ($request) {
+                $employee = Employee::where('user_id', auth()->id())->first();
+                
+                // Ensure ID is null if empty string
+                $id = $request->inspection_id ?: null;
 
-            $inspection = RoomInspection::updateOrCreate(
-                ['id' => $id], 
-                [
-                    'user_id'     => auth()->id(),
-                    'employee_id' => $employee->id ?? null,
-                    'branch_id'   => $request->branch_id,
-                    'floor_id'    => $request->floor_id,
-                    'room'        => $request->room,
-                    'note'        => $request->note,
-                    'date'        => now()->format('Y-m-d'),
-                ]
-            );
+                $inspection = RoomInspection::updateOrCreate(
+                    ['id' => $id], 
+                    [
+                        'user_id'     => auth()->id(),
+                        'employee_id' => $employee->id ?? null,
+                        'branch_id'   => $request->branch_id,
+                        'floor_id'    => $request->floor_id,
+                        'room'        => $request->room,
+                        'note'        => $request->note,
+                        'date'        => now()->format('Y-m-d'),
+                    ]
+                );
 
-            // Sync Checked Items
-            RoomInspectionItem::where('room_inspection_id', $inspection->id)->delete();
-            
-            if ($request->has('checkitem')) {
-                $items = [];
-                foreach ($request->checkitem as $itemId) {
-                    $items[] = [
-                        'room_inspection_id' => $inspection->id,
-                        'checklist_item_id'  => $itemId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                // Sync Checked Items
+                RoomInspectionItem::where('room_inspection_id', $inspection->id)->delete();
+                
+                if ($request->has('checkitem')) {
+                    $items = [];
+                    foreach ($request->checkitem as $itemId) {
+                        $items[] = [
+                            'room_inspection_id' => $inspection->id,
+                            'checklist_item_id'  => $itemId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                    RoomInspectionItem::insert($items); // Bulk insert is faster
                 }
-                RoomInspectionItem::insert($items); // Bulk insert is faster
-            }
 
-            return response()->json(['success' => true, 'message' => 'Inspection saved successfully!']);
-        });
-        
-    } catch (\Exception $e) {
-        // This will now catch DB errors and tell you exactly what happened
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                return response()->json(['success' => true, 'message' => 'Inspection saved successfully!']);
+            });
+            
+        } catch (\Exception $e) {
+            // This will now catch DB errors and tell you exactly what happened
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
-}
 
 
 

@@ -52,6 +52,22 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @forelse($data as $row)
+                                    <tr>
+                                        <td>{{ \Carbon\Carbon::parse($row->date)->format('d M, Y') }}</td>
+                                        <td>{{ $row->branch->name ?? 'N/A' }}</td>
+                                        <td><span class="badge badge-secondary">{{ $row->room }}</span></td>
+                                        <td class="text-right">
+                                            <button type="button" class="btn btn-sm btn-info edit-btn" data-id="{{ $row->id }}" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">No inspections found.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -198,7 +214,7 @@
             submitBtn.removeClass('btn-success').addClass('btn-primary');
             resetBtn.show();
 
-            $.get("/inspection-edit/" + id, function(data) {
+            $.get("/admin/inspection-edit/" + id, function(data) {
                 $('#inspection_id').val(data.id);
                 $('#branch_id').val(data.branch_id).trigger('change');
                 $('#floor_id').val(data.floor_id).trigger('change');
