@@ -13,6 +13,7 @@ use App\Models\RoomInspectionItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ChecklistController extends Controller
 {
@@ -170,7 +171,9 @@ class ChecklistController extends Controller
 
     public function roomcheck()
     {
-        $data = RoomInspection::with('items')->orderby('id', 'DESC')->get();
+
+        $data = RoomInspection::with('items')->where('branch_id', Auth::user()->branch_id)->orderby('id', 'DESC')->get();
+
         $categories = ChecklistCategory::with('item')->where('status', 1)->get();
         $branches = Branch::where('status', 1)->get();
         $floors = Floor::where('status', 1)->get();

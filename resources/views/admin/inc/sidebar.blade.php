@@ -144,7 +144,7 @@
       </li>
       @endif
 
-      
+      @if (auth()->user()->canDo([32]))
       <li class="nav-item">
         <a href="{{route('roomcheck')}}" class="nav-link {{ (request()->is('admin/room-check*')) ? 'active' : '' }}">
          <i class="fas fa-users"></i>
@@ -153,6 +153,10 @@
           </p>
         </a>
       </li>
+      @endif
+
+      
+      
       
 
       <li class="nav-item dropdown {{ request()->is('admin/asset-type') || request()->is('admin/location') || request()->is('admin/asset') || request()->routeIs('stock') || request()->routeIs('maintenance.index') || request()->routeIs('floors') || request()->routeIs('faultyProducts') ? 'menu-open' : '' }}">
