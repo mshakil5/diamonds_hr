@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PDF;
 use App\Models\AssetType;
+use App\Models\ChecklistCategory;
 use App\Models\EmployeePreRota;
+use App\Models\Floor;
+use App\Models\RoomInspection;
 use App\Models\StockAssetType;
 
 class ReportController extends Controller
@@ -460,46 +463,50 @@ class ReportController extends Controller
 
     public function inspectionReport(Request $request)
     {
-        $query = DB::table('products as p')
-            ->where('sm.branch_id', Auth::user()->branch_id)
-            ->where('p.branch_id', Auth::user()->branch_id)
-            ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
-            ->select(
-                'p.name',
-                'p.id',
-                DB::raw("SUM(CASE WHEN sm.cloth_type='Initial Stock' THEN sm.quantity ELSE 0 END) as initial_stock"),
-                DB::raw("SUM(CASE WHEN sm.cloth_type='Dirty' THEN sm.quantity ELSE 0 END) as dirty"),
-                DB::raw("SUM(CASE WHEN sm.cloth_type='Bed' THEN sm.quantity ELSE 0 END) as bed"),
-                DB::raw("SUM(CASE WHEN sm.cloth_type='Arrived' THEN sm.quantity ELSE 0 END) as arrived"),
-                DB::raw("SUM(CASE WHEN sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE 0 END) as lost"),
-                DB::raw("SUM(sm.marks) as marks")
-            )
-            ->whereNull('sm.deleted_at')
-            ->whereNull('p.deleted_at') 
-            ->groupBy('p.id', 'p.name');
+        // 1. Get data for search dropdowns
+        $branches = Branch::where('status', 1)->get();
+        $floors = Floor::where('status', 1)->get();
+        $employees = Employee::all(); // You can filter this by branch if needed
 
+        // 2. Start the query with eager loading to prevent N+1 issues
+        $query = RoomInspection::with(['employee', 'branch', 'floor', 'items']);
 
-            $data = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Initial Stock')->whereNull('deleted_at')->sum('quantity');
-
-            $dirty = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Dirty')->whereNull('deleted_at')->sum('quantity');
-
-            $arrived = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Arrived')->whereNull('deleted_at')->sum('quantity');
-
-            // dd($data, $dirty, $arrived);
-
-
-        if ($request->isMethod('post') && $request->has(['from_date', 'to_date'])) {
-            $fromDate = $request->input('from_date');
-            $toDate = $request->input('to_date');
-
-            if ($fromDate && $toDate) {
-                $query->whereBetween('sm.created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59']);
-            }
+        // 3. Apply Filters
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $query->whereBetween('date', [$request->from_date, $request->to_date]);
         }
 
-        $products = $query->get();
+        if ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
 
-        return view('admin.reports.inspectionReport', compact('products'));
+        if ($request->filled('floor_id')) {
+            $query->where('floor_id', $request->floor_id);
+        }
+
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
+
+        // 4. Execute query
+        $inspections = $query->orderBy('date', 'DESC')->get();
+
+        return view('admin.reports.inspectionReport', compact('inspections', 'branches', 'floors', 'employees'));
+    }
+
+
+    public function getInspectionDetails($id)
+    {
+        // Load all necessary relationships
+        $inspection = RoomInspection::with(['items', 'branch', 'floor', 'employee', 'user'])->findOrFail($id);
+        $categories = ChecklistCategory::with('item')->where('status', 1)->get();
+        $checkedItemIds = $inspection->items->pluck('checklist_item_id')->toArray();
+
+        return response()->json([
+            'inspection' => $inspection,
+            'categories' => $categories,
+            'checked_ids'=> $checkedItemIds
+        ]);
     }
 
 

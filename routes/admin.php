@@ -270,6 +270,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     
     Route::get('/inspection-edit/{id}', [ChecklistController::class, 'inspectionEdit']);
     Route::post('/inspection-store', [ChecklistController::class, 'inspectionStore'])->name('inspectionStore');
+    Route::get('/inspection-details/{id}', [ReportController::class, 'getInspectionDetails']);
 
 
 
