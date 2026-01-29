@@ -457,4 +457,50 @@ class ReportController extends Controller
         
     }
 
+
+    public function inspectionReport(Request $request)
+    {
+        $query = DB::table('products as p')
+            ->where('sm.branch_id', Auth::user()->branch_id)
+            ->where('p.branch_id', Auth::user()->branch_id)
+            ->leftJoin('stockmaintainces as sm', 'sm.product_id', '=', 'p.id')
+            ->select(
+                'p.name',
+                'p.id',
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Initial Stock' THEN sm.quantity ELSE 0 END) as initial_stock"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Dirty' THEN sm.quantity ELSE 0 END) as dirty"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Bed' THEN sm.quantity ELSE 0 END) as bed"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Arrived' THEN sm.quantity ELSE 0 END) as arrived"),
+                DB::raw("SUM(CASE WHEN sm.cloth_type='Lost/Missed' THEN sm.quantity ELSE 0 END) as lost"),
+                DB::raw("SUM(sm.marks) as marks")
+            )
+            ->whereNull('sm.deleted_at')
+            ->whereNull('p.deleted_at') 
+            ->groupBy('p.id', 'p.name');
+
+
+            $data = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Initial Stock')->whereNull('deleted_at')->sum('quantity');
+
+            $dirty = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Dirty')->whereNull('deleted_at')->sum('quantity');
+
+            $arrived = Stockmaintaince::where('branch_id', Auth::user()->branch_id)->where('product_id', 40)->where('cloth_type', 'Arrived')->whereNull('deleted_at')->sum('quantity');
+
+            // dd($data, $dirty, $arrived);
+
+
+        if ($request->isMethod('post') && $request->has(['from_date', 'to_date'])) {
+            $fromDate = $request->input('from_date');
+            $toDate = $request->input('to_date');
+
+            if ($fromDate && $toDate) {
+                $query->whereBetween('sm.created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59']);
+            }
+        }
+
+        $products = $query->get();
+
+        return view('admin.reports.inspectionReport', compact('products'));
+    }
+
+
 }

@@ -171,6 +171,11 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/report/asset-stock', [ReportController::class, 'assetStockReport'])->name('assetStockReport');
     Route::post('/report/asset-stock', [ReportController::class, 'assetStockReport'])->name('assetStockReport.search');
 
+    
+    // inspection report
+    Route::get('/report/inspection', [ReportController::class, 'inspectionReport'])->name('inspectionReport');
+    Route::post('/report/inspection', [ReportController::class, 'inspectionReport'])->name('inspectionReport.search');
+
     // roles and permission
     Route::get('settings/role', [RoleController::class, 'index'])->name('admin.role');
     Route::post('role', [RoleController::class, 'store'])->name('admin.rolestore');

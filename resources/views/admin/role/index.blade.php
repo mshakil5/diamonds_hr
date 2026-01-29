@@ -269,6 +269,10 @@
                                                     <input class="form-check-input" type="checkbox" id="p26" name="permission[]" value="26">
                                                     <label class="form-check-label" for="p26">Staff Based Stock Report</label>
                                                 </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="p35" name="permission[]" value="35">
+                                                    <label class="form-check-label" for="p35">Inspection Report</label>
+                                                </div>
                                             </fieldset>
                                             <fieldset class="border p-2">
                                                 <legend class="w-auto px-2">Settings</legend>

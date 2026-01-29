@@ -220,7 +220,7 @@
           </ul> 
       </li>
       
-      @if (auth()->user()->canDo([23, 24, 25, 26]))
+      @if (auth()->user()->canDo([23, 24, 25, 26, 35]))
       <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}">
           <a href="#" class="nav-link dropdown-toggle bg-primary {{ request()->is('admin/blogs*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
@@ -270,6 +270,15 @@
                   <a href="{{ route('dirtyStockReport') }}" class="nav-link {{ request()->routeIs('dirtyStockReport') ? 'active' : '' }}">
                       <i class="fas fa-tags nav-icon"></i>
                       <p>Dirty Stock Report</p>
+                  </a>
+              </li>
+              @endif
+              
+              @if (auth()->user()->canDo(35))
+              <li class="nav-item">
+                  <a href="{{ route('inspectionReport') }}" class="nav-link {{ request()->routeIs('inspectionReport') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Inspection Report</p>
                   </a>
               </li>
               @endif
