@@ -62,6 +62,8 @@
                                             <option value="Initial Stock">Initial Stock</option>
                                             <option value="Lost/Missed">Missed</option>
                                             <option value="Rejected">Rejected</option>
+                                            <option value="Decreased">Decreased</option>
+                                            <option value="Increased">Increased</option>
                                         </select>
                                     </div>
                                 </div>

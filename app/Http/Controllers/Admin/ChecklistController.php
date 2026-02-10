@@ -240,6 +240,21 @@ class ChecklistController extends Controller
         }
     }
 
+    public function updateNote(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:room_inspections,id',
+            'note' => 'nullable|string'
+        ]);
+
+        $inspection = RoomInspection::find($request->id);
+        $inspection->inspection_note = $request->note; 
+        $inspection->inspection_by = Auth::user()->id; 
+        $inspection->save();
+
+        return response()->json(['success' => true, 'message' => 'Note updated successfully!']);
+    }
+
 
 
 

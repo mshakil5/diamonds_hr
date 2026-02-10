@@ -21,12 +21,19 @@ class RoomInspection extends Model
     // Standard Relationships
     public function branch() { return $this->belongsTo(Branch::class); }
     public function floor() { return $this->belongsTo(Floor::class); }
-    public function user() { return $this->belongsTo(User::class); }
 
     
 
     public function employee(){
         return $this->belongsTo(Employee::class);
+    }
+
+
+
+    public function user() { return $this->belongsTo(User::class); }
+    // Add this new relationship
+    public function inspector() {
+        return $this->belongsTo(User::class, 'inspection_by');
     }
 
 

@@ -498,7 +498,7 @@ class ReportController extends Controller
     public function getInspectionDetails($id)
     {
         // Load all necessary relationships
-        $inspection = RoomInspection::with(['items', 'branch', 'floor', 'employee', 'user'])->findOrFail($id);
+        $inspection = RoomInspection::with(['items', 'branch', 'floor', 'employee', 'user', 'inspector'])->findOrFail($id);
         $categories = ChecklistCategory::with('item')->where('status', 1)->get();
         $checkedItemIds = $inspection->items->pluck('checklist_item_id')->toArray();
 

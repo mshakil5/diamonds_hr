@@ -85,6 +85,7 @@
                             <th>Room</th>
                             <th>Items Checked</th>
                             <th>Notes</th>
+                            <th>Inspector Note</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -100,6 +101,23 @@
                                     <span class="badge badge-success">{{ $inspection->items->count() }} Items</span>
                                 </td>
                                 <td><small>{{ Str::limit($inspection->note, 50) }}</small></td>
+                                <td>
+                                    <div class="input-group">
+                                        <textarea 
+                                            class="form-control form-control-sm inspection-note" 
+                                            id="note-{{ $inspection->id }}" 
+                                            rows="2" 
+                                            placeholder="Add note...">{{ $inspection->inspection_note }}</textarea>
+                                        <div class="input-group-append">
+                                            <button 
+                                                class="btn btn-outline-success btn-sm update-note-btn" 
+                                                data-id="{{ $inspection->id }}" 
+                                                type="button">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-primary view-details" data-id="{{ $inspection->id }}">
                                         <i class="fas fa-eye"></i> View
@@ -137,11 +155,15 @@
                 </div>
 
                 <div class="row mb-4 bg-light p-3 rounded">
-                    <div class="col-6 mb-2">
+                    <div class="col-4 mb-2">
                         <small class="text-muted d-block">ROOM / SUITE</small>
                         <strong id="modalRoom" class="text-primary" style="font-size: 1.1rem;"></strong>
                     </div>
-                    <div class="col-6 mb-2 text-right">
+                    <div class="col-4 mb-2 text-center">
+                        <small class="text-muted d-block">ROOM INSPECTION BY</small>
+                        <strong id="inspectionBy"></strong>
+                    </div>
+                    <div class="col-4 mb-2 text-right">
                         <small class="text-muted d-block">INSPECTION DATE</small>
                         <strong id="modalDate"></strong>
                     </div>
@@ -150,12 +172,16 @@
                         <span id="modalFloor"></span>
                     </div>
                     <div class="col-4 text-center">
-                        <small class="text-muted d-block">INSPECTED BY</small>
-                        <span id="modalInspector"></span>
+                        <small class="text-muted d-block">ROOM CHANGE BY</small>
+                        <span id="roomChangeBy"></span>
                     </div>
                     <div class="col-4 text-right">
                         <small class="text-muted d-block">STATUS</small>
-                        <span class="badge badge-success">COMPLETED</span>
+                        <span class="">COMPLETED</span>
+                    </div>
+                    <div class="col-12">
+                        <small class="text-muted d-block">Inspector Note</small>
+                        <span id="inspectorNote"></span>
                     </div>
                 </div>
 
@@ -186,12 +212,17 @@
             $('.currentDate').text(new Date().toLocaleDateString());
 
             $.get("/admin/inspection-details/" + id, function(data) {
+                console.log(data.inspection);
                 // Fill Header & Meta Info
                 $('#modalBranchName').text(data.inspection.branch.name);
                 $('#modalRoom').text("ROOM " + data.inspection.room);
                 $('#modalDate').text(data.inspection.date);
+                $('#inspectorNote').text(data.inspection.inspection_note);
                 $('#modalFloor').text(data.inspection.floor.name);
-                $('#modalInspector').text(data.inspection.employee ? data.inspection.employee.name : 'System Admin');
+                // This shows the person who changed the room (linked via user_id)
+                $('#roomChangeBy').text(data.inspection.user ? data.inspection.user.name : 'N/A');
+                $('#inspectionBy').text(data.inspection.inspector ? data.inspection.inspector.name : 'N/A');
+
                 $('#modalNote').text(data.inspection.note || 'No specific observations recorded.');
 
                 let html = '';
@@ -218,6 +249,41 @@
                 });
 
                 $('#checklistResult').html(html);
+            });
+        });
+
+        $(document).on('click', '.update-note-btn', function() {
+            let btn = $(this);
+            let id = btn.data('id');
+            let note = $('#note-' + id).val();
+
+            // Visual feedback: disable button and change icon
+            btn.prop('disabled', true);
+            btn.find('i').removeClass('fa-check').addClass('fa-spinner fa-spin');
+
+            $.ajax({
+                url: "{{ route('update.inspection.note') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    note: note
+                },
+                success: function(response) {
+                    // Flash a success color, then return to normal
+                    $('#note-' + id).css('border-color', '#28a745');
+                    setTimeout(() => {
+                        $('#note-' + id).css('border-color', '#ced4da');
+                        btn.find('i').removeClass('fa-spinner fa-spin').addClass('fa-check');
+                        btn.prop('disabled', false);
+                    }, 1000);
+                    console.log(response.message);
+                },
+                error: function() {
+                    alert('Something went wrong. Please try again.');
+                    btn.prop('disabled', false);
+                    btn.find('i').removeClass('fa-spinner fa-spin').addClass('fa-check');
+                }
             });
         });
 
