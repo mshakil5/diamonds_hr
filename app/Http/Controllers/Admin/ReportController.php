@@ -446,7 +446,7 @@ class ReportController extends Controller
     public function nextweekPrerotaReport(Request $request)
     {
         
-        $currentDate = Carbon::today();
+        // $currentDate = Carbon::today();
         $currentWeekStart = $currentDate->copy()->startOfWeek(Carbon::MONDAY); 
         $currentWeekEnd = $currentDate->copy()->endOfWeek(Carbon::SUNDAY);
 
@@ -461,7 +461,7 @@ class ReportController extends Controller
     }
 
 
-    
+
 
 
     public function inspectionReport(Request $request)
