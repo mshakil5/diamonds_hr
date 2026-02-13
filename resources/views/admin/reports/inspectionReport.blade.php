@@ -1,6 +1,18 @@
 @extends('admin.layouts.admin')
 
 @section('content')
+<style>
+    #pdfContent {
+        margin: 0 !important;
+        padding-top: 10px !important;
+    }
+
+    #pdfContent h2,
+    #pdfContent p {
+        margin-top: 0 !important;
+    }
+
+</style>
 <section class="content mt-3">
     <div class="container-fluid">
         <div class="card card-secondary">
@@ -149,12 +161,12 @@
             </div>
             
             <div class="modal-body" id="pdfContent" style="padding: 30px; background: #fff;">
-                <div class="text-center mb-4 border-bottom pb-3">
+                <div class="text-center mb-2 border-bottom pb-2">
                     <h2 class="mb-0 text-uppercase" style="letter-spacing: 2px;">Room Inspection Report</h2>
                     <p class="text-muted" id="modalBranchName" style="font-size: 1.2rem;"></p>
                 </div>
 
-                <div class="row mb-4 bg-light p-3 rounded">
+                <div class="row mb-2 bg-light p-3 rounded">
                     <div class="col-4 mb-2">
                         <small class="text-muted d-block">ROOM / SUITE</small>
                         <strong id="modalRoom" class="text-primary" style="font-size: 1.1rem;"></strong>
@@ -188,9 +200,8 @@
                 <div id="checklistResult">
                     </div>
 
-                <div class="mt-4 p-3 border-left border-info" style="background: #f8f9fa;">
-                    <h6><strong>Manager/Inspector Notes:</strong></h6>
-                    <p id="modalNote" class="mb-0 italic text-muted"></p>
+                <div class="mt-2 p-3 border-left border-info" style="background: #f8f9fa;">
+                    <h6><strong>Notes:</strong> <span  id="modalNote" class="mb-0 italic text-muted"></span></h6>
                 </div>
 
                 <div class="mt-5 text-center border-top pt-3" style="font-size: 0.8rem; color: #aaa;">
@@ -289,19 +300,24 @@
 
         // Download PDF Logic
         $('#downloadPDF').click(function() {
+
+            window.scrollTo(0, 0);   // 🔥 important
+
             const element = document.getElementById('pdfContent');
             const room = $('#modalRoom').text();
-            
+
             const opt = {
-                margin:       0.5,
-                filename:     `Inspection_Report_${room}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                margin: 0,
+                filename: `Inspection_Report_${room}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, scrollY: 0 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
 
-            // New API for html2pdf to handle professional styling
             html2pdf().set(opt).from(element).save();
         });
+
     </script>
+
+
 @endsection
