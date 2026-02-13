@@ -461,6 +461,9 @@ class ReportController extends Controller
     }
 
 
+    
+
+
     public function inspectionReport(Request $request)
     {
         // 1. Get data for search dropdowns
