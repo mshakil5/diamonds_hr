@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AssetStockController;
 use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\ChecklistController;
+use App\Http\Controllers\Admin\DailyProrotaController;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
   
@@ -274,6 +275,14 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
     Route::get('/inspection-details/{id}', [ReportController::class, 'getInspectionDetails']);
     
 
+    Route::prefix('daily-pre-rotas')->group(function () {
+        Route::get('/', [DailyProrotaController::class, 'index'])->name('daily-prerotas.index');
+        Route::get('/check-staff-schedule', [DailyProrotaController::class, 'checkStaffSchedule'])->name('admin.daily-prerotas.check-staff-schedule');
+        Route::post('/', [DailyProrotaController::class, 'store'])->name('daily-prerotas.store');
+        Route::get('/{id}/edit', [DailyProrotaController::class, 'edit'])->name('daily-prerotas.edit');
+        Route::post('/update', [DailyProrotaController::class, 'update'])->name('daily-prerotas.update');
+        Route::get('/{id}', [DailyProrotaController::class, 'delete'])->name('daily-prerotas.delete');
+    });
 
 
 

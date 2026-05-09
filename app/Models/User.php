@@ -87,4 +87,20 @@ class User extends Authenticatable
         return (in_array($this->is_type, ['0', '1'])) && count(array_intersect($permissions, $userPermissions)) > 0;
     }
 
+    /**
+     * Scope to get only staff users (type 2 or 3)
+     */
+    public function scopeStaff($query)
+    {
+        return $query->whereIn('is_type', ['2', '3']);
+    }
+
+    /**
+     * Check if user is staff
+     */
+    public function isStaff(): bool
+    {
+        return in_array($this->type, ['2', '3']);
+    }
+
 }
