@@ -203,6 +203,10 @@
             $("input[name='end_times[]']").each((i, el)    => form_data.append("end_times[]",   el.value));
             $("input[name='detail_notes[]']").each((i, el) => form_data.append("detail_notes[]",el.value)); // NEW
 
+            if (isUpdate) {
+                form_data.append("employee_id", $("#employee_id").val());
+            }
+
             $.ajax({
                 url: isUpdate ? upurl : url,
                 method: "POST",

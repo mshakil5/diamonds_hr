@@ -22,7 +22,7 @@ class DailyProrotaController extends Controller
             ->get();
             
         // Pass staff to the view for the dropdown
-        $employees = User::all(); 
+        $employees = User::where('is_type', 0)->get(); 
 
         return view('admin.daily-prerota.index', compact('data', 'employees'));
     }
@@ -30,21 +30,26 @@ class DailyProrotaController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'from_date' => 'required|date',
-            'to_date'   => 'required|date|after_or_equal:from_date',
-            'note'      => 'nullable|string',
+            'from_date'  => 'required|date',
+            'to_date'    => 'required|date|after_or_equal:from_date',
+            'employee_id'=> 'required|exists:users,id',
+            'note'       => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
+        // GET EMPLOYEE'S BRANCH ID
+        $employee = User::find($request->employee_id);
+        $employeeBranchId = $employee->branch_id ?? Auth::user()->branch_id;
+
         try {
             DB::beginTransaction();
 
             $rota = new DailyPreRota();
             $rota->date       = $request->from_date;
-            $rota->branch_id  = Auth::user()->branch_id;
+            $rota->branch_id  = $employeeBranchId; // USE EMPLOYEE BRANCH ID
             $rota->note       = $request->note;
             $rota->status     = 1;
             $rota->created_by = Auth::user()->id;
@@ -52,33 +57,32 @@ class DailyProrotaController extends Controller
 
             if ($request->has('staff_ids')) {
                 foreach ($request->staff_ids as $index => $staffId) {
-                    $date   = $request->dates[$index] ?? null;
-                    $start  = $request->start_times[$index] ?? null;
-                    $end    = $request->end_times[$index] ?? null;
-                    $status = 1; // Default In Rota
-                    $detailNote = $request->detail_notes[$index] ?? null; // NEW
-
-                    $timeRange = ($start && $end) ? $start . ' - ' . $end : null;
+                    $date       = $request->dates[$index] ?? null;
+                    $start      = $request->start_times[$index] ?? null;
+                    $end        = $request->end_times[$index] ?? null;
+                    $detailNote = $request->detail_notes[$index] ?? null;
+                    $timeRange  = ($start && $end) ? $start . ' - ' . $end : null;
 
                     $existing = DailyPreRotaDetail::where('staff_id', $staffId)->where('date', $date)->first();
 
                     if ($existing) {
                         $existing->update([
                             'daily_pre_rota_id' => $rota->id,
+                            'branch_id'  => $employeeBranchId, // USE EMPLOYEE BRANCH ID
                             'time_range' => $timeRange,
-                            'note'       => $detailNote, // NEW
-                            'status'     => $status,
+                            'note'       => $detailNote,
+                            'status'     => 1,
                             'updated_by' => Auth::user()->id,
                         ]);
                     } else {
                         DailyPreRotaDetail::create([
                             'daily_pre_rota_id' => $rota->id,
                             'staff_id'   => $staffId,
-                            'branch_id'  => Auth::user()->branch_id,
+                            'branch_id'  => $employeeBranchId, // USE EMPLOYEE BRANCH ID
                             'date'       => $date,
                             'time_range' => $timeRange,
-                            'note'       => $detailNote, // NEW
-                            'status'     => $status,
+                            'note'       => $detailNote,
+                            'status'     => 1,
                             'created_by' => Auth::user()->id,
                         ]);
                     }
@@ -86,38 +90,37 @@ class DailyProrotaController extends Controller
             }
 
             DB::commit();
-
-            return response()->json([
-                'status'  => 200,
-                'message' => 'Pre-rota created successfully.',
-            ]);
+            return response()->json(['status' => 200, 'message' => 'Pre-rota created successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'status'  => 500,
-                'message' => 'An error occurred: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['status' => 500, 'message' => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
 
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'codeid'    => 'required|exists:daily_pre_rotas,id',
-            'from_date' => 'required|date',
-            'to_date'   => 'required|date|after_or_equal:from_date',
-            'note'      => 'nullable|string',
+            'codeid'     => 'required|exists:daily_pre_rotas,id',
+            'from_date'  => 'required|date',
+            'to_date'    => 'required|date|after_or_equal:from_date',
+            'employee_id'=> 'required|exists:users,id', // Make sure you pass this from JS
+            'note'       => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
+        // GET EMPLOYEE'S BRANCH ID
+        $employee = User::find($request->employee_id);
+        $employeeBranchId = $employee->branch_id ?? Auth::user()->branch_id;
+
         try {
             DB::beginTransaction();
 
             $rota = DailyPreRota::findOrFail($request->codeid);
             $rota->date       = $request->from_date;
+            $rota->branch_id  = $employeeBranchId; // USE EMPLOYEE BRANCH ID
             $rota->note       = $request->note;
             $rota->updated_by = Auth::user()->id;
             $rota->save();
@@ -127,23 +130,20 @@ class DailyProrotaController extends Controller
 
             if ($request->has('staff_ids')) {
                 foreach ($request->staff_ids as $index => $staffId) {
-                    $date   = $request->dates[$index] ?? null;
-                    $start  = $request->start_times[$index] ?? null;
-                    $end    = $request->end_times[$index] ?? null;
-                    $status = $request->statuses[$index] ?? 1;
-
-                    $timeRange = null;
-                    if ($start && $end) {
-                        $timeRange = $start . ' - ' . $end;
-                    }
+                    $date       = $request->dates[$index] ?? null;
+                    $start      = $request->start_times[$index] ?? null;
+                    $end        = $request->end_times[$index] ?? null;
+                    $detailNote = $request->detail_notes[$index] ?? null;
+                    $timeRange  = ($start && $end) ? $start . ' - ' . $end : null;
 
                     DailyPreRotaDetail::create([
                         'daily_pre_rota_id' => $rota->id,
                         'staff_id'   => $staffId,
-                        'branch_id'  => Auth::user()->branch_id,
+                        'branch_id'  => $employeeBranchId, // USE EMPLOYEE BRANCH ID
                         'date'       => $date,
                         'time_range' => $timeRange,
-                        'status'     => $status,
+                        'note'       => $detailNote,
+                        'status'     => 1,
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
@@ -151,17 +151,10 @@ class DailyProrotaController extends Controller
             }
 
             DB::commit();
-
-            return response()->json([
-                'status'  => 200,
-                'message' => 'Pre-rota updated successfully.',
-            ]);
+            return response()->json(['status' => 200, 'message' => 'Pre-rota updated successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'status'  => 500,
-                'message' => 'An error occurred: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['status' => 500, 'message' => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
 
@@ -209,7 +202,7 @@ class DailyProrotaController extends Controller
 
         return response()->json([
             'rota'         => $rota,
-            'staff_id'     => $details->first()->staff_id ?? null, // For dropdown
+            'staff_id'     => $details->first()->staff_id ?? null, // ADDED THIS
             'details_html' => $prop,
         ]);
     }

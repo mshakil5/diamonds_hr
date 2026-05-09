@@ -315,7 +315,7 @@
             </li>
       @endif
 
-        @if (auth()->user()->canDo([32]))
+        @if (auth()->user()->canDo([40]))
         <li class="nav-item">
             <a href="{{route('daily-prerotas.index')}}" class="nav-link {{ (request()->is('admin/daily-pre-rotas*')) ? 'active' : '' }}">
             <i class="fas fa-users"></i>

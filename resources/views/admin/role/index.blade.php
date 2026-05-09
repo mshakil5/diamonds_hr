@@ -322,6 +322,14 @@
                                                 </div>
                                             </fieldset>
 
+                                            <fieldset class="border p-2">
+                                                <legend class="w-auto px-2">Daily Rota</legend>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="p40" name="permission[]" value="40">
+                                                    <label class="form-check-label" for="p40">Daily rota</label>
+                                                </div>
+                                            </fieldset>
+
 
                                         </div>
                                     </div>
