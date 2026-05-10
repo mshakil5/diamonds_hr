@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\DailyPreRota;
 use App\Models\DailyPreRotaDetail;
@@ -16,15 +17,15 @@ class DailyProrotaController extends Controller
 {
     public function index()
     {
-        $data = DailyPreRota::where('branch_id', Auth::user()->branch_id)
-            ->with('branch', 'details')
+        $data = DailyPreRota::with('branch', 'details')
             ->orderby('id', 'DESC')
             ->get();
             
         // Pass staff to the view for the dropdown
         $employees = User::where('is_type', 0)->get(); 
+        $branches = Branch::all();
 
-        return view('admin.daily-prerota.index', compact('data', 'employees'));
+        return view('admin.daily-prerota.index', compact('data', 'employees','branches'));
     }
 
     public function store(Request $request)
@@ -48,8 +49,9 @@ class DailyProrotaController extends Controller
             DB::beginTransaction();
 
             $rota = new DailyPreRota();
+            $rota->staff_id   = $request->employee_id; 
             $rota->date       = $request->from_date;
-            $rota->branch_id  = $employeeBranchId; // USE EMPLOYEE BRANCH ID
+            $rota->branch_id  = $employeeBranchId; 
             $rota->note       = $request->note;
             $rota->status     = 1;
             $rota->created_by = Auth::user()->id;
@@ -68,7 +70,7 @@ class DailyProrotaController extends Controller
                     if ($existing) {
                         $existing->update([
                             'daily_pre_rota_id' => $rota->id,
-                            'branch_id'  => $employeeBranchId, // USE EMPLOYEE BRANCH ID
+                            'branch_id'  => $employeeBranchId, 
                             'time_range' => $timeRange,
                             'note'       => $detailNote,
                             'status'     => 1,
@@ -78,7 +80,7 @@ class DailyProrotaController extends Controller
                         DailyPreRotaDetail::create([
                             'daily_pre_rota_id' => $rota->id,
                             'staff_id'   => $staffId,
-                            'branch_id'  => $employeeBranchId, // USE EMPLOYEE BRANCH ID
+                            'branch_id'  => $employeeBranchId, 
                             'date'       => $date,
                             'time_range' => $timeRange,
                             'note'       => $detailNote,
@@ -119,8 +121,9 @@ class DailyProrotaController extends Controller
             DB::beginTransaction();
 
             $rota = DailyPreRota::findOrFail($request->codeid);
+            $rota->staff_id   = $request->employee_id; 
             $rota->date       = $request->from_date;
-            $rota->branch_id  = $employeeBranchId; // USE EMPLOYEE BRANCH ID
+            $rota->branch_id  = $employeeBranchId; 
             $rota->note       = $request->note;
             $rota->updated_by = Auth::user()->id;
             $rota->save();
@@ -139,7 +142,7 @@ class DailyProrotaController extends Controller
                     DailyPreRotaDetail::create([
                         'daily_pre_rota_id' => $rota->id,
                         'staff_id'   => $staffId,
-                        'branch_id'  => $employeeBranchId, // USE EMPLOYEE BRANCH ID
+                        'branch_id'  => $employeeBranchId,
                         'date'       => $date,
                         'time_range' => $timeRange,
                         'note'       => $detailNote,
@@ -201,6 +204,7 @@ class DailyProrotaController extends Controller
         }
 
         return response()->json([
+            'branch_id'    => $rota->branch_id, 
             'rota'         => $rota,
             'staff_id'     => $details->first()->staff_id ?? null, // ADDED THIS
             'details_html' => $prop,

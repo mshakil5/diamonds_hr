@@ -28,18 +28,31 @@
                                         <input type="date" class="form-control" id="to_date" name="to_date" />
                                     </div>
                                 </div>
+                                
+                                <!-- NEW: Branch Dropdown -->
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label>Employee <span class="text-danger">*</span></label>
-                                        <select class="form-control select2" id="employee_id" name="employee_id">
-                                            <option value="">Select Employee</option>
-                                            @foreach ($employees as $emp)
-                                            <option value="{{ $emp->id }}">{{ $emp->name }}</option>
+                                        <label>Branch <span class="text-danger">*</span></label>
+                                        <select class="form-control select2" id="branch_id" name="branch_id">
+                                            <option value="">Select Branch</option>
+                                            @foreach ($branches as $branch)
+                                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
+
+                                <!-- UPDATED: Employee Dropdown (Empty initially) -->
                                 <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Employee <span class="text-danger">*</span></label>
+                                        <select class="form-control select2" id="employee_id" name="employee_id">
+                                            <option value="">Select Branch First</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>General Note</label>
                                         <input type="text" class="form-control" name="note" id="note" placeholder="Optional main note">
@@ -74,6 +87,7 @@
 </section>
 
 <section class="content" id="contentContainer">
+    <!-- Keep your existing table exactly as it was -->
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
@@ -141,6 +155,9 @@
         // Init Select2
         $('.select2').select2();
 
+        // PASS ALL EMPLOYEES TO JAVASCRIPT ARRAY
+        const allEmployees = @json($employees);
+
         $.ajaxSetup({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
@@ -153,6 +170,33 @@
         function reloadPage(timeout) { setTimeout(function() { location.reload(); }, timeout); }
         function pagetop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
+        // NEW: FILTER EMPLOYEES WHEN BRANCH CHANGES
+        $("#branch_id").change(function() {
+            var branchId = $(this).val();
+            var $empSelect = $("#employee_id");
+            
+            // Reset employee dropdown
+            $empSelect.empty().trigger('change');
+            $empSelect.append('<option value="">Select Employee</option>');
+            
+            // Clear schedule if branch changes
+            $("#prerotaContainer").html('');
+
+            if (!branchId) {
+                $empSelect.trigger('change');
+                return;
+            }
+
+            // Filter employees from JS array
+            var filteredEmployees = allEmployees.filter(emp => emp.branch_id == branchId);
+            
+            filteredEmployees.forEach(emp => {
+                $empSelect.append(`<option value="${emp.id}">${emp.name}</option>`);
+            });
+            
+            $empSelect.trigger('change'); // Refresh Select2
+        });
+
         // Submit
         $("#addBtn").click(function() {
             pagetop();
@@ -160,6 +204,10 @@
 
             if ($('#from_date').val() === '' || $('#to_date').val() === '') {
                 showError('Please select From Date and To Date.');
+                return;
+            }
+            if ($('#branch_id').val() === '') {
+                showError('Please select a Branch.');
                 return;
             }
             if ($('#employee_id').val() === '') {
@@ -195,17 +243,17 @@
             form_data.append("from_date", $("#from_date").val());
             form_data.append("to_date",   $("#to_date").val());
             form_data.append("note",      $("#note").val());
-            if (isUpdate) form_data.append("codeid", $("#codeid").val());
+            form_data.append("employee_id", $("#employee_id").val()); // Always send
+            
+            if (isUpdate) {
+                form_data.append("codeid", $("#codeid").val());
+            }
 
             $("input[name='staff_ids[]']").each((i, el)   => form_data.append("staff_ids[]",   el.value));
             $("input[name='dates[]']").each((i, el)        => form_data.append("dates[]",       el.value));
             $("input[name='start_times[]']").each((i, el)  => form_data.append("start_times[]", el.value));
             $("input[name='end_times[]']").each((i, el)    => form_data.append("end_times[]",   el.value));
-            $("input[name='detail_notes[]']").each((i, el) => form_data.append("detail_notes[]",el.value)); // NEW
-
-            if (isUpdate) {
-                form_data.append("employee_id", $("#employee_id").val());
-            }
+            $("input[name='detail_notes[]']").each((i, el) => form_data.append("detail_notes[]",el.value));
 
             $.ajax({
                 url: isUpdate ? upurl : url,
@@ -229,7 +277,14 @@
                 var dates = d.rota.details.map(dd => dd.date).sort();
                 if (dates.length > 0) $("#to_date").val(dates[dates.length - 1]);
                 
-                $("#employee_id").val(d.staff_id).trigger('change'); // Populate Dropdown
+                // 1. Set Branch First
+                $("#branch_id").val(d.branch_id).trigger('change');
+                
+                // 2. Wait a tiny bit for JS to populate the employee dropdown, THEN set employee
+                setTimeout(function() {
+                    $("#employee_id").val(d.staff_id).trigger('change');
+                }, 150);
+
                 $("#note").val(d.rota.note);
                 $("#codeid").val(d.rota.id);
                 $("#prerotaContainer").html(d.details_html);
@@ -255,7 +310,7 @@
             });
         });
 
-        // Load schedule ONLY when Employee changes (and dates are selected)
+        // Load schedule ONLY when Employee changes
         $("#employee_id").change(function() {
             loadStaffSchedule();
         });
@@ -280,7 +335,7 @@
                 return;
             }
             if (employee_id === '') {
-                return; // Do nothing if employee isn't selected yet
+                return; 
             }
 
             $.ajax({
