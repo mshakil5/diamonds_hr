@@ -225,8 +225,8 @@
       </li>
       
       @if (auth()->user()->canDo([23, 24, 25, 26, 35]))
-      <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link dropdown-toggle bg-primary {{ request()->is('admin/blogs*') ? 'active' : '' }}">
+      <li class="nav-item dropdown {{ request()->is('admin/report*') ? 'menu-open' : '' }}  {{ request()->is('admin/daily-rota-report') ? 'menu-open' : '' }} {{ request()->is('admin/multi-branch-report') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link dropdown-toggle bg-primary {{ request()->is('admin/report*') ? 'active' : '' }}  {{ request()->is('admin/daily-rota-report') ? 'menu-open' : '' }}  {{ request()->is('admin/multi-branch-report') ? 'menu-open' : '' }}">
               <i class="nav-icon fas fa-blog"></i>
               <p>
                   Report <i class="fas fa-angle-left right"></i>
@@ -286,6 +286,28 @@
                   </a>
               </li>
               @endif
+
+
+              @if (auth()->user()->canDo(40))
+              <li class="nav-item">
+                  <a href="{{ route('daily-prerotas.report') }}" class="nav-link {{ request()->routeIs('daily-prerotas.report') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Daily Rota Single Branch</p>
+                  </a>
+              </li>
+              
+              <li class="nav-item">
+                  <a href="{{ route('daily-prerotas.multi-report') }}" class="nav-link {{ request()->routeIs('daily-prerotas.multi-report') ? 'active' : '' }}">
+                      <i class="fas fa-list nav-icon"></i>
+                      <p>Daily Rota Multi Branch</p>
+                  </a>
+              </li>
+
+              @endif
+
+
+
+
           </ul>
       </li>
       @endif
