@@ -24,7 +24,7 @@
         <div class="row">
 
           <div class="col-lg-3 col-md-4 col-6 mb-3">
-              <a href="#" class="text-decoration-none">
+              <a href="{{ route('attendance.all-branches')}}" class="text-decoration-none">
                 <div class="small-box bg-primary rounded shadow-sm">
                   <div class="inner">
                     <h3 class="text-white font-weight-bold">{{ $todayAllAttendanceCount }} Employee</h3>

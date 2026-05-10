@@ -107,6 +107,11 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::post('/update', [AttendanceController::class, 'update'])->name('attendance.update');
         Route::delete('/{id}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
         Route::get('/export', [AttendanceController::class, 'export'])->name('attendance.export');
+
+
+        Route::get('/all-branches', [AttendanceController::class, 'allBranches'])->name('attendance.all-branches');
+        Route::post('/all-branches', [AttendanceController::class, 'allBranches'])->name('attendance.all-branches.search');
+        Route::get('/all-branches-export', [AttendanceController::class, 'allBranchesExport'])->name('attendance.all-branches.export');
     });
 
 

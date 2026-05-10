@@ -147,4 +147,134 @@ class AttendanceController extends Controller
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', 'attachment; filename="attendance.csv"');
     }
+
+
+
+    public function allBranches(Request $request)
+    {
+        $fromDate = $request->from_date ?? '';
+        $toDate = $request->to_date ?? '';
+        $branchId = $request->branch_id ?? '';
+        
+        // Default to today if no dates provided
+        if (!$fromDate && !$toDate) {
+            $fromDate = Carbon::today()->format('Y-m-d');
+            $toDate = Carbon::today()->format('Y-m-d');
+        }
+        
+        $query = Attendance::with(['employee', 'branch'])
+                ->orderBy('id', 'DESC');
+        
+        // Date filter
+        $query->when($fromDate && $toDate, function ($q) use ($fromDate, $toDate) {
+            $q->whereBetween('clock_in', [
+                Carbon::parse($fromDate)->startOfDay(),
+                Carbon::parse($toDate)->endOfDay()
+            ]);
+        });
+        
+        // Branch filter
+        $query->when($branchId, function ($q) use ($branchId) {
+            $q->where('branch_id', $branchId);
+        });
+        
+        $data = $query->get();
+        
+        // Group data by branch
+        $groupedByBranch = $data->groupBy(function ($item) {
+            return $item->branch->name ?? 'Unknown Branch';
+        });
+        
+        // Get all branches for dropdown
+        $branches = \App\Models\Branch::where('status', 1)->orderBy('name', 'ASC')->get();
+        
+        return view('admin.attendance.all-branches', compact('groupedByBranch', 'branches', 'fromDate', 'toDate', 'branchId'));
+    }
+
+    // For Today's All Branches Attendance (if needed)
+    public function allBranchesToday()
+    {
+        $todayAttendance = Attendance::with(['employee', 'branch'])
+                ->whereDate('clock_in', Carbon::today())
+                ->orderBy('branch_id', 'ASC')
+                ->get();
+        
+        // Group by branch
+        $groupedByBranch = $todayAttendance->groupBy(function ($item) {
+            return $item->branch->name ?? 'Unknown Branch';
+        });
+        
+        return view('admin.attendance.all-branches-today', compact('groupedByBranch'));
+    }
+
+    // Export for all branches
+    public function allBranchesExport(Request $request)
+    {
+        $fromDate = $request->from_date;
+        $toDate = $request->to_date;
+        $branchId = $request->branch_id;
+        
+        $query = Attendance::with(['employee', 'branch']);
+        
+        if ($fromDate && $toDate) {
+            $query->whereBetween('clock_in', [
+                Carbon::parse($fromDate)->startOfDay(),
+                Carbon::parse($toDate)->endOfDay()
+            ]);
+        }
+        
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        
+        $data = $query->orderBy('id', 'DESC')->get();
+        
+        $filename = 'all_branches_attendance_' . date('Y-m-d') . '.csv';
+        
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+        
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Employee Name', 'Branch', 'Date', 'Type', 'Time In', 'Time Out', 'Late', 'Early Leave', 'Total Time']);
+            
+            foreach ($data as $item) {
+                $totalTime = '-';
+                if ($item->clock_in && $item->clock_out) {
+                    $in = Carbon::parse($item->clock_in);
+                    $out = Carbon::parse($item->clock_out);
+                    $diff = $in->diff($out);
+                    $totalTime = $diff->format('%H:%I:%S');
+                }
+                
+                fputcsv($file, [
+                    $item->employee->name ?? '',
+                    $item->branch->name ?? '',
+                    $item->clock_in ? Carbon::parse($item->clock_in)->format('d/m/Y') : '',
+                    $item->type ?? '',
+                    $item->clock_in ? Carbon::parse($item->clock_in)->format('H:i:s') : '',
+                    $item->clock_out ? Carbon::parse($item->clock_out)->format('H:i:s') : '',
+                    $item->late ?? '',
+                    $item->early_leave ?? '',
+                    $totalTime
+                ]);
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+
+
+
+
+
+
+
 }
