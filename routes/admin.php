@@ -286,7 +286,8 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::get('/daily-rota-report', [DailyProrotaController::class, 'reportView'])->name('daily-prerotas.report');
         Route::get('/daily-rota-report-data', [DailyProrotaController::class, 'getReportData'])->name('admin.daily-prerotas.report-data');
 
-
+        Route::get('/multi-branch-report', [DailyProrotaController::class, 'multiBranchReportView'])->name('daily-prerotas.multi-report');
+        Route::get('/multi-branch-report-data', [DailyProrotaController::class, 'getMultiBranchReportData'])->name('admin.daily-prerotas.multi-report-data');
 
 
 });

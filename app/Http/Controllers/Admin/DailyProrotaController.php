@@ -377,6 +377,68 @@ class DailyProrotaController extends Controller
     }
 
 
+    public function multiBranchReportView()
+    {
+        $branches = Branch::orderBy('name')->get();
+        return view('admin.daily-prerota.multi-report', compact('branches'));
+    }
+
+    public function getMultiBranchReportData(Request $request)
+    {
+        $request->validate([
+            'start_date'  => 'required|date',
+            'end_date'    => 'required|date|after_or_equal:start_date',
+            'branch_ids'  => 'required|array',
+            'branch_ids.*'=> 'exists:branches,id',
+        ]);
+
+        $startDate = Carbon::parse($request->start_date);
+        $endDate   = Carbon::parse($request->end_date);
+
+        // 1. Get all details for selected branches and date range
+        $details = DailyPreRotaDetail::whereIn('branch_id', $request->branch_ids)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->where('status', 1) // Only "In Rota" staff
+            ->with('staff', 'branch')
+            ->get();
+
+        // 2. Get selected branches info
+        $branches = Branch::whereIn('id', $request->branch_ids)->orderBy('name')->get();
+
+        // 3. Generate Date Rows
+        $dates = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $dates[] = [
+                'full_date'     => $currentDate->format('Y-m-d'),
+                'day_name'      => $currentDate->format('D'),   // e.g., "Mon"
+                'formatted_date'=> $currentDate->format('d M'),  // e.g., "12 May"
+            ];
+            $currentDate->addDay();
+        }
+
+        // 4. Group Data by Date, then by Branch ID
+        // Structure: $groupedData['2026-05-12']['1'] = [ ['name'=>'abc', 'time'=>'9:00 - 13:30'], ... ]
+        $groupedData = [];
+        foreach ($details as $detail) {
+            $groupedData[$detail->date][$detail->branch_id][] = [
+                'name' => $detail->staff->name ?? 'Unknown',
+                'time' => $detail->time_range ?? '',
+                'note' => $detail->note ?? ''
+            ];
+        }
+
+        return response()->json([
+            'success'  => true,
+            'start'    => $startDate->format('d M Y'),
+            'end'      => $endDate->format('d M Y'),
+            'branches' => $branches,
+            'dates'    => $dates,
+            'data'     => $groupedData,
+        ]);
+    }
+
+
 
 
 }
