@@ -285,4 +285,98 @@ class DailyProrotaController extends Controller
     }
 
 
+
+
+    public function reportView()
+    {
+        $branches = Branch::all();
+        return view('admin.daily-prerota.report', compact('branches'));
+    }
+
+    public function getReportData(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+            'branch_id'  => 'required|exists:branches,id',
+        ]);
+
+        $startDate = Carbon::parse($request->start_date);
+        $endDate   = Carbon::parse($request->end_date);
+
+        // 1. Get all details for this branch and date range
+        $details = DailyPreRotaDetail::where('branch_id', $request->branch_id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->where('status', 1) // Only "In Rota" staff
+            ->with('staff')
+            ->get();
+
+        if ($details->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No schedule data found for this criteria.']);
+        }
+
+        // 2. Generate Columns (Dates)
+        $columns = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $columns[] = [
+                'full_date' => $currentDate->format('Y-m-d'),
+                'day_num'   => $currentDate->format('d'), // e.g., "12"
+                'day_name'  => $currentDate->format('l'),  // e.g., "Tuesday"
+            ];
+            $currentDate->addDay();
+        }
+
+        // 3. Generate Rows (Hourly Time Slots)
+        // Find the earliest start time and latest end time to create the grid bounds
+        $allStarts = $details->map(fn($d) => explode(' - ', $d->time_range)[0] ?? null)->filter()->sort();
+        $allEnds   = $details->map(fn($d) => explode(' - ', $d->time_range)[1] ?? null)->filter()->sort();
+
+        $gridStart = $allStarts->first() ? Carbon::parse($allStarts->first()) : Carbon::parse('09:00');
+        $gridEnd   = $allEnds->last() ? Carbon::parse($allEnds->last()) : Carbon::parse('17:00');
+
+        $timeSlots = [];
+        $slotStart = $gridStart->copy();
+        while ($slotStart < $gridEnd) {
+            $slotEnd = $slotStart->copy()->addHour();
+            $timeSlots[] = $slotStart->format('H:i') . ' - ' . $slotEnd->format('H:i');
+            $slotStart = $slotEnd;
+        }
+
+        // 4. Build the Matrix Data
+        $matrix = [];
+        foreach ($timeSlots as $slot) {
+            $slotStartTime = Carbon::parse(explode(' - ', $slot)[0]);
+            $slotEndTime   = Carbon::parse(explode(' - ', $slot)[1]);
+
+            foreach ($columns as $col) {
+                // Find staff working on this date whose shift OVERLAPS with this 1-hour slot
+                $staffNames = $details->filter(function ($detail) use ($col, $slotStartTime, $slotEndTime) {
+                    if ($detail->date != $col['full_date'] || !$detail->time_range) return false;
+
+                    $shiftStart = Carbon::parse(explode(' - ', $detail->time_range)[0]);
+                    $shiftEnd   = Carbon::parse(explode(' - ', $detail->time_range)[1]);
+
+                    // Check overlap: Shift starts before slot ends AND shift ends after slot starts
+                    return $shiftStart < $slotEndTime && $shiftEnd > $slotStartTime;
+                })->pluck('staff.name')->join(', '); // Join multiple names with comma
+
+                $matrix[$slot][$col['full_date']] = $staffNames;
+            }
+        }
+
+        return response()->json([
+            'success'   => true,
+            'branch'    => Branch::find($request->branch_id)->name,
+            'start'     => $startDate->format('d M Y'),
+            'end'       => $endDate->format('d M Y'),
+            'columns'   => $columns,
+            'timeSlots' => $timeSlots,
+            'matrix'    => $matrix,
+        ]);
+    }
+
+
+
+
 }

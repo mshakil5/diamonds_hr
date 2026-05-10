@@ -283,6 +283,9 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth']], function(){
         Route::post('/update', [DailyProrotaController::class, 'update'])->name('daily-prerotas.update');
         Route::get('/{id}', [DailyProrotaController::class, 'delete'])->name('daily-prerotas.delete');
     });
+        Route::get('/daily-rota-report', [DailyProrotaController::class, 'reportView'])->name('daily-prerotas.report');
+        Route::get('/daily-rota-report-data', [DailyProrotaController::class, 'getReportData'])->name('admin.daily-prerotas.report-data');
+
 
 
 
