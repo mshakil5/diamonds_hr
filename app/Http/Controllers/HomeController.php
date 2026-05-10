@@ -71,6 +71,7 @@ class HomeController extends Controller
         $todayAbsence = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->whereType('Absence')->count();
         $totalHours = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->count();
         $todayAttendance = Attendance::where('branch_id', Auth::user()->branch_id)->whereDate('clock_in', Carbon::today())->get();
+        $todayAllAttendanceCount = Attendance::whereDate('clock_in', Carbon::today())->count();
 
         $assets = StockAssetType::with(['location.flooor', 'branch', 'maintenance', 'stock.assetType'])
         ->where('asset_status', 5)
@@ -110,7 +111,7 @@ class HomeController extends Controller
             ->distinct('employee_id')
             ->count('employee_id');
 
-        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status', 'statusCounts','currentWeekPreRota','nextWeekPreRota'));
+        return view('admin.dashboard', compact('monthlyHoliday', 'todaySick','todayAbsence','todayAttendance','totalHours','blogsCount', 'usersCount', 'assets', 'branches', 'floors', 'maintenances', 'statuses', 'status', 'statusCounts','currentWeekPreRota','nextWeekPreRota', 'todayAllAttendanceCount'));
     }
   
     /**

@@ -22,6 +22,22 @@
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
+
+          <div class="col-lg-3 col-md-4 col-6 mb-3">
+              <a href="#" class="text-decoration-none">
+                <div class="small-box bg-primary rounded shadow-sm">
+                  <div class="inner">
+                    <h3 class="text-white font-weight-bold">{{ $todayAllAttendanceCount }} Employee</h3>
+                    <p class="text-white m-0">Day Employee</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                </div>
+              </a>
+          </div>
+
+
           <div class="col-lg-3 col-md-4 col-6 mb-3">
             <div class="small-box bg-info rounded shadow-sm">
               <div class="inner">
