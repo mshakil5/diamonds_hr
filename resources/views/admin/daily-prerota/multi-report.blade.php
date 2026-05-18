@@ -68,7 +68,6 @@
         $("#generateBtn").click(function() {
             var start = $("#start_date").val();
             var end   = $("#end_date").val();
-            // Select2 multiple returns an array
             var branches = $("#branch_ids").val(); 
 
             if (!start || !end) {
@@ -100,20 +99,19 @@
                 var html = '<table class="table table-bordered" style="min-width: 800px; font-size: 13px;">';
                 
                 // --- ROW 1: Branch Names ---
-                html += '<thead><tr class="bg-secondary text-white text-center">';
+                html += '<thead><tr class="text-dark text-center print-header-bg">';
                 html += '<th rowspan="2" class="align-middle" style="width: 120px;">Day / Date</th>';
                 
                 res.branches.forEach(branch => {
-                    // Each branch takes 2 columns (Name + Time)
                     html += '<th colspan="2">' + branch.name + '</th>';
                 });
                 html += '</tr>';
 
                 // --- ROW 2: Sub-headers ---
-                html += '<tr class="bg-gray-light text-dark font-weight-bold text-center">';
+                html += '<tr class="print-header-bg" style="background-color: #f4f4f4 !important; color: #333 !important;">';
                 res.branches.forEach(branch => {
-                    html += '<th>Employee Name</th>';
-                    html += '<th>Time</th>';
+                    html += '<th class="text-center">Employee Name</th>';
+                    html += '<th class="text-center">Time</th>';
                 });
                 html += '</tr></thead>';
 
@@ -121,10 +119,8 @@
                 html += '<tbody>';
                 res.dates.forEach(dateObj => {
                     html += '<tr>';
-                    // First Column: Day Name and Date
                     html += '<td class="font-weight-bold text-center align-middle">' + dateObj.day_name + '<br><small>(' + dateObj.formatted_date + ')</small></td>';
                     
-                    // Subsequent Columns: Branch Data
                     res.branches.forEach(branch => {
                         var staffList = res.data[dateObj.full_date]?.[branch.id] || [];
                         
@@ -134,12 +130,14 @@
                         if (staffList.length > 0) {
                             staffList.forEach(staff => {
                                 nameCell += staff.name + '<br>';
-                                timeCell += staff.time + '<br>';
+                                // FIX: Replace dash with non-breaking dash so time doesn't break
+                                timeCell += (staff.time || '').replace(/\s*-\s*/g, '&ndash;') + '<br>';
                             });
                         }
 
                         html += '<td style="white-space: pre-line; vertical-align: top;">' + nameCell + '</td>';
-                        html += '<td style="white-space: pre-line; vertical-align: top;">' + timeCell + '</td>';
+                        // FIX: Added time-cell class for smaller font
+                        html += '<td class="time-cell" style="white-space: pre-line; vertical-align: top;">' + timeCell + '</td>';
                     });
                     
                     html += '</tr>';
@@ -158,13 +156,25 @@
 
 {{-- Print Styles --}}
 <style>
+    /* FIX 1: Time font 1 size smaller than base 13px = 12px */
+    .time-cell {
+        font-size: 12px;
+    }
+
     @media print {
         body * { visibility: hidden; }
         #reportContainer, #reportContainer * { visibility: visible; }
         #reportContainer { position: absolute; left: 0; top: 0; width: 100%; }
         .btn { display: none !important; }
         .card-header { border: none !important; box-shadow: none !important; }
-        /* Force landscape printing for wide tables */
+        
+        /* FIX 2: Force header background color to print */
+        .print-header-bg {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+
         @page { size: landscape; }
     }
     .bg-gray-light { background-color: #f4f4f4 !important; }
