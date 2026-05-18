@@ -29,7 +29,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- NEW: Branch Dropdown -->
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <label>Branch <span class="text-danger">*</span></label>
@@ -42,7 +41,6 @@
                                     </div>
                                 </div>
 
-                                <!-- UPDATED: Employee Dropdown (Empty initially) -->
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <label>Employee <span class="text-danger">*</span></label>
@@ -61,7 +59,7 @@
                                 
                                 <div class="col-sm-12 perrmsg"></div>
                                 
-                                <!-- Dynamic Table Area -->
+                                <!-- UPDATED: Dynamic Table Area Header - Added Branch column -->
                                 <div class="col-sm-12">
                                     <div class="row font-weight-bold mb-2" style="padding-left:15px;">
                                         <div class="col-md-2">Employee Name</div>
@@ -69,8 +67,9 @@
                                         <div class="col-md-1">Day</div>
                                         <div class="col-md-1">Start</div>
                                         <div class="col-md-1">End</div>
-                                        <div class="col-md-3">Note</div>
-                                        <div class="col-md-2">Action</div>
+                                        <div class="col-md-2">Branch</div>
+                                        <div class="col-md-2">Note</div>
+                                        <div class="col-md-1">Action</div>
                                     </div>
                                 </div>
                                 <div id="prerotaContainer" class="col-sm-12"></div>
@@ -87,7 +86,6 @@
 </section>
 
 <section class="content" id="contentContainer">
-    <!-- Keep your existing table exactly as it was -->
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
@@ -152,11 +150,11 @@
         addRemoveRow();
         addEndTimeValidation();
 
-        // Init Select2
         $('.select2').select2();
 
-        // PASS ALL EMPLOYEES TO JAVASCRIPT ARRAY
         const allEmployees = @json($employees);
+        // NEW: Pass branches to JavaScript for any future use
+        const allBranches = @json($branches);
 
         $.ajaxSetup({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
@@ -170,16 +168,12 @@
         function reloadPage(timeout) { setTimeout(function() { location.reload(); }, timeout); }
         function pagetop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-        // NEW: FILTER EMPLOYEES WHEN BRANCH CHANGES
         $("#branch_id").change(function() {
             var branchId = $(this).val();
             var $empSelect = $("#employee_id");
             
-            // Reset employee dropdown
             $empSelect.empty().trigger('change');
             $empSelect.append('<option value="">Select Employee</option>');
-            
-            // Clear schedule if branch changes
             $("#prerotaContainer").html('');
 
             if (!branchId) {
@@ -187,17 +181,15 @@
                 return;
             }
 
-            // Filter employees from JS array
             var filteredEmployees = allEmployees.filter(emp => emp.branch_id == branchId);
             
             filteredEmployees.forEach(emp => {
                 $empSelect.append(`<option value="${emp.id}">${emp.name}</option>`);
             });
             
-            $empSelect.trigger('change'); // Refresh Select2
+            $empSelect.trigger('change');
         });
 
-        // Submit
         $("#addBtn").click(function() {
             pagetop();
             var isUpdate = $(this).val() === 'Update';
@@ -218,6 +210,18 @@
                 showError('No schedule rows found.');
                 return;
             }
+
+            // NEW: Validate branch selection in each row
+            var branchError = false;
+            $(".schedule-row").each(function(index) {
+                var branchSelect = $(this).find(".row-branch-select");
+                if (!branchSelect.val()) {
+                    showError('Please select a branch in row ' + (index + 1) + '.');
+                    branchError = true;
+                    return false;
+                }
+            });
+            if (branchError) return;
 
             var timeError = false;
             $(".schedule-row").each(function(index) {
@@ -243,7 +247,7 @@
             form_data.append("from_date", $("#from_date").val());
             form_data.append("to_date",   $("#to_date").val());
             form_data.append("note",      $("#note").val());
-            form_data.append("employee_id", $("#employee_id").val()); // Always send
+            form_data.append("employee_id", $("#employee_id").val());
             
             if (isUpdate) {
                 form_data.append("codeid", $("#codeid").val());
@@ -254,6 +258,8 @@
             $("input[name='start_times[]']").each((i, el)  => form_data.append("start_times[]", el.value));
             $("input[name='end_times[]']").each((i, el)    => form_data.append("end_times[]",   el.value));
             $("input[name='detail_notes[]']").each((i, el) => form_data.append("detail_notes[]",el.value));
+            // NEW: Append branch_ids array
+            $("select[name='branch_ids[]']").each((i, el)  => form_data.append("branch_ids[]", el.value));
 
             $.ajax({
                 url: isUpdate ? upurl : url,
@@ -269,7 +275,6 @@
             });
         });
 
-        // Edit
         $("#contentContainer").on('click', '#EditBtn', function() {
             var codeid  = $(this).attr('rid');
             $.get(url + '/' + codeid + '/edit', {}, function(d) {
@@ -277,10 +282,8 @@
                 var dates = d.rota.details.map(dd => dd.date).sort();
                 if (dates.length > 0) $("#to_date").val(dates[dates.length - 1]);
                 
-                // 1. Set Branch First
                 $("#branch_id").val(d.branch_id).trigger('change');
                 
-                // 2. Wait a tiny bit for JS to populate the employee dropdown, THEN set employee
                 setTimeout(function() {
                     $("#employee_id").val(d.staff_id).trigger('change');
                 }, 150);
@@ -300,7 +303,6 @@
             });
         });
 
-        // Delete
         $("#contentContainer").on('click', '#deleteBtn', function() {
             if (!confirm('Sure?')) return;
             $.ajax({
@@ -310,12 +312,10 @@
             });
         });
 
-        // Load schedule ONLY when Employee changes
         $("#employee_id").change(function() {
             loadStaffSchedule();
         });
 
-        // If dates change while employee is selected, reload
         $("#from_date, #to_date").change(function() {
             if($("#employee_id").val() !== "") {
                 loadStaffSchedule();
@@ -326,6 +326,7 @@
             var start_date = $("#from_date").val();
             var end_date   = $("#to_date").val();
             var employee_id = $("#employee_id").val();
+            var branch_id = $("#branch_id").val(); // NEW: Pass selected branch
             
             $("#prerotaContainer").html('');
             $(".perrmsg").html('');
@@ -341,7 +342,12 @@
             $.ajax({
                 url: "{{ route('admin.daily-prerotas.check-staff-schedule') }}",
                 type: "GET",
-                data: { employee_id: employee_id, start_date: start_date, end_date: end_date },
+                data: { 
+                    employee_id: employee_id, 
+                    start_date: start_date, 
+                    end_date: end_date,
+                    branch_id: branch_id // NEW: Pass branch for default selection
+                },
                 success: function(data) {
                     if (data.success) {
                         $("#prerotaContainer").html(data.html);
