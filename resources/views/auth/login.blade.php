@@ -110,67 +110,100 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-  function showLogoutBox() {
-      $('#logoutBox, #logoutBackdrop').removeClass('d-none');
-  }
-
-  function hideLogoutBox() {
-      $('#logoutBox, #logoutBackdrop').addClass('d-none');
-  }
-
-  $('#logoutForm').on('submit', function(e) {
-      e.preventDefault();
-
-      const details = $('#logoutDetails').val().trim();
-      const email = $('#email').val().trim();
-      const password = $('#password').val().trim();
-      const $error = $('#logoutError');
-
-      if (!details) {
-          $error.removeClass('d-none');
-          return;
-      } else {
-          $error.addClass('d-none');
-      }
+function showLogoutBox() {
+    // Refresh token when opening the modal
     $.ajax({
-      url: '{{ route("logout.with.activity") }}',
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      },
-      data: {
-        details: details,
-        email: email,
-        password: password
-      },
-    success: function(data) {
-      $('.errmsg').html('<div class="alert alert-success text-center">' + data.message + '</div>');
-        setTimeout(function() {
-            window.location.href = '{{ route("login") }}';
-        }, 3000);
-      },
-      error: function(xhr) {
-        if (xhr.responseJSON && xhr.responseJSON.errors) {
-          const errorMessage = Object.values(xhr.responseJSON.errors)[0][0];
-          $('.errmsg').html('<div class="alert alert-danger text-center">' + errorMessage + '</div>');
-        } else if (xhr.responseJSON && xhr.responseJSON.message) {
-          $('.errmsg').html('<div class="alert alert-danger text-center">' + xhr.responseJSON.message + '</div>');
-        } else {
-          alert('An unknown error occurred');
+        url: '{{ url("/refresh-csrf") }}',
+        method: 'GET',
+        async: false,
+        success: function(data) {
+            $('meta[name="csrf-token"]').attr('content', data.token);
+            // Also update the hidden input if exists
+            if ($('input[name="_token"]').length) {
+                $('input[name="_token"]').val(data.token);
+            }
         }
-      }
     });
-  });
+    $('#logoutBox, #logoutBackdrop').removeClass('d-none');
+}
+
+function hideLogoutBox() {
+    $('#logoutBox, #logoutBackdrop').addClass('d-none');
+    $('.errmsg').html('');
+    $('#logoutDetails').val('');
+    $('#email').val('');
+    $('#password').val('');
+}
+
+function submitLogoutForm() {
+    const details = $('#logoutDetails').val().trim();
+    const email = $('#email').val().trim();
+    const password = $('#password').val().trim();
+    const $error = $('#logoutError');
+
+    if (!details) {
+        $error.removeClass('d-none');
+        return;
+    } else {
+        $error.addClass('d-none');
+    }
+
+    $.ajax({
+        url: '{{ route("logout.with.activity") }}',
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+            details: details,
+            email: email,
+            password: password
+        },
+        beforeSend: function() {
+            // Disable buttons during submission
+            $('#logoutForm button[type="submit"]').prop('disabled', true).text('Processing...');
+        },
+        success: function(data) {
+            $('.errmsg').html('<div class="alert alert-success text-center">' + data.message + '</div>');
+            setTimeout(function() {
+                window.location.href = '{{ route("login") }}';
+            }, 3000);
+        },
+        error: function(xhr) {
+            // Re-enable buttons
+            $('#logoutForm button[type="submit"]').prop('disabled', false).text('Confirm & Log Out');
+            
+            if (xhr.status === 419) {
+                $('.errmsg').html('<div class="alert alert-danger text-center">Session expired. Reloading...</div>');
+                setTimeout(function() {
+                    location.reload();
+                }, 2000);
+                return;
+            }
+            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                const errorMessage = Object.values(xhr.responseJSON.errors)[0][0];
+                $('.errmsg').html('<div class="alert alert-danger text-center">' + errorMessage + '</div>');
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                $('.errmsg').html('<div class="alert alert-danger text-center">' + xhr.responseJSON.message + '</div>');
+            } else {
+                $('.errmsg').html('<div class="alert alert-danger text-center">An error occurred. Please try again.</div>');
+            }
+        }
+    });
+}
+
+ $('#logoutForm').on('submit', function(e) {
+    e.preventDefault();
+    submitLogoutForm();
+});
 </script>
 
 <script>
-    function updateTime() {
-        const now = new Date();
-        const formatted = now.toLocaleTimeString('en-GB', { hour12: false });
-        document.getElementById('currentTime').textContent = 'Time: ' + formatted;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+function updateTime() {
+    const now = new Date();
+    const formatted = now.toLocaleTimeString('en-GB', { hour12: false });
+    document.getElementById('currentTime').textContent = 'Time: ' + formatted;
+}
+setInterval(updateTime, 1000);
+updateTime();
 </script>
-
-@endsection
