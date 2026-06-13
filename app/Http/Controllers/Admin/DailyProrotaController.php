@@ -15,17 +15,16 @@ use Carbon\Carbon;
 
 class DailyProrotaController extends Controller
 {
-    public function index()
+        public function index()
     {
         $data = DailyPreRota::with('branch', 'details')
             ->orderby('id', 'DESC')
             ->get();
             
-        // Pass staff to the view for the dropdown
         $employees = User::where('is_type', 0)->get(); 
         $branches = Branch::all();
 
-        return view('admin.daily-prerota.index', compact('data', 'employees','branches'));
+        return view('admin.daily-prerota.index', compact('data', 'employees', 'branches'));
     }
 
     public function store(Request $request)
@@ -41,7 +40,6 @@ class DailyProrotaController extends Controller
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
-        // GET EMPLOYEE'S BRANCH ID
         $employee = User::find($request->employee_id);
         $employeeBranchId = $employee->branch_id ?? Auth::user()->branch_id;
 
@@ -63,6 +61,7 @@ class DailyProrotaController extends Controller
                     $start      = $request->start_times[$index] ?? null;
                     $end        = $request->end_times[$index] ?? null;
                     $detailNote = $request->detail_notes[$index] ?? null;
+                    $detailBranchId = $request->branch_ids[$index] ?? $employeeBranchId; // NEW: Get branch from row
                     $timeRange  = ($start && $end) ? $start . ' - ' . $end : null;
 
                     $existing = DailyPreRotaDetail::where('staff_id', $staffId)->where('date', $date)->first();
@@ -70,7 +69,7 @@ class DailyProrotaController extends Controller
                     if ($existing) {
                         $existing->update([
                             'daily_pre_rota_id' => $rota->id,
-                            'branch_id'  => $employeeBranchId, 
+                            'branch_id'  => $detailBranchId, // UPDATED: Use row-level branch
                             'time_range' => $timeRange,
                             'note'       => $detailNote,
                             'status'     => 1,
@@ -80,7 +79,7 @@ class DailyProrotaController extends Controller
                         DailyPreRotaDetail::create([
                             'daily_pre_rota_id' => $rota->id,
                             'staff_id'   => $staffId,
-                            'branch_id'  => $employeeBranchId, 
+                            'branch_id'  => $detailBranchId, // UPDATED: Use row-level branch
                             'date'       => $date,
                             'time_range' => $timeRange,
                             'note'       => $detailNote,
@@ -105,7 +104,7 @@ class DailyProrotaController extends Controller
             'codeid'     => 'required|exists:daily_pre_rotas,id',
             'from_date'  => 'required|date',
             'to_date'    => 'required|date|after_or_equal:from_date',
-            'employee_id'=> 'required|exists:users,id', // Make sure you pass this from JS
+            'employee_id'=> 'required|exists:users,id',
             'note'       => 'nullable|string',
         ]);
 
@@ -113,7 +112,6 @@ class DailyProrotaController extends Controller
             return response()->json(['status' => 422, 'message' => $validator->errors()->first()]);
         }
 
-        // GET EMPLOYEE'S BRANCH ID
         $employee = User::find($request->employee_id);
         $employeeBranchId = $employee->branch_id ?? Auth::user()->branch_id;
 
@@ -128,7 +126,6 @@ class DailyProrotaController extends Controller
             $rota->updated_by = Auth::user()->id;
             $rota->save();
 
-            // Delete old details and recreate
             DailyPreRotaDetail::where('daily_pre_rota_id', $rota->id)->delete();
 
             if ($request->has('staff_ids')) {
@@ -137,12 +134,13 @@ class DailyProrotaController extends Controller
                     $start      = $request->start_times[$index] ?? null;
                     $end        = $request->end_times[$index] ?? null;
                     $detailNote = $request->detail_notes[$index] ?? null;
+                    $detailBranchId = $request->branch_ids[$index] ?? $employeeBranchId; // NEW: Get branch from row
                     $timeRange  = ($start && $end) ? $start . ' - ' . $end : null;
 
                     DailyPreRotaDetail::create([
                         'daily_pre_rota_id' => $rota->id,
                         'staff_id'   => $staffId,
-                        'branch_id'  => $employeeBranchId,
+                        'branch_id'  => $detailBranchId, // UPDATED: Use row-level branch
                         'date'       => $date,
                         'time_range' => $timeRange,
                         'note'       => $detailNote,
@@ -165,6 +163,7 @@ class DailyProrotaController extends Controller
     {
         $rota    = DailyPreRota::with('details')->findOrFail($id);
         $details = $rota->details;
+        $branches = Branch::all(); // NEW: Get branches for dropdown
 
         $prop = '';
         foreach ($details as $key => $detail) {
@@ -175,42 +174,47 @@ class DailyProrotaController extends Controller
             $startTime = $times[0] ?? '';
             $endTime   = $times[1] ?? '';
 
+            // NEW: Build branch dropdown options
+            $branchOptions = '';
+            foreach ($branches as $branch) {
+                $selected = ($detail->branch_id == $branch->id) ? 'selected' : '';
+                $branchOptions .= '<option value="' . $branch->id . '" ' . $selected . '>' . $branch->name . '</option>';
+            }
+
             $prop .= '<div class="row schedule-row mb-2">';
             $prop .= '<input type="hidden" name="staff_ids[]" value="' . $detail->staff_id . '">';
             
-            // 1. Employee Name
             $prop .= '<div class="col-md-2"><input type="text" class="form-control" value="' . $staffName . '" readonly></div>';
-            // 2. Date
             $prop .= '<div class="col-md-2"><input type="text" class="form-control" name="dates[]" value="' . $detail->date . '" readonly></div>';
-            // 3. Day Name
             $prop .= '<div class="col-md-1"><input type="text" class="form-control" value="' . $dayName . '" readonly></div>';
             
-            // 4. Start Time
             $prop .= '<div class="col-md-1"><div class="input-group date timepicker" id="start_time_' . $key . '" data-target-input="nearest">';
             $prop .= '<input type="text" name="start_times[]" class="form-control datetimepicker-input start-time" data-target="#start_time_' . $key . '" value="' . $startTime . '"/>';
             $prop .= '<div class="input-group-append" data-target="#start_time_' . $key . '" data-toggle="datetimepicker"><div class="input-group-text"><i class="fa fa-clock-o"></i></div></div></div></div>';
             
-            // 5. End Time
             $prop .= '<div class="col-md-1"><div class="input-group date timepicker" id="end_time_' . $key . '" data-target-input="nearest">';
             $prop .= '<input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_' . $key . '" value="' . $endTime . '"/>';
             $prop .= '<div class="input-group-append" data-target="#end_time_' . $key . '" data-toggle="datetimepicker"><div class="input-group-text"><i class="fa fa-clock-o"></i></div></div></div></div>';
             
-            // 6. Note
-            $prop .= '<div class="col-md-3"><input type="text" name="detail_notes[]" class="form-control" value="' . $detail->note . '" placeholder="Enter note"></div>';
+            // NEW: Branch dropdown column
+            $prop .= '<div class="col-md-2"><select name="branch_ids[]" class="form-control row-branch-select">';
+            $prop .= '<option value="">Select</option>';
+            $prop .= $branchOptions;
+            $prop .= '</select></div>';
             
-            // 7. Delete Button
-            $prop .= '<div class="col-md-2 d-flex align-items-center"><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></div>';
+            $prop .= '<div class="col-md-2"><input type="text" name="detail_notes[]" class="form-control" value="' . $detail->note . '" placeholder="Enter note"></div>';
+            
+            $prop .= '<div class="col-md-1 d-flex align-items-center"><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></div>';
             $prop .= '</div>';
         }
 
         return response()->json([
             'branch_id'    => $rota->branch_id, 
             'rota'         => $rota,
-            'staff_id'     => $details->first()->staff_id ?? null, // ADDED THIS
+            'staff_id'     => $details->first()->staff_id ?? null,
             'details_html' => $prop,
         ]);
     }
-
 
     public function delete($id)
     {
@@ -231,10 +235,18 @@ class DailyProrotaController extends Controller
         $start_date = Carbon::parse($request->start_date);
         $end_date   = $request->end_date ? Carbon::parse($request->end_date) : $start_date;
         $staff      = User::find($request->employee_id);
+        $branches   = Branch::all(); // NEW: Get branches for dropdown
 
         $existingDetails = DailyPreRotaDetail::where('staff_id', $request->employee_id)
             ->whereBetween('date', [$start_date, $end_date])
             ->get();
+
+        // NEW: Build branch dropdown options HTML
+        $branchOptionsHtml = '';
+        foreach ($branches as $branch) {
+            $selected = ($staff->branch_id == $branch->id) ? 'selected' : '';
+            $branchOptionsHtml .= '<option value="' . $branch->id . '" ' . $selected . '>' . $branch->name . '</option>';
+        }
 
         $prop  = '';
         $index = 0;
@@ -251,10 +263,18 @@ class DailyProrotaController extends Controller
                 $startTime = $times[0] ?? '';
                 $endTime   = $times[1] ?? '';
                 $note      = $existing->note ?? '';
+                // NEW: Use existing branch if found
+                $existingBranchId = $existing->branch_id ?? $staff->branch_id;
+                $rowBranchOptions = '';
+                foreach ($branches as $branch) {
+                    $selected = ($existingBranchId == $branch->id) ? 'selected' : '';
+                    $rowBranchOptions .= '<option value="' . $branch->id . '" ' . $selected . '>' . $branch->name . '</option>';
+                }
             } else {
                 $startTime = '09:00';
                 $endTime   = '17:30';
                 $note      = '';
+                $rowBranchOptions = $branchOptionsHtml; // Use default options
             }
 
             $prop .= '<div class="row schedule-row mb-2">';
@@ -272,9 +292,15 @@ class DailyProrotaController extends Controller
             $prop .= '<input type="text" name="end_times[]" class="form-control datetimepicker-input end-time" data-target="#end_time_' . $index . '" value="' . $endTime . '"/>';
             $prop .= '<div class="input-group-append" data-target="#end_time_' . $index . '" data-toggle="datetimepicker"><div class="input-group-text"><i class="fa fa-clock-o"></i></div></div></div></div>';
             
-            $prop .= '<div class="col-md-3"><input type="text" name="detail_notes[]" class="form-control" value="' . $note . '" placeholder="Enter note"></div>';
+            // NEW: Branch dropdown column
+            $prop .= '<div class="col-md-2"><select name="branch_ids[]" class="form-control row-branch-select">';
+            $prop .= '<option value="">Select</option>';
+            $prop .= $rowBranchOptions;
+            $prop .= '</select></div>';
             
-            $prop .= '<div class="col-md-2 d-flex align-items-center"><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></div>';
+            $prop .= '<div class="col-md-2"><input type="text" name="detail_notes[]" class="form-control" value="' . $note . '" placeholder="Enter note"></div>';
+            
+            $prop .= '<div class="col-md-1 d-flex align-items-center"><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></div>';
             $prop .= '</div>';
 
             $current_date->addDay();
@@ -395,30 +421,34 @@ class DailyProrotaController extends Controller
         $startDate = Carbon::parse($request->start_date);
         $endDate   = Carbon::parse($request->end_date);
 
-        // 1. Get all details for selected branches and date range
+        // Get all details for selected branches and date range
         $details = DailyPreRotaDetail::whereIn('branch_id', $request->branch_ids)
             ->whereBetween('date', [$startDate, $endDate])
-            ->where('status', 1) // Only "In Rota" staff
+            ->where('status', 1)
             ->with('staff', 'branch')
+            ->orderBy('date')
+            ->orderBy('branch_id')
             ->get();
 
-        // 2. Get selected branches info
+        // Get selected branches info
         $branches = Branch::whereIn('id', $request->branch_ids)->orderBy('name')->get();
 
-        // 3. Generate Date Rows
+        // Generate Date Rows
         $dates = [];
         $currentDate = $startDate->copy();
         while ($currentDate <= $endDate) {
             $dates[] = [
-                'full_date'     => $currentDate->format('Y-m-d'),
-                'day_name'      => $currentDate->format('D'),   // e.g., "Mon"
-                'formatted_date'=> $currentDate->format('d M'),  // e.g., "12 May"
+                'full_date'      => $currentDate->format('Y-m-d'),
+                'day_name'       => $currentDate->format('l'),    // e.g., "Monday"
+                'day_short'      => $currentDate->format('D'),    // e.g., "Mon"
+                'formatted_date' => $currentDate->format('d M Y'), // e.g., "12 May 2025"
+                'day_num'        => $currentDate->format('d'),
+                'month_year'     => $currentDate->format('M Y'),
             ];
             $currentDate->addDay();
         }
 
-        // 4. Group Data by Date, then by Branch ID
-        // Structure: $groupedData['2026-05-12']['1'] = [ ['name'=>'abc', 'time'=>'9:00 - 13:30'], ... ]
+        // Group Data by Date, then by Branch ID
         $groupedData = [];
         foreach ($details as $detail) {
             $groupedData[$detail->date][$detail->branch_id][] = [
@@ -428,13 +458,34 @@ class DailyProrotaController extends Controller
             ];
         }
 
+        // Calculate summary stats
+        $summary = [];
+        foreach ($branches as $branch) {
+            $totalShifts = 0;
+            $uniqueStaff = [];
+            foreach ($groupedData as $dateBranches) {
+                if (isset($dateBranches[$branch->id])) {
+                    $totalShifts += count($dateBranches[$branch->id]);
+                    foreach ($dateBranches[$branch->id] as $staff) {
+                        $uniqueStaff[$staff['name']] = true;
+                    }
+                }
+            }
+            $summary[$branch->id] = [
+                'total_shifts' => $totalShifts,
+                'unique_staff' => count($uniqueStaff)
+            ];
+        }
+
         return response()->json([
             'success'  => true,
             'start'    => $startDate->format('d M Y'),
             'end'      => $endDate->format('d M Y'),
+            'total_days' => count($dates),
             'branches' => $branches,
             'dates'    => $dates,
             'data'     => $groupedData,
+            'summary'  => $summary,
         ]);
     }
 
