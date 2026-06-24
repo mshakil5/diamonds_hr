@@ -108,17 +108,20 @@
                                     <th>Total Time</th>
                                 </tr>
                             </thead>
+
+
+
                             <tbody>
                                 @php $totalSeconds = 0; @endphp
-                                @foreach ($data as $key => $data)
+                                @foreach ($data as $key => $item)
 
                                 @php
-                                    $date = \Carbon\Carbon::parse($data->created_at)->format('Y-m-d');
-                                    $checkPrerota = \App\Models\EmployeePreRota::where('employee_id', $data->employee_id)->where('date', $date)->first();
+                                    $date = \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+                                    $checkPrerota = \App\Models\EmployeePreRota::where('employee_id', $item->employee_id)->where('date', $date)->first();
                                     $lateTime = null; 
-                                    if ($checkPrerota && $data->clock_in) {
+                                    if ($checkPrerota && $item->clock_in) {
                                         $scheduledStart = \Carbon\Carbon::parse($checkPrerota->start_time); 
-                                        $actualClockIn = \Carbon\Carbon::parse($data->clock_in);
+                                        $actualClockIn = \Carbon\Carbon::parse($item->clock_in);
                                         if ($actualClockIn->gt($scheduledStart)) {
                                             $lateTime = $scheduledStart->diff($actualClockIn);
                                         } else {
@@ -130,9 +133,9 @@
 
                                 <tr>
                                     <td>{{$key + 1}}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('d/m/Y') }}</td>
-                                    <td>{{ $data->employee_name }}</td>
-                                    <td>{{ $data->type }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($item->clock_in)->format('d/m/Y') }}</td>
+                                    <td>{{ $item->employee_name }}</td>
+                                    <td>{{ $item->type }}</td>
                                     <td>
                                         @if($lateTime)
                                             {{ $lateTime->format('%H:%I:%S') }}
@@ -140,20 +143,26 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>{{ \Carbon\Carbon::parse($data->clock_in)->format('h:i') }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->clock_out)->format('h:i') }}</td>
-                                    <td>{{ $data->details }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($item->clock_in)->format('h:i A') }}</td>
+                                    <td>{{ $item->clock_out ? \Carbon\Carbon::parse($item->clock_out)->format('h:i A') : '-' }}</td>
+                                    <td>{{ $item->details }}</td>
                                     <td>
-                                        @if($data->clock_in && $data->clock_out)
+                                        @if($item->clock_in && $item->clock_out)
                                             @php
-                                                $in = \Carbon\Carbon::parse($data->clock_in);
-                                                $out = \Carbon\Carbon::parse($data->clock_out);
-                                                $diff = $out->diff($in);
-                                                $totalSeconds += $out->diffInSeconds($in);
+                                                $in = \Carbon\Carbon::parse($item->clock_in);
+                                                $out = \Carbon\Carbon::parse($item->clock_out);
+                                                
+                                                // FIX: Use abs() to ensure always positive
+                                                $seconds = abs($in->diffInSeconds($out));
+                                                $totalSeconds += $seconds;
+                                                
+                                                $diffHours = floor($seconds / 3600);
+                                                $diffMinutes = floor(($seconds % 3600) / 60);
+                                                $diffSecs = $seconds % 60;
                                             @endphp
 
                                             <span style="background-color: #f0f8ff; padding: 6px 12px; border-radius: 20px; display: inline-block; color: #333;">
-                                                {{ $diff->h }} Hours {{ $diff->i }} Minutes {{ $diff->s }} Seconds
+                                                {{ $diffHours }} Hours {{ $diffMinutes }} Minutes {{ $diffSecs }} Seconds
                                             </span>
                                         @else
                                             -
@@ -173,6 +182,9 @@
                                     <td><strong>{{ $h }}h {{ $m }}m {{ $s }}s</strong></td>
                                 </tr>
                             </tbody>
+
+
+
                         </table>
                     </div>
                 </div>

@@ -56,8 +56,6 @@ class ReportController extends Controller
             ->whereNull('attendances.deleted_at')
             ->get();
 
-            // dd($data);
-        
         $employeeName = Employee::where('id', $request->input('employee_id'))->where('branch_id', Auth::user()->branch_id)->value('name');
         $employees = Employee::where('is_active', 1)->where('branch_id', Auth::user()->branch_id)->get();
         return view('admin.reports.employeeReport', compact('employees','data','employeeName'));
